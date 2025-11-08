@@ -1,0 +1,12 @@
+# Python dependencies for NEOCOUDE-HD-15 HMI
+# Install with: pip install -r requirements.txt
+
+# WebSocket server
+websockets==12.0
+
+# Modbus RTU communication (for live mode with PLC)
+pymodbus==3.5.4
+
+# Optional: For future features
+# python-telegram-bot  # Telegram alerts
+# gspread  # Google Sheets logging

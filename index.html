@@ -1,0 +1,895 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>NEOCOUDE-HD-15 HMI</title>
+    <style>
+        /* ============================================================================ */
+        /* RESET AND BASE STYLES */
+        /* ============================================================================ */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            color: #fff;
+            height: 100vh;
+            overflow: hidden;
+            position: relative;
+        }
+
+        /* ============================================================================ */
+        /* HEADER */
+        /* ============================================================================ */
+        header {
+            background: rgba(0, 0, 0, 0.4);
+            padding: 15px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 2px solid rgba(255, 255, 255, 0.1);
+        }
+
+        header h1 {
+            font-size: 1.5rem;
+            font-weight: 600;
+        }
+
+        .connection-status {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 0.9rem;
+        }
+
+        .status-indicator {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: #f44336;
+            box-shadow: 0 0 10px rgba(244, 67, 54, 0.5);
+            animation: pulse-red 2s infinite;
+        }
+
+        .status-indicator.connected {
+            background: #4caf50;
+            box-shadow: 0 0 10px rgba(76, 175, 80, 0.5);
+            animation: pulse-green 2s infinite;
+        }
+
+        @keyframes pulse-red {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        @keyframes pulse-green {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.7; }
+        }
+
+        /* ============================================================================ */
+        /* TAB NAVIGATION */
+        /* ============================================================================ */
+        .tab-nav {
+            display: flex;
+            background: rgba(0, 0, 0, 0.3);
+            padding: 10px 20px;
+            gap: 10px;
+            overflow-x: auto;
+        }
+
+        .tab-button {
+            flex: 1;
+            padding: 12px 20px;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 8px;
+            color: #fff;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.3s;
+            white-space: nowrap;
+        }
+
+        .tab-button:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        .tab-button.active {
+            background: rgba(76, 175, 80, 0.3);
+            border-color: #4caf50;
+            box-shadow: 0 0 15px rgba(76, 175, 80, 0.3);
+        }
+
+        /* ============================================================================ */
+        /* TAB CONTENT */
+        /* ============================================================================ */
+        .tab-content {
+            display: none;
+            padding: 20px;
+            height: calc(100vh - 140px);
+            overflow-y: auto;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        /* ============================================================================ */
+        /* OPERAÇÃO TAB */
+        /* ============================================================================ */
+        .encoder-display {
+            background: rgba(0, 0, 0, 0.4);
+            padding: 30px;
+            border-radius: 12px;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .encoder-display h2 {
+            font-size: 1rem;
+            opacity: 0.8;
+            margin-bottom: 10px;
+        }
+
+        .encoder-value {
+            font-size: 3.5rem;
+            font-weight: 700;
+            color: #4caf50;
+            text-shadow: 0 0 20px rgba(76, 175, 80, 0.5);
+        }
+
+        .virtual-keyboard {
+            background: rgba(0, 0, 0, 0.4);
+            padding: 20px;
+            border-radius: 12px;
+        }
+
+        .keyboard-row {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 10px;
+            justify-content: center;
+        }
+
+        .key-button {
+            flex: 1;
+            max-width: 80px;
+            padding: 20px;
+            background: linear-gradient(145deg, #3a3a3a, #2a2a2a);
+            border: 2px solid #555;
+            border-radius: 8px;
+            color: #fff;
+            font-size: 1.2rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+            user-select: none;
+        }
+
+        .key-button:active {
+            transform: scale(0.95);
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+        }
+
+        .key-button:disabled {
+            opacity: 0.3;
+            cursor: not-allowed;
+        }
+
+        .key-button.function {
+            background: linear-gradient(145deg, #2196f3, #1976d2);
+            border-color: #1565c0;
+        }
+
+        .key-button.control {
+            background: linear-gradient(145deg, #ff9800, #f57c00);
+            border-color: #e65100;
+        }
+
+        /* ============================================================================ */
+        /* DIAGNÓSTICO TAB */
+        /* ============================================================================ */
+        .io-section {
+            background: rgba(0, 0, 0, 0.4);
+            padding: 20px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+        }
+
+        .io-section h3 {
+            margin-bottom: 15px;
+            font-size: 1.2rem;
+        }
+
+        .io-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+            gap: 15px;
+        }
+
+        .io-indicator {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .led {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: #333;
+            border: 3px solid #555;
+            box-shadow: inset 0 2px 5px rgba(0, 0, 0, 0.5);
+            transition: all 0.3s;
+        }
+
+        .led.on {
+            background: #4caf50;
+            border-color: #66bb6a;
+            box-shadow: 0 0 20px rgba(76, 175, 80, 0.8),
+                        inset 0 0 10px rgba(255, 255, 255, 0.5);
+        }
+
+        .io-label {
+            font-size: 0.9rem;
+            font-weight: 600;
+        }
+
+        /* ============================================================================ */
+        /* LOGS TAB */
+        /* ============================================================================ */
+        .runtime-counter {
+            background: rgba(0, 0, 0, 0.4);
+            padding: 20px;
+            border-radius: 12px;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .runtime-value {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: #2196f3;
+            margin-top: 10px;
+        }
+
+        .alert-log {
+            background: rgba(0, 0, 0, 0.4);
+            padding: 20px;
+            border-radius: 12px;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+
+        .alert-item {
+            padding: 12px;
+            background: rgba(255, 255, 255, 0.05);
+            border-left: 4px solid #2196f3;
+            margin-bottom: 10px;
+            border-radius: 4px;
+        }
+
+        .alert-item.warning {
+            border-color: #ff9800;
+        }
+
+        .alert-item.error {
+            border-color: #f44336;
+        }
+
+        .alert-time {
+            font-size: 0.8rem;
+            opacity: 0.7;
+        }
+
+        /* ============================================================================ */
+        /* CONFIGURAÇÃO TAB */
+        /* ============================================================================ */
+        .config-section {
+            background: rgba(0, 0, 0, 0.4);
+            padding: 20px;
+            border-radius: 12px;
+            opacity: 0.5;
+        }
+
+        .config-notice {
+            background: rgba(255, 152, 0, 0.2);
+            padding: 15px;
+            border-radius: 8px;
+            border-left: 4px solid #ff9800;
+            margin-top: 15px;
+        }
+
+        /* ============================================================================ */
+        /* ERROR OVERLAYS */
+        /* ============================================================================ */
+        .error-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(244, 67, 54, 0.95);
+            z-index: 9999;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+        }
+
+        .error-overlay.show {
+            display: flex;
+        }
+
+        .error-overlay h1 {
+            font-size: 3rem;
+            margin-bottom: 20px;
+            animation: pulse 1s infinite;
+        }
+
+        .error-overlay p {
+            font-size: 1.2rem;
+            opacity: 0.9;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.7; }
+        }
+
+        /* ============================================================================ */
+        /* SCROLLBAR STYLING */
+        /* ============================================================================ */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: rgba(0, 0, 0, 0.2);
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.3);
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: rgba(255, 255, 255, 0.5);
+        }
+    </style>
+</head>
+<body>
+    <!-- ============================================================================ -->
+    <!-- ERROR OVERLAYS -->
+    <!-- ============================================================================ -->
+    <div id="offlineOverlay" class="error-overlay">
+        <h1>⚠️ DESLIGADO</h1>
+        <p>Conexão com servidor perdida</p>
+        <p style="font-size: 0.9rem; margin-top: 10px;">Tentando reconectar...</p>
+    </div>
+
+    <div id="plcErrorOverlay" class="error-overlay" style="background: rgba(255, 152, 0, 0.95);">
+        <h1>⚠️ FALHA CLP</h1>
+        <p>Erro de comunicação com CLP</p>
+    </div>
+
+    <!-- ============================================================================ -->
+    <!-- HEADER -->
+    <!-- ============================================================================ -->
+    <header>
+        <h1>NEOCOUDE-HD-15</h1>
+        <div class="connection-status">
+            <div id="statusIndicator" class="status-indicator"></div>
+            <span id="statusText">Desconectado</span>
+        </div>
+    </header>
+
+    <!-- ============================================================================ -->
+    <!-- TAB NAVIGATION -->
+    <!-- ============================================================================ -->
+    <nav class="tab-nav">
+        <button class="tab-button active" onclick="switchTab('operacao')">Operação</button>
+        <button class="tab-button" onclick="switchTab('diagnostico')">Diagnóstico</button>
+        <button class="tab-button" onclick="switchTab('logs')">Logs e Produção</button>
+        <button class="tab-button" onclick="switchTab('config')">Configuração</button>
+    </nav>
+
+    <!-- ============================================================================ -->
+    <!-- TAB CONTENT: OPERAÇÃO -->
+    <!-- ============================================================================ -->
+    <div id="operacao" class="tab-content active">
+        <div class="encoder-display">
+            <h2>ÂNGULO DO ENCODER (PV)</h2>
+            <div class="encoder-value" id="encoderAngle">0°</div>
+        </div>
+
+        <!-- Display IHM - Replica o visor físico -->
+        <div style="background: rgba(0, 0, 0, 0.4); padding: 20px; border-radius: 12px; margin-bottom: 20px;">
+            <h3 style="margin-bottom: 15px; color: #4caf50;">📺 DISPLAY IHM (Réplica do Visor Físico)</h3>
+
+            <!-- Cabeçalho igual ao visor físico original -->
+            <div style="background: rgba(0, 150, 0, 0.2); border: 2px solid #4caf50; padding: 15px; border-radius: 8px; margin-bottom: 20px; text-align: center; font-family: monospace; font-size: 1.2rem; font-weight: bold;">
+                <div style="color: #ffeb3b; letter-spacing: 2px; margin-bottom: 5px;">★★ TRILLOR MAQUINAS ★★</div>
+                <div style="color: #ff9800; letter-spacing: 2px;">★★ DOBRADEIRA HD ★★</div>
+            </div>
+
+            <!-- Dobra 1 -->
+            <div style="background: rgba(255, 255, 255, 0.05); padding: 15px; border-radius: 8px; margin-bottom: 10px; font-family: monospace; font-size: 1.1rem;">
+                <div style="color: #ff9800; margin-bottom: 5px;">AJUSTE ÂNGULO 01:</div>
+                <div style="display: flex; gap: 30px;">
+                    <span>AJ= <span id="aj1" style="color: #4caf50; font-weight: bold;">----</span>°</span>
+                    <span>PV= <span id="pv1" style="color: #2196f3; font-weight: bold;">----</span>°</span>
+                </div>
+            </div>
+
+            <!-- Dobra 2 -->
+            <div style="background: rgba(255, 255, 255, 0.05); padding: 15px; border-radius: 8px; margin-bottom: 10px; font-family: monospace; font-size: 1.1rem;">
+                <div style="color: #ff9800; margin-bottom: 5px;">AJUSTE ÂNGULO 02:</div>
+                <div style="display: flex; gap: 30px;">
+                    <span>AJ= <span id="aj2" style="color: #4caf50; font-weight: bold;">----</span>°</span>
+                    <span>PV= <span id="pv2" style="color: #2196f3; font-weight: bold;">----</span>°</span>
+                </div>
+            </div>
+
+            <!-- Dobra 3 -->
+            <div style="background: rgba(255, 255, 255, 0.05); padding: 15px; border-radius: 8px; margin-bottom: 10px; font-family: monospace; font-size: 1.1rem;">
+                <div style="color: #ff9800; margin-bottom: 5px;">AJUSTE ÂNGULO 03:</div>
+                <div style="display: flex; gap: 30px;">
+                    <span>AJ= <span id="aj3" style="color: #4caf50; font-weight: bold;">----</span>°</span>
+                    <span>PV= <span id="pv3" style="color: #2196f3; font-weight: bold;">----</span>°</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="virtual-keyboard">
+            <h3 style="margin-bottom: 15px;">Teclado Virtual</h3>
+
+            <!-- Numeric Keys -->
+            <div class="keyboard-row">
+                <button class="key-button" onclick="pressKey('K1')">1</button>
+                <button class="key-button" onclick="pressKey('K2')">2</button>
+                <button class="key-button" onclick="pressKey('K3')">3</button>
+            </div>
+            <div class="keyboard-row">
+                <button class="key-button" onclick="pressKey('K4')">4</button>
+                <button class="key-button" onclick="pressKey('K5')">5</button>
+                <button class="key-button" onclick="pressKey('K6')">6</button>
+            </div>
+            <div class="keyboard-row">
+                <button class="key-button" onclick="pressKey('K7')">7</button>
+                <button class="key-button" onclick="pressKey('K8')">8</button>
+                <button class="key-button" onclick="pressKey('K9')">9</button>
+            </div>
+            <div class="keyboard-row">
+                <button class="key-button" onclick="pressKey('K0')">0</button>
+            </div>
+
+            <!-- Function Keys -->
+            <div class="keyboard-row" style="margin-top: 20px;">
+                <button class="key-button function" onclick="pressKey('S1')">S1</button>
+                <button class="key-button function" onclick="pressKey('S2')">S2</button>
+            </div>
+
+            <!-- Navigation -->
+            <div class="keyboard-row">
+                <button class="key-button function" onclick="pressKey('ARROW_UP')">▲</button>
+                <button class="key-button function" onclick="pressKey('ARROW_DOWN')">▼</button>
+            </div>
+
+            <!-- Control Keys -->
+            <div class="keyboard-row">
+                <button class="key-button control" onclick="pressKey('EDIT')">EDIT</button>
+                <button class="key-button control" onclick="pressKey('ENTER')">ENTER</button>
+                <button class="key-button control" onclick="pressKey('ESC')">ESC</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ============================================================================ -->
+    <!-- TAB CONTENT: DIAGNÓSTICO -->
+    <!-- ============================================================================ -->
+    <div id="diagnostico" class="tab-content">
+        <div class="io-section">
+            <h3>Entradas Digitais (E0-E7)</h3>
+            <div class="io-grid" id="digitalInputs">
+                <!-- Generated by JavaScript -->
+            </div>
+        </div>
+
+        <div class="io-section">
+            <h3>Saídas Digitais (S0-S7)</h3>
+            <div class="io-grid" id="digitalOutputs">
+                <!-- Generated by JavaScript -->
+            </div>
+        </div>
+
+        <div class="io-section">
+            <h3>Sensores ESP32 (Futuro)</h3>
+            <div class="config-notice">
+                Sensores adicionais serão disponibilizados após migração para ESP32
+            </div>
+        </div>
+    </div>
+
+    <!-- ============================================================================ -->
+    <!-- TAB CONTENT: LOGS E PRODUÇÃO -->
+    <!-- ============================================================================ -->
+    <div id="logs" class="tab-content">
+        <div class="runtime-counter">
+            <h3>Tempo de Ciclo</h3>
+            <div class="runtime-value" id="runtimeCounter">00:00:00</div>
+            <p style="opacity: 0.7; margin-top: 10px;">Contador ativo quando ciclo iniciado</p>
+        </div>
+
+        <div class="alert-log">
+            <h3 style="margin-bottom: 15px;">Registro de Alertas</h3>
+            <div id="alertLog">
+                <!-- Generated by JavaScript -->
+            </div>
+        </div>
+    </div>
+
+    <!-- ============================================================================ -->
+    <!-- TAB CONTENT: CONFIGURAÇÃO -->
+    <!-- ============================================================================ -->
+    <div id="config" class="tab-content">
+        <div class="config-section">
+            <h3>Configurações WiFi</h3>
+            <p>Configuração de WiFi estará disponível após migração para ESP32</p>
+
+            <div class="config-notice">
+                ⚠️ Esta seção será habilitada quando o sistema for migrado para ESP32/MicroPython.
+                Atualmente rodando em modo de desenvolvimento Ubuntu.
+            </div>
+        </div>
+    </div>
+
+    <!-- ============================================================================ -->
+    <!-- JAVASCRIPT -->
+    <!-- ============================================================================ -->
+    <script>
+        // ============================================================================
+        // GLOBAL STATE
+        // ============================================================================
+        let ws = null;
+        let reconnectInterval = null;
+        let connected = false;
+        let machineState = {};
+        let runtimeStartTime = null;
+        let runtimeInterval = null;
+
+        // ============================================================================
+        // WEBSOCKET CONNECTION
+        // ============================================================================
+        function connect() {
+            try {
+                ws = new WebSocket('ws://localhost:8080');
+
+                ws.onopen = () => {
+                    console.log('✓ Connected to server');
+                    connected = true;
+                    updateConnectionStatus(true);
+                    hideOverlay('offlineOverlay');
+
+                    if (reconnectInterval) {
+                        clearInterval(reconnectInterval);
+                        reconnectInterval = null;
+                    }
+                };
+
+                ws.onmessage = (event) => {
+                    try {
+                        const message = JSON.parse(event.data);
+                        handleMessage(message);
+                    } catch (e) {
+                        console.error('Error parsing message:', e);
+                    }
+                };
+
+                ws.onclose = () => {
+                    console.log('✗ Disconnected from server');
+                    connected = false;
+                    updateConnectionStatus(false);
+                    showOverlay('offlineOverlay');
+                    disableAllButtons();
+
+                    // Auto-reconnect every 3 seconds
+                    if (!reconnectInterval) {
+                        reconnectInterval = setInterval(connect, 3000);
+                    }
+                };
+
+                ws.onerror = (error) => {
+                    console.error('WebSocket error:', error);
+                };
+
+            } catch (e) {
+                console.error('Connection error:', e);
+            }
+        }
+
+        // ============================================================================
+        // MESSAGE HANDLING
+        // ============================================================================
+        function handleMessage(message) {
+            console.log('Received:', message);
+
+            switch (message.type) {
+                case 'initial_state':
+                    machineState = message.data;
+                    updateUI(machineState);
+                    enableAllButtons();
+                    break;
+
+                case 'state_update':
+                    // Merge deltas into state
+                    mergeState(machineState, message.data);
+                    updateUI(message.data);
+                    break;
+
+                case 'alert':
+                    addAlert(message.data);
+                    break;
+
+                case 'alert_log':
+                    // Initial alert log
+                    message.data.forEach(alert => addAlert(alert));
+                    break;
+
+                case 'button_response':
+                    console.log(`Button ${message.button}: ${message.success ? 'OK' : 'FAIL'}`);
+                    break;
+
+                case 'error':
+                    console.error('Server error:', message.message);
+                    break;
+            }
+        }
+
+        function mergeState(target, source) {
+            for (let key in source) {
+                if (typeof source[key] === 'object' && !Array.isArray(source[key])) {
+                    if (!target[key]) target[key] = {};
+                    mergeState(target[key], source[key]);
+                } else {
+                    target[key] = source[key];
+                }
+            }
+        }
+
+        // ============================================================================
+        // UI UPDATES
+        // ============================================================================
+        function updateUI(state) {
+            // Update encoder angle
+            if (state.encoder_angle !== undefined) {
+                document.getElementById('encoderAngle').textContent = state.encoder_angle + '°';
+
+                // Update PV (Process Value) para todas as 3 dobras
+                document.getElementById('pv1').textContent = state.encoder_angle;
+                document.getElementById('pv2').textContent = state.encoder_angle;
+                document.getElementById('pv3').textContent = state.encoder_angle;
+            }
+
+            // Update setpoints (AJ - Ajuste) do display IHM
+            if (state.angle_setpoints) {
+                // Dobra 1: usa bend_1_a
+                if (state.angle_setpoints.bend_1_a !== undefined) {
+                    document.getElementById('aj1').textContent = state.angle_setpoints.bend_1_a;
+                }
+                // Dobra 2: usa bend_2_a
+                if (state.angle_setpoints.bend_2_a !== undefined) {
+                    document.getElementById('aj2').textContent = state.angle_setpoints.bend_2_a;
+                }
+                // Dobra 3: usa bend_3_a
+                if (state.angle_setpoints.bend_3_a !== undefined) {
+                    document.getElementById('aj3').textContent = state.angle_setpoints.bend_3_a;
+                }
+            }
+
+            // Update digital inputs
+            if (state.digital_inputs) {
+                for (let [name, value] of Object.entries(state.digital_inputs)) {
+                    const led = document.getElementById(`led-input-${name}`);
+                    if (led) {
+                        led.classList.toggle('on', value);
+                    }
+                }
+            }
+
+            // Update digital outputs
+            if (state.digital_outputs) {
+                for (let [name, value] of Object.entries(state.digital_outputs)) {
+                    const led = document.getElementById(`led-output-${name}`);
+                    if (led) {
+                        led.classList.toggle('on', value);
+                    }
+                }
+            }
+
+            // Update runtime counter
+            if (state.cycle_active !== undefined) {
+                if (state.cycle_active && !runtimeStartTime) {
+                    startRuntimeCounter();
+                } else if (!state.cycle_active && runtimeStartTime) {
+                    stopRuntimeCounter();
+                }
+            }
+        }
+
+        function updateConnectionStatus(isConnected) {
+            const indicator = document.getElementById('statusIndicator');
+            const text = document.getElementById('statusText');
+
+            if (isConnected) {
+                indicator.classList.add('connected');
+                text.textContent = 'Conectado';
+            } else {
+                indicator.classList.remove('connected');
+                text.textContent = 'Desconectado';
+            }
+        }
+
+        // ============================================================================
+        // BUTTON HANDLING
+        // ============================================================================
+        function pressKey(button) {
+            if (!connected) {
+                console.warn('Not connected');
+                return;
+            }
+
+            console.log(`Pressing button: ${button}`);
+
+            const message = {
+                action: 'press_button',
+                button: button
+            };
+
+            ws.send(JSON.stringify(message));
+        }
+
+        function enableAllButtons() {
+            document.querySelectorAll('.key-button').forEach(btn => {
+                btn.disabled = false;
+            });
+        }
+
+        function disableAllButtons() {
+            document.querySelectorAll('.key-button').forEach(btn => {
+                btn.disabled = true;
+            });
+        }
+
+        // ============================================================================
+        // TAB SWITCHING
+        // ============================================================================
+        function switchTab(tabName) {
+            // Hide all tabs
+            document.querySelectorAll('.tab-content').forEach(tab => {
+                tab.classList.remove('active');
+            });
+
+            // Remove active from all buttons
+            document.querySelectorAll('.tab-button').forEach(btn => {
+                btn.classList.remove('active');
+            });
+
+            // Show selected tab
+            document.getElementById(tabName).classList.add('active');
+
+            // Activate button
+            event.target.classList.add('active');
+        }
+
+        // ============================================================================
+        // OVERLAYS
+        // ============================================================================
+        function showOverlay(id) {
+            document.getElementById(id).classList.add('show');
+        }
+
+        function hideOverlay(id) {
+            document.getElementById(id).classList.remove('show');
+        }
+
+        // ============================================================================
+        // RUNTIME COUNTER
+        // ============================================================================
+        function startRuntimeCounter() {
+            runtimeStartTime = Date.now();
+            runtimeInterval = setInterval(updateRuntimeDisplay, 100);
+        }
+
+        function stopRuntimeCounter() {
+            if (runtimeInterval) {
+                clearInterval(runtimeInterval);
+                runtimeInterval = null;
+            }
+            runtimeStartTime = null;
+        }
+
+        function updateRuntimeDisplay() {
+            if (!runtimeStartTime) return;
+
+            const elapsed = Date.now() - runtimeStartTime;
+            const hours = Math.floor(elapsed / 3600000);
+            const minutes = Math.floor((elapsed % 3600000) / 60000);
+            const seconds = Math.floor((elapsed % 60000) / 1000);
+
+            const display = `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+            document.getElementById('runtimeCounter').textContent = display;
+        }
+
+        // ============================================================================
+        // ALERT LOG
+        // ============================================================================
+        function addAlert(alert) {
+            const log = document.getElementById('alertLog');
+            const item = document.createElement('div');
+            item.className = `alert-item ${alert.level}`;
+
+            const time = new Date(alert.timestamp).toLocaleTimeString('pt-BR');
+
+            item.innerHTML = `
+                <div class="alert-time">${time}</div>
+                <div>${alert.message}</div>
+            `;
+
+            log.insertBefore(item, log.firstChild);
+
+            // Keep only last 50 alerts in DOM
+            while (log.children.length > 50) {
+                log.removeChild(log.lastChild);
+            }
+        }
+
+        // ============================================================================
+        // INITIALIZATION
+        // ============================================================================
+        function init() {
+            // Generate digital I/O indicators
+            const inputsContainer = document.getElementById('digitalInputs');
+            const outputsContainer = document.getElementById('digitalOutputs');
+
+            for (let i = 0; i < 8; i++) {
+                // Inputs
+                const inputDiv = document.createElement('div');
+                inputDiv.className = 'io-indicator';
+                inputDiv.innerHTML = `
+                    <div class="led" id="led-input-E${i}"></div>
+                    <div class="io-label">E${i}</div>
+                `;
+                inputsContainer.appendChild(inputDiv);
+
+                // Outputs
+                const outputDiv = document.createElement('div');
+                outputDiv.className = 'io-indicator';
+                outputDiv.innerHTML = `
+                    <div class="led" id="led-output-S${i}"></div>
+                    <div class="io-label">S${i}</div>
+                `;
+                outputsContainer.appendChild(outputDiv);
+            }
+
+            // Connect to WebSocket
+            connect();
+
+            // Disable buttons initially
+            disableAllButtons();
+        }
+
+        // Start application
+        window.addEventListener('load', init);
+    </script>
+</body>
+</html>
