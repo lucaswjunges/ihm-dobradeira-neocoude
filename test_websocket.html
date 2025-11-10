@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Teste WebSocket - Botão AVANÇAR</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+            background: #f0f0f0;
+        }
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+        button {
+            padding: 20px 40px;
+            font-size: 18px;
+            font-weight: bold;
+            border-radius: 10px;
+            border: none;
+            cursor: pointer;
+            margin: 10px;
+        }
+        .forward {
+            background: #3498db;
+            color: white;
+        }
+        .backward {
+            background: #e67e22;
+            color: white;
+        }
+        .stop {
+            background: #f1c40f;
+            color: #2c3e50;
+        }
+        #log {
+            background: #2c3e50;
+            color: #2ecc71;
+            padding: 15px;
+            border-radius: 5px;
+            font-family: monospace;
+            font-size: 12px;
+            max-height: 400px;
+            overflow-y: auto;
+            margin-top: 20px;
+        }
+        .error {
+            color: #e74c3c;
+        }
+        .success {
+            color: #2ecc71;
+        }
+        .info {
+            color: #3498db;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🧪 Teste WebSocket - Botões de Controle</h1>
+
+        <div style="text-align: center;">
+            <button class="forward" onclick="sendControl('FORWARD')">↻ AVANÇAR</button>
+            <button class="backward" onclick="sendControl('BACKWARD')">↺ RECUAR</button>
+            <button class="stop" onclick="sendControl('STOP')">■ PARADA</button>
+        </div>
+
+        <div id="log"></div>
+    </div>
+
+    <script>
+        const WS_URL = 'ws://localhost:8080';
+        let ws = null;
+
+        function log(message, type = 'info') {
+            const logDiv = document.getElementById('log');
+            const timestamp = new Date().toLocaleTimeString();
+            const color = type === 'error' ? 'error' : (type === 'success' ? 'success' : 'info');
+            logDiv.innerHTML += `<div class="${color}">[${timestamp}] ${message}</div>`;
+            logDiv.scrollTop = logDiv.scrollHeight;
+        }
+
+        function connect() {
+            log('Conectando ao WebSocket: ' + WS_URL, 'info');
+
+            ws = new WebSocket(WS_URL);
+
+            ws.onopen = () => {
+                log('✓ WebSocket CONECTADO!', 'success');
+                log('Estado: ' + ws.readyState + ' (OPEN=' + WebSocket.OPEN + ')', 'success');
+            };
+
+            ws.onmessage = (event) => {
+                log('← Mensagem recebida: ' + event.data, 'success');
+            };
+
+            ws.onerror = (error) => {
+                log('✗ Erro WebSocket: ' + error, 'error');
+            };
+
+            ws.onclose = () => {
+                log('✗ WebSocket DESCONECTADO', 'error');
+                setTimeout(connect, 3000);
+            };
+        }
+
+        function sendControl(control) {
+            log(`Botão ${control} clicado`, 'info');
+            log(`WebSocket estado: ${ws ? ws.readyState : 'null'} (OPEN=${WebSocket.OPEN})`, 'info');
+
+            if (!ws) {
+                log('✗ WebSocket não existe!', 'error');
+                return;
+            }
+
+            if (ws.readyState !== WebSocket.OPEN) {
+                log(`✗ WebSocket não está aberto! Estado: ${ws.readyState}`, 'error');
+                return;
+            }
+
+            const message = {
+                action: 'control_button',
+                control: control
+            };
+
+            const jsonString = JSON.stringify(message);
+            log(`→ Enviando: ${jsonString}`, 'success');
+
+            try {
+                ws.send(jsonString);
+                log('✓ Mensagem enviada com sucesso!', 'success');
+            } catch (error) {
+                log(`✗ Erro ao enviar: ${error}`, 'error');
+            }
+        }
+
+        // Conectar ao carregar página
+        connect();
+    </script>
+</body>
+</html>

@@ -176,6 +176,10 @@ class StateManager:
                 for name, value in inputs.items():
                     if value is not None:
                         self.machine_state['digital_inputs'][name] = value
+                # DEBUG: Log inputs that are ON
+                active_inputs = [name for name, val in inputs.items() if val]
+                if active_inputs:
+                    logger.info(f"Active inputs: {active_inputs}")
 
             # Read digital outputs
             outputs = await asyncio.to_thread(self.client.get_digital_outputs)
@@ -188,32 +192,33 @@ class StateManager:
             # Store the configured slave address (not reading from PLC)
             self.machine_state['plc_slave_address'] = self.client.config.slave_address
 
-            # Read application-specific registers (mapped from ladder)
-            import modbus_map as mm
+            # TODO: Application-specific registers (commented out until addresses are verified)
+            # These addresses from ladder analysis need to be tested and verified
+            # import modbus_map as mm
 
-            # Read angle setpoints
-            for name, addr in mm.ANGLE_SETPOINTS.items():
-                value = await asyncio.to_thread(self.client.read_register, addr)
-                if value is not None:
-                    if 'angle_setpoints' not in self.machine_state:
-                        self.machine_state['angle_setpoints'] = {}
-                    self.machine_state['angle_setpoints'][name.lower()] = value
+            # # Read angle setpoints (currently returning illegal address errors)
+            # for name, addr in mm.ANGLE_SETPOINTS.items():
+            #     value = await asyncio.to_thread(self.client.read_register, addr)
+            #     if value is not None:
+            #         if 'angle_setpoints' not in self.machine_state:
+            #             self.machine_state['angle_setpoints'] = {}
+            #         self.machine_state['angle_setpoints'][name.lower()] = value
 
-            # Read mode/cycle bits
-            for name, addr in mm.MODE_BITS.items():
-                value = await asyncio.to_thread(self.client.read_coil, addr)
-                if value is not None:
-                    if 'mode_bits' not in self.machine_state:
-                        self.machine_state['mode_bits'] = {}
-                    self.machine_state['mode_bits'][name.lower()] = value
+            # # Read mode/cycle bits (currently returning illegal address errors)
+            # for name, addr in mm.MODE_BITS.items():
+            #     value = await asyncio.to_thread(self.client.read_coil, addr)
+            #     if value is not None:
+            #         if 'mode_bits' not in self.machine_state:
+            #             self.machine_state['mode_bits'] = {}
+            #         self.machine_state['mode_bits'][name.lower()] = value
 
-            # Read quantity setpoints
-            for name, addr in mm.QUANTITY_SETPOINTS.items():
-                value = await asyncio.to_thread(self.client.read_register, addr)
-                if value is not None:
-                    if 'quantity_setpoints' not in self.machine_state:
-                        self.machine_state['quantity_setpoints'] = {}
-                    self.machine_state['quantity_setpoints'][name.lower()] = value
+            # # Read quantity setpoints (currently returning illegal address errors)
+            # for name, addr in mm.QUANTITY_SETPOINTS.items():
+            #     value = await asyncio.to_thread(self.client.read_register, addr)
+            #     if value is not None:
+            #         if 'quantity_setpoints' not in self.machine_state:
+            #             self.machine_state['quantity_setpoints'] = {}
+            #         self.machine_state['quantity_setpoints'][name.lower()] = value
 
             # Update metadata
             self.machine_state['connected'] = self.client.connected

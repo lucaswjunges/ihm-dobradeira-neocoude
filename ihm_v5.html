@@ -1,0 +1,639 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>IHM v5 - Atos MPC4004 Mirror</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Share+Tech+Mono&display=swap');
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Share Tech Mono', 'Courier New', monospace;
+            background: #1a1a1a;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        /* ==================== PAINEL PRINCIPAL ==================== */
+
+        .ihm-panel {
+            background: linear-gradient(145deg, #2a2a2a, #1a1a1a);
+            border: 4px solid #3a3a3a;
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.8),
+                        inset 0 1px 0 rgba(255,255,255,0.1);
+            max-width: 420px;
+            width: 100%;
+        }
+
+        .ihm-header {
+            text-align: center;
+            color: #888;
+            font-size: 11px;
+            margin-bottom: 15px;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            border-bottom: 1px solid #333;
+            padding-bottom: 10px;
+        }
+
+        .ihm-brand {
+            font-size: 16px;
+            color: #aaa;
+            font-weight: bold;
+            margin-bottom: 3px;
+        }
+
+        /* ==================== LCD DISPLAY (RETRO) ==================== */
+
+        .lcd-container {
+            background: #0a0a0a;
+            border: 3px solid #1a1a1a;
+            border-radius: 6px;
+            padding: 12px;
+            margin-bottom: 20px;
+            box-shadow: inset 0 2px 10px rgba(0,0,0,0.9);
+        }
+
+        .lcd-display {
+            background: #9FBC2B;  /* Verde fosforescente clássico */
+            background: linear-gradient(180deg, #9FBC2B 0%, #8FAC1F 100%);
+            border: 2px solid #7A9920;
+            border-radius: 3px;
+            padding: 10px 8px;
+            font-family: 'Courier New', monospace;
+            position: relative;
+            box-shadow: inset 0 1px 3px rgba(0,0,0,0.3);
+        }
+
+        /* Efeito de scan lines (linhas horizontais retrô) */
+        .lcd-display::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: repeating-linear-gradient(
+                0deg,
+                rgba(0,0,0,0.03) 0px,
+                rgba(0,0,0,0.03) 1px,
+                transparent 1px,
+                transparent 2px
+            );
+            pointer-events: none;
+            border-radius: 3px;
+        }
+
+        .lcd-line {
+            font-size: 18px;
+            font-weight: bold;
+            color: #1a3a0a;  /* Texto verde escuro */
+            letter-spacing: 3px;
+            white-space: pre;
+            line-height: 1.4;
+            text-shadow: 0 1px 1px rgba(255,255,255,0.2);
+            font-family: 'Share Tech Mono', 'Courier New', monospace;
+        }
+
+        /* ==================== STATUS INDICATORS ==================== */
+
+        .status-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: #1a1a1a;
+            border: 1px solid #333;
+            padding: 6px 10px;
+            border-radius: 4px;
+            margin-bottom: 15px;
+        }
+
+        .status-item {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 10px;
+            color: #666;
+            text-transform: uppercase;
+        }
+
+        .status-led {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #333;
+            border: 1px solid #222;
+        }
+
+        .status-led.online {
+            background: #00ff00;
+            box-shadow: 0 0 8px #00ff00, inset 0 0 4px #00ff00;
+            animation: pulse 2s infinite;
+        }
+
+        .status-led.mirror {
+            background: #00aaff;
+            box-shadow: 0 0 8px #00aaff, inset 0 0 4px #00aaff;
+        }
+
+        .status-led.unstable {
+            background: #ffaa00;
+            box-shadow: 0 0 8px #ffaa00, inset 0 0 4px #ffaa00;
+            animation: pulse-fast 1s infinite;
+        }
+
+        .status-led.reconnecting {
+            background: #ff6600;
+            box-shadow: 0 0 8px #ff6600, inset 0 0 4px #ff6600;
+            animation: pulse-fast 0.5s infinite;
+        }
+
+        @keyframes pulse-fast {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.3; }
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.6; }
+        }
+
+        /* ==================== BOTÕES INDUSTRIAIS ==================== */
+
+        .keyboard-section {
+            background: #222;
+            border: 2px solid #333;
+            border-radius: 6px;
+            padding: 12px;
+            margin-bottom: 12px;
+        }
+
+        .keyboard-label {
+            color: #666;
+            font-size: 9px;
+            text-transform: uppercase;
+            margin-bottom: 8px;
+            letter-spacing: 1px;
+        }
+
+        .keyboard-grid {
+            display: grid;
+            gap: 8px;
+        }
+
+        .numeric-grid {
+            grid-template-columns: repeat(3, 1fr);
+        }
+
+        .function-grid {
+            grid-template-columns: repeat(4, 1fr);
+        }
+
+        .nav-grid {
+            grid-template-columns: repeat(2, 1fr);
+        }
+
+        .row-7-keys {
+            grid-template-columns: repeat(7, 1fr);
+        }
+
+        .top-controls {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 12px;
+        }
+
+        .status-indicator {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            font-size: 9px;
+            color: #666;
+        }
+
+        /* Botão estilo membrana industrial */
+        .btn {
+            background: linear-gradient(145deg, #4a4a4a, #3a3a3a);
+            border: 2px solid #555;
+            border-radius: 4px;
+            padding: 12px;
+            font-size: 14px;
+            font-weight: bold;
+            color: #ddd;
+            cursor: pointer;
+            transition: all 0.1s;
+            user-select: none;
+            -webkit-tap-highlight-color: transparent;
+            box-shadow: 0 3px 0 #1a1a1a,
+                        inset 0 1px 0 rgba(255,255,255,0.1);
+            text-align: center;
+            font-family: 'Share Tech Mono', monospace;
+        }
+
+        .btn:hover {
+            background: linear-gradient(145deg, #5a5a5a, #4a4a4a);
+            border-color: #666;
+        }
+
+        .btn:active {
+            transform: translateY(2px);
+            box-shadow: 0 1px 0 #1a1a1a,
+                        inset 0 2px 3px rgba(0,0,0,0.5);
+        }
+
+        /* Botões numéricos (amarelo industrial) */
+        .btn-numeric {
+            background: linear-gradient(145deg, #f4a742, #e89732);
+            border-color: #d88722;
+            color: #1a1a1a;
+        }
+
+        .btn-numeric:hover {
+            background: linear-gradient(145deg, #ffc75a, #f4a742);
+        }
+
+        /* Botões de função (azul industrial) */
+        .btn-function {
+            background: linear-gradient(145deg, #4a8acc, #3a7abc);
+            border-color: #2a6aac;
+            color: #fff;
+            font-size: 11px;
+            padding: 8px;
+        }
+
+        .btn-function:hover {
+            background: linear-gradient(145deg, #5a9adc, #4a8acc);
+        }
+
+        /* Botão largo (K0) */
+        .btn-wide {
+            grid-column: span 3;
+        }
+
+        /* Botão ENTER (verde destaque) */
+        .btn-enter {
+            background: linear-gradient(145deg, #5cb85c, #4ca84c);
+            border-color: #3c983c;
+            color: #fff;
+        }
+
+        .btn-enter:hover {
+            background: linear-gradient(145deg, #6cc86c, #5cb85c);
+        }
+
+        /* Botão ESC (vermelho) */
+        .btn-esc {
+            background: linear-gradient(145deg, #d95c5c, #c94c4c);
+            border-color: #b93c3c;
+            color: #fff;
+        }
+
+        .btn-esc:hover {
+            background: linear-gradient(145deg, #e96c6c, #d95c5c);
+        }
+
+        /* ==================== OVERLAY DE DESCONEXÃO ==================== */
+
+        .offline-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(139, 0, 0, 0.95);
+            color: white;
+            font-size: 48px;
+            font-weight: bold;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+            flex-direction: column;
+        }
+
+        .offline-overlay.active {
+            display: flex;
+        }
+
+        .offline-icon {
+            font-size: 80px;
+            margin-bottom: 20px;
+        }
+
+        /* ==================== RESPONSIVE ==================== */
+
+        @media (max-width: 500px) {
+            .ihm-panel {
+                padding: 15px;
+            }
+
+            .lcd-line {
+                font-size: 14px;
+                letter-spacing: 2px;
+            }
+
+            .btn {
+                padding: 10px;
+                font-size: 12px;
+            }
+
+            .btn-function {
+                font-size: 9px;
+                padding: 6px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Overlay de desconexão -->
+    <div class="offline-overlay" id="offlineOverlay">
+        <div class="offline-icon">⚠</div>
+        <div>DESCONECTADO</div>
+    </div>
+
+    <div class="ihm-panel">
+        <!-- Header -->
+        <div class="ihm-header">
+            <div class="ihm-brand">ATOS MPC4004</div>
+            <div>Expert Series HMI</div>
+        </div>
+
+        <!-- Status Bar -->
+        <div class="status-bar">
+            <div class="status-item">
+                <div class="status-led" id="statusLed"></div>
+                <span id="statusText">Conectando...</span>
+            </div>
+            <div class="status-item">
+                <div class="status-led" id="clpLed"></div>
+                <span id="clpStatus">CLP: --</span>
+            </div>
+            <div class="status-item">
+                <div class="status-led mirror" id="mirrorLed"></div>
+                <span>Tela: <span id="screenId">--</span></span>
+            </div>
+        </div>
+
+        <!-- LCD Display Retro -->
+        <div class="lcd-container">
+            <div class="lcd-display">
+                <div class="lcd-line" id="lcdLine1">**TRILLOR MAQUINAS**</div>
+                <div class="lcd-line" id="lcdLine2">**DOBRADEIRA HD    **</div>
+            </div>
+        </div>
+
+        <!-- Linha Superior: Navegação e Funções -->
+        <div class="keyboard-section">
+            <div class="keyboard-label">Controles Principais</div>
+            <div class="top-controls">
+                <div class="status-indicator">
+                    <div class="status-led" id="statusLed2"></div>
+                    <span>Status</span>
+                </div>
+                <button class="btn btn-function" data-key="172" style="flex: 1;">↑</button>
+                <button class="btn btn-function" data-key="220" style="flex: 1;">S1</button>
+                <button class="btn btn-function" data-key="221" style="flex: 1;">S2</button>
+                <button class="btn btn-function" data-key="173" style="flex: 1;">↓</button>
+            </div>
+        </div>
+
+        <!-- Linha 1: K1 a K7 -->
+        <div class="keyboard-section">
+            <div class="keyboard-label">Teclado Numérico - Linha 1</div>
+            <div class="keyboard-grid row-7-keys">
+                <button class="btn btn-numeric" data-key="160">K1</button>
+                <button class="btn btn-numeric" data-key="161">K2</button>
+                <button class="btn btn-numeric" data-key="162">K3</button>
+                <button class="btn btn-numeric" data-key="163">K4</button>
+                <button class="btn btn-numeric" data-key="164">K5</button>
+                <button class="btn btn-numeric" data-key="165">K6</button>
+                <button class="btn btn-numeric" data-key="166">K7</button>
+            </div>
+        </div>
+
+        <!-- Linha 2: K8, K9, K0, LOCK, ESC, EDIT, ENTER -->
+        <div class="keyboard-section">
+            <div class="keyboard-label">Teclado Numérico - Linha 2 e Controles</div>
+            <div class="keyboard-grid row-7-keys">
+                <button class="btn btn-numeric" data-key="167">K8</button>
+                <button class="btn btn-numeric" data-key="168">K9</button>
+                <button class="btn btn-numeric" data-key="169">K0</button>
+                <button class="btn btn-function" data-key="241" style="background: linear-gradient(145deg, #d95c5c, #c94c4c); border-color: #b93c3c; color: #fff;">LOCK</button>
+                <button class="btn btn-esc" data-key="188">ESC</button>
+                <button class="btn btn-function" data-key="38">EDIT</button>
+                <button class="btn btn-enter" data-key="37">ENTER</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // ==================== CONFIGURAÇÃO ====================
+
+        const WS_URL = 'ws://localhost:8085';
+        let ws = null;
+        let reconnectTimer = null;
+
+        // ==================== ELEMENTOS DOM ====================
+
+        const lcdLine1 = document.getElementById('lcdLine1');
+        const lcdLine2 = document.getElementById('lcdLine2');
+        const screenId = document.getElementById('screenId');
+        const statusLed = document.getElementById('statusLed');
+        const statusLed2 = document.getElementById('statusLed2');
+        const clpLed = document.getElementById('clpLed');
+        const clpStatus = document.getElementById('clpStatus');
+        const mirrorLed = document.getElementById('mirrorLed');
+        const statusText = document.getElementById('statusText');
+        const offlineOverlay = document.getElementById('offlineOverlay');
+
+        // ==================== WEBSOCKET ====================
+
+        function connectWebSocket() {
+            console.log('🔌 Conectando ao IHM v5 Server...');
+
+            ws = new WebSocket(WS_URL);
+
+            ws.onopen = () => {
+                console.log('✅ WebSocket conectado!');
+                statusLed.classList.add('online');
+                statusLed2.classList.add('online');
+                statusText.textContent = 'Online';
+                offlineOverlay.classList.remove('active');
+
+                // Solicitar estado inicial
+                ws.send(JSON.stringify({ action: 'get_state' }));
+            };
+
+            ws.onmessage = (event) => {
+                try {
+                    const data = JSON.parse(event.data);
+                    handleServerMessage(data);
+                } catch (error) {
+                    console.error('❌ Erro ao processar mensagem:', error);
+                }
+            };
+
+            ws.onerror = (error) => {
+                console.error('❌ Erro WebSocket:', error);
+            };
+
+            ws.onclose = () => {
+                console.log('⚠️  WebSocket desconectado');
+                statusLed.classList.remove('online');
+                statusLed2.classList.remove('online');
+                statusText.textContent = 'Desconectado';
+                offlineOverlay.classList.add('active');
+
+                // Tentar reconectar
+                reconnectTimer = setTimeout(connectWebSocket, 2000);
+            };
+        }
+
+        // ==================== HANDLERS ====================
+
+        function handleServerMessage(data) {
+            // Atualizar display LCD
+            if (data.line1 !== undefined) {
+                lcdLine1.textContent = data.line1;
+            }
+
+            if (data.line2 !== undefined) {
+                lcdLine2.textContent = data.line2;
+            }
+
+            // Atualizar ID da tela
+            if (data.screen_id !== undefined) {
+                screenId.textContent = data.screen_id;
+            }
+
+            // Atualizar status de conexão do CLP
+            if (data.connection_status !== undefined) {
+                updateCLPStatus(data.connection_status, data.modbus_connected);
+            }
+
+            // Atualizar mensagens do sistema
+            if (data.message !== undefined) {
+                console.log(`📢 ${data.message}`);
+            }
+
+            // Confirmar modo mirror
+            if (data.mode === 'mirror') {
+                mirrorLed.classList.add('mirror');
+            }
+        }
+
+        function updateCLPStatus(status, connected) {
+            // Remover todas as classes de status
+            clpLed.classList.remove('online', 'unstable', 'reconnecting');
+
+            switch(status) {
+                case 'connected':
+                    clpLed.classList.add('online');
+                    clpStatus.textContent = 'CLP: Online';
+                    break;
+                case 'unstable':
+                    clpLed.classList.add('unstable');
+                    clpStatus.textContent = 'CLP: Instável';
+                    break;
+                case 'reconnecting':
+                    clpLed.classList.add('reconnecting');
+                    clpStatus.textContent = 'CLP: Reconectando...';
+                    break;
+                case 'disconnected':
+                default:
+                    clpStatus.textContent = 'CLP: Desconectado';
+                    break;
+            }
+        }
+
+        function sendKeyPress(keyCode) {
+            if (ws && ws.readyState === WebSocket.OPEN) {
+                const message = {
+                    action: 'press_key',
+                    key_code: keyCode
+                };
+
+                ws.send(JSON.stringify(message));
+                console.log(`⌨️  Tecla enviada: ${keyCode}`);
+            } else {
+                console.warn('⚠️  WebSocket não conectado');
+            }
+        }
+
+        // ==================== EVENT LISTENERS ====================
+
+        // Adicionar listeners para todos os botões
+        document.querySelectorAll('.btn[data-key]').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const keyCode = parseInt(btn.getAttribute('data-key'));
+                sendKeyPress(keyCode);
+
+                // Feedback visual
+                btn.style.transform = 'translateY(2px)';
+                setTimeout(() => {
+                    btn.style.transform = '';
+                }, 150);
+            });
+        });
+
+        // Suporte a teclado físico
+        document.addEventListener('keydown', (event) => {
+            const keyMap = {
+                // Controles principais
+                'Enter': 37,
+                'Escape': 188,
+                'e': 38,  // EDIT
+                'E': 38,
+                'l': 241, // LOCK
+                'L': 241,
+                // Números K0-K9
+                '0': 169, '1': 160, '2': 161, '3': 162, '4': 163,
+                '5': 164, '6': 165, '7': 166, '8': 167, '9': 168,
+                // Navegação
+                'ArrowUp': 172,
+                'ArrowDown': 173,
+                // Funções S1/S2
+                'F1': 220,  // S1
+                'F2': 221   // S2
+            };
+
+            const keyCode = keyMap[event.key];
+            if (keyCode) {
+                event.preventDefault();
+                sendKeyPress(keyCode);
+
+                // Destacar botão virtual
+                const btn = document.querySelector(`.btn[data-key="${keyCode}"]`);
+                if (btn) {
+                    btn.style.transform = 'translateY(2px)';
+                    setTimeout(() => btn.style.transform = '', 150);
+                }
+            }
+        });
+
+        // ==================== INICIALIZAÇÃO ====================
+
+        connectWebSocket();
+
+        // Polling de estado (fallback para garantir sincronia)
+        setInterval(() => {
+            if (ws && ws.readyState === WebSocket.OPEN) {
+                ws.send(JSON.stringify({ action: 'get_state' }));
+            }
+        }, 1000);  // A cada 1 segundo
+    </script>
+</body>
+</html>

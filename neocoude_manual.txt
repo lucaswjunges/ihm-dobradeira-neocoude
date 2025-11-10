@@ -1,0 +1,1427 @@
+MÁQUINAS CONFIÁVEIS
+
+NEOCOUDE-HD-15
+“CLP”
+
+MÁQUINAS CONFIÁVEIS
+
+MANUAL TÉCNICO
+DOBRADEIRA
+
+MARCA
+
+TRILLOR
+
+MODELO-NEOCOUDE-HD-15
+COM CLP
+
+Parabéns
+
+O senhor está diante do Manual Técnico de uma grande máquina.
+Toda máquina exige alguns cuidados na instalação, operação e manutenção preventiva.
+Portanto, recomendamos a leitura atenta deste Manual, se possível diante da máquina a
+fim de identificar todas as sua partes.
+Em caso de dúvida, não hesite: Telefone para o Departamento de Assistência Técnica da
+TRILLOR MÁQUINAS LTDA.
+Telefax: (021) 2676-1622 / 2776-2514 / 2776-2736 Email: trillor-rj@trillor.com.br
+
+* MÁQUINA Nº : 07-08-035
+
+* FABRICAÇÃO (DATA): 17-08-07
+* VOLTAGEM: 380 volts – 60 HZ
+
+* *PROPRIETÁRIO: CONSTRUTORA e COMÉRCIO CAMARGO CORREA.
+
+OBRA DE SALTO - SANTA CATARINA - SC.
+
+MÁQUINAS CONFIÁVEIS
+
+Í N D I C E
+DENOMINAÇÃO
+
+PÁGINA
+
+Descrição.........................................................................................................
+
+1
+
+Características Técnicas.................................................................................
+
+3
+
+Instalação da Máquina...................................................................................
+
+4
+
+Recomendações Importantes – Normas de Segurança ...............................
+
+5
+
+Operação.........................................................................................................
+
+7
+
+Tabela de Capacidade de Dobra......................................................................
+
+9
+
+Raio Mínimo de Dobra....................................................................................
+
+10
+
+Diagrama Orientativo-1 da Montagem de Ferramentas................................
+
+11
+
+Diagrama Orientativo-2 da Montagem de Ferramentas................................
+
+12
+
+Diagrama Orientativo-3 da Montagem de Ferramentas................................
+
+13
+
+Listas das Ferramentas Standard......................................................................
+
+14
+
+Desenhos Ferramentas Standard................................................................. .....
+
+15
+
+Identificação Ferramentas de Dobra e Outras Montagens............................. 16,17
+Vista Superior..................................................................................................
+
+18
+
+Corte Longitudinal...........................................................................................
+
+19
+
+Lista de Material..............................................................................................
+
+20
+
+Limpeza, Manutenção e Lubrificação............................................................
+
+22
+
+Tabela de Lubrificantes e Graxas.................................................................
+
+24
+
+Redutor de Velocidade – Características/Manutenção.................................
+
+25
+
+Parâmetros Para o Inversor de Freqüência...................................................
+
+30
+
+Informações Eletro-eletrônica / Lógica...........................................................
+
+31
+
+Terminal de Operação do CLP........................................................................
+
+32
+
+Painel de Comando............................................................................................
+
+33
+
+Esquemas do Circuito Eletro-eletrônico.........................................................
+
+34-42
+
+Manual do Encoder..........................................................................................
+
+43
+
+Peças Sobressalentes.........................................................................................
+
+44
+
+Produtos Trillor................................................................................................
+
+45
+
+MÁQUINAS CONFIÁVEIS
+
+PÁG.-1
+
+DESCRIÇÃO
+A máquina NEOCOUDE-HD-15 destina-se a dobrar barras de aço redondo,
+comum para concreto armado até 2” de diâmetro. Empregando aço especial a
+capacidade da máquina será proporcionalmente reduzida. Em caso de dúvida, é
+indispensável fazer uma consulta a TRILLOR MÁQUINAS, como indicação da
+resistência média do aço, e do seu alongamento.
+Principais vantagens da máquina de dobrar NEOCOUDE-HD-15 – TRILLOR,
+para serviço pesado:
+
+1. dobra de aço de construção de até 50mm de diâmetro em CA-25.
+2. dobra até quatro barras de menor diâmetro em uma só operação
+3. comandada por CLP
+4. maior velocidade de operação
+5. travas reguláveis para dar precisão absoluta de dobramento e se obter
+peças idênticas
+6. retorno automático do prato para posição neutra
+7. dispensa regulagens e tem manutenção reduzidíssima: todos os
+componentes mecânicos trabalham em banho de óleo.
+Com a máquina de dobrar NEOCOUDE-HD-15, a produção de ferragens para
+concreto armado pode ser aumentada sensivelmente.
+Sua capacidade vai até  50mm (2”) para aço CA-25 ( 40Kg/mm2 ou 65.000 psi).
+e  44mm (1 3/4”) para aço CA-50 ( 65Kg/mm2 ou 95.000 psi).
+
+Mais importante, é que esta capacidade pode ser aproveitada plenamente, tanto
+para dobrar várias barras de menores seções em uma só operação, como para
+aumentar consideravelmente a velocidade de dobramento convencional.
+
+A rotação do prato de dobramento, para a esquerda ou para a direita, é
+comandada pelo CLP.
+
+MÁQUINAS CONFIÁVEIS
+
+PÁG.-2
+
+DESCRIÇÃO
+(continuação)
+
+A NEOCOUDE-HD-15 possui uma interface eletrônica que permite selecionar, com
+antecedência, três ângulos de dobramento para a esquerda e três ângulos para a
+direita.
+
+Esta característica, além de assegurar economia de tempo para fabricação em série
+de ferragem para concreto, garante a repetição precisa de formas, sem qualquer
+dificuldade para o operador.
+
+Assim é possível, a cada operação, adaptar a velocidade do trabalho ao diâmetro
+das ferragens. Esta característica assegura um rendimento máximo de produção,
+qualquer que seja a seção de ferros a formar.
+
+Ver tabela de velocidade em função do diâmetro e da quantidade de barras a
+dobrar em uma única operação.
+
+Para facilitar seu deslocamento nas obras, a NEOCOUDE-HD-15 dispõe de quatro
+rodas para movimentação.
+
+A máquina é fornecida com um jogo de ferramentas standard composto por pinos,
+roletes, rodas, etc, necessários às dobras mais comuns em uma obra. Para cada
+diâmetro de barra e raio de dobramento, deve-se utilizar o arranjo de ferramentas
+mais adequado.
+
+Existem outros jogos de ferramentas especiais e específicos para outros fins, que
+são oferecidos separadamente conforme consulta.
+
+Neste manual apresentamos algumas montagens de ferramentas possíveis de
+dobras, que servem como orientação aos operadores.
+
+MÁQUINAS CONFIÁVEIS
+
+PÁG.-3
+
+CARACTERÍSTICAS TÉCNICAS
+
+➢ Velocidade “NOMINAL” do prato:
+
+-Baixa - 5 rpm
+-Média - 10 rpm
+-Máxima –15 rpm
+
+➢ Motor: 15 CV – IV Polos – 1755 rpm / 23 a / 380v
+
+➢ Capacidade máxima de dobra: até 50mm (2”)
+em CA-25
+até 44mm ( 1 3/4”) em CA-50
+
+➢ Dimensões básicas:
+
+Comprimento: 2.100mm
+Largura: 1.200mm
+Altura: 900mm
+
+➢ Peso:
+
+1.000 Kg.
+
+➢ Produção média:
+
+200/250 toneladas/mês – 8 horas.
+
+➢
+
+Deslocamento:
+
+manual por rodas.
+
+MÁQUINAS CONFIÁVEIS
+
+pág.4
+
+INSTALAÇÃO DA MÁQUINA
+
+Na obra a máquina NEOCOUDE-HD-15 deverá ser instalada de preferência entre
+duas bancadas de trabalho, postas a direita e esquerda no sentido longitudinal de
+trabalho.
+O nível das bancadas deverá corresponder exatamente ao nível do prato de
+dobragem da máquina.
+
+Recomendamos deixar entre a mesa e a máquina, um espaço de 0,80 a 1,00 metros
+para passagem do operador e a manutenção. A máquina deve ser nivelada.
+
+• LIGAÇÃO ELÉTRICA
+
+Aconselhamos sempre colocar o chassis da máquina, ligado a um terra eficiente.
+
+É indispensável que o cabo alimentador seja ligado a uma chave com fusíveis
+apropriados.
+
+A máquina sai de fábrica ligada na voltagem solicitada pelo cliente.
+
+A mudança para outra voltagem, deve ser executada, mediante consulta à nossa
+fábrica e efetuada por um eletricista habilitado.
+
+PÁG...
+
+MÁQUINAS CONFIÁVEIS
+
+PÁG.5
+
+RECOMENDAÇÕES IMPORTANTES
+ NORMAS DE SEGURANÇA
+➢ Verificar a voltagem da rede elétrica onde será instalada a
+máquina.
+➢ Prever cabos de alimentação elétrica compatível com a
+capacidade de energia da máquina, ligados a uma chave com
+fusíveis e proteção apropriados, além de um aterramento
+eficiente .
+➢ Não opere sem treinamento prévio.
+➢ Para serviços de manutenção e limpeza, desligue a chave geral.
+➢ Não utilizar a máquina para dobras acima de sua capacidade,
+veja Plaqueta de Capacidade fixada na máquina.
+➢ Ao operar a máquina, verificar que nenhuma ferramenta ou
+ferro esteja sobre o prato ou sobre a máquina.
+➢ Ao posicionar as ferramentas, certificar o perfeito encaixe das
+mesmas nos furos ou nos portas ferramentas.
+➢ O operador da máquina deve estar posicionado na frente da
+máquina de modo que possa efetuar a dobra com segurança.
+➢ Realização de operação, manutenção, inspeção e demais
+intervenções na máquina, deve ser executado somente por
+trabalhadores habilitados, qualificados ou capacitados,
+autorizados para este fim.
+
+MÁQUINAS CONFIÁVEIS
+
+PÁG.6
+
+.
+
+ ATENÇÃO:
+Ant
+
+aa
+
+ee
+
+Antes de operar com ferro, aconselhamos fazer funcionar a
+máquina em vazio por 1 a 2 horas, experimentando todos os
+recursos que a máquina dispõe. Este treinamento prévio,
+além de verificar e se habituar a todas as reações da
+máquina, permite ao operador um melhor aproveitamento
+posterior sem falsas manobras, e com segurança.
+
+MÁQUINAS CONFIÁVEIS
+
+PÁG.7
+
+OPERAÇÃO
+
+MODO MANUAL:
+LIGAR O COMANDO GERAL: A máquina está pronta para operar no modo manual.
+
+Só opera na classe-1 de velocidade =5 rpm.
+Se desejar que o prato gire no sentido anti-horário, aperte o botão avançar do painel.
+Para o sentido contrário aperte o botão recuar do painel. A dobra se dará conforme o
+ângulo pré-programado e mostrado no display do CLP no painel. É necessário manter o
+botão precionado para completar a dobra .
+Ao fim de curso do movimento angular do prato , este retornará a posição inicial do
+sensor, pouco antes de chegar no mesmo, aperte simultâneamente o botão parada com o
+botão usado para este movimento,(botão av./botão rc) para se obter precisão na parada.
+Após isso se o display não estiver com o valor do ângulo em zero, aperte a tecla (S2).
+O sistema está pronto para novo trabalho no modo manual.
+
+MODO AUTOMÁTICO:
+
+Para migrar do modo manual para o automático, somente com o
+sistema parado, aperte a tecla (S1).
+Selecione primeiro o sentido de giro do prato, apertando o botão do painel (PARADA),
+logo no display as teclas K4 ou K5 ficará luminosa. Para que o prato gire no sentido
+anti-horário deixe acesa a tecla K4, ou K5 para trabalhar no outro sentido. Verifique no
+display o ângulo desejado, só então comece a trabalhar, apertando o botão avançar para
+o sentido anti-horário ou o botão recuar para o sentido horário.
+
+MÁQUINAS CONFIÁVEIS
+
+PÁG.8
+
+OPERAÇÃO
+ATENÇÃO:
+*Faça a mudança do modo Automático para o Manual, somente
+com a tecla (K1) acesa, que corresponde a 1°dobra.
+
+A
+
+*Só é possivel mudar as classes de velocidades no “modo
+manual”.
+Aperte as teclas K1 e K7 simultâneamente , e observe o
+display.
+*Em cada classe de velocidade: 5rpm, 10rpm e 15rpm estão
+embutidas três dobras direitas e esquerdas nas variáveis k1, k2
+e k3, com deslocamentos angulares que podem se reajustados.
+*O sistema não permite retornar a dobras anteriores, por
+exemplo: se estou fazendo a dobra-3 não consigo retornar a
+dobra-1, só reiniciando: por desligar o comando geral,
+aguardar apagar o display, algum tempo depois, religar o
+comando geral. Porém se necessitar fazer dobras següênciais
+de único valor, use a tecla de navegação do display, na
+tela(1HM) altere a váriável (AJ) das 3dobras para o mesmo
+valor: por exemplo todas com (90°).
+*Ao alterar a variável (AJ) não é necessário modificar (PV).
+_(AJ) recebe valores de ângulo como: 90°,120°,35°etc _ (PV)
+determina como se dará esse deslocamento, não é necessário
+ser manipulada pelo usuário, (PV) se corrige automáticamente.
+*A escolha da melhor velocidade de trabalho depende do
+diâmetro do ferro a ser dobrado e da quantidade de barras.
+A tabela de capacidade de dobra ,
+fornece
+valores
+aconselhados para o máximo aproveitamento da máquina.
+
+.
+
+MÁQUINAS CONFIÁVEIS
+
+pág.9
+
+TABELA DE CAPACIDADE DE DOBRA
+
+aa
+
+MÁQUINAS CONFIÁVEIS
+
+pág.10
+
+# ESCOLHA DO RAIO DE DOBRA:
+O raio de dobra deve ser efetuado de acordo com a especificação do projeto.
+Lembramos porém que a capacidade da NEOCOUDE-HD-15 se enquadra nos
+valores para raio mínimo indicados pela ABNT norma EB-3/67 e que estes raios
+não devem ser ultrapassados.
+TABELA DE RAIOS INTERNOS MÍNIMOS RECOMENDADOS,
+CONFORME ABNT EB - 3/67
+
+RAIO MÍNIMO DE DOBRA
+
+MANUAL T CNICO
+NEOCOUDE- HD-CLP
+
+DIAGRAMA ORIENTATIVO PARA
+A MONTAGEM DAS FERRAMENTAS
+PARA FERRO FINO
+
+MANUAL T CNICO
+NEOCOUDE- HD-CLP
+
+DIAGRAMA ORIENTATIVO PARA
+A MONTAGEM DAS FERRAMENTAS
+PARA BITOLAS ACIMA DE 10mm
+
+MANUAL T CNICO
+NEOCOUDE- HD-CLP
+
+DIAGRAMA ORIENTATIVO PARA
+A MONTAGEM DAS FERRAMENTAS
+PARA GRANDES BITOLAS
+COM A ÚLTILIZAÇÃO DO BRAÇO DE DOBRA
+
+MÁQUINAS CONFIÁVEIS
+
+PÁG.14
+
+RELAÇÃO DO JOGO DE FERRAMENTAS STANDARD
+1- ELEMENTOS DE FIXAÇÃO
+Item
+
+Qtd.
+
+1
+2
+3
+4
+5
+6
+7
+
+04
+02
+02
+01
+02
+01
+01
+
+NºDesenho Denominação
+M-2976-A
+M-3258-A
+M-3259-A
+M-12047-B
+15.016.036
+M-2623-C
+M-2973-A
+
+Pino de fixação
+Pivô de fixação
+Distancial
+Braço
+Parafuso Allen  1”x 3 1/2”
+Ferramenta guia
+Placa
+
+2- ELEMENTOS DE DOBRA
+Item
+
+Qtd.
+
+1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+
+01
+01
+01
+01
+01
+01
+01
+01
+01
+01
+01
+01
+01
+01
+01
+01
+
+Nº Desenho Denominação
+M-2974-A
+M-2975-A
+M-942-A
+M-3325-A
+M-3324-A
+M-2978-A
+M-2979-A
+M-2980-A
+M-2981-A
+M-2982-A
+M-2983-A
+M-3330-A
+M-3331-A
+M-3332-A
+M-3329-A
+M-12041-A
+
+Pino central  26
+Pino central  35
+Pino
+ 40
+Rolete
+ 45
+Rolete
+ 55
+Rolete
+ 70
+Rolete
+ 79
+Rolete
+ 100
+Rolete
+ 115
+Rolete
+ 145
+Rolete
+ 200
+Rolete
+ 225
+Rolete
+ 250
+Rolete
+ 275
+Meia-lua
+R.150 e 200
+Haste longa
+
+3- ELEMENTOS DE COMANDO – PINOS DO PRATO
+Item
+
+Qtd.
+
+1
+2
+3
+
+02
+02
+02
+
+Nº Desenho Denominação
+M-2732-A
+M-2720-A
+M-2719-A
+
+Pino Nº 1
+Pino Nº 2
+Pino Nº 3
+
+MÁQUINAS CONFIÁVEIS
+
+PÁG.15
+
+JOGOS DE FERRAMENTAS
+1- JOGO STANDARD – IDENTIFICAÇÃO
+➢ A-
+
+1-
+
+ELEMENTOS DE FIXAÇÃO – STANDARD
+
+Pivo para roletes R = 28 e R = 100 e setor 45º para raios 150 e 200.
+
+- M-2976-A
+
+2-
+
+Pivo para roletes R = 115 e R = 140 e setores 90º para raios 190 e 475
+(usar com braço de dobra M-12047-B).
+
+- M-3259-A
+- M-3258-A
+
+3-
+
+Braço de dobra para roletes R = 115 a R = 140 e setores 90º para grandes raios R = 190 a
+R = 475. Pivo M-942-A 02 (dois) parafusos Allen c/cab.  1”x 3 1/2”W.
+
+- M-12047-B
+
+4-
+
+Guia para estribos a ser usado com pinos R = 13 a R = 23.
+
+- M-2973-A
+- M-2623-C
+
+MÁQUINAS CONFIÁVEIS
+
+PÁG.16
+
+FERRAMENTAS DE DOBRA – STANDARD
+
+1-
+
+Pinos standard para dobra de estribos R = 13 a R = 23.
+
+-
+
+M-2974-A R = 13
+M-2975-A R = 18
+M-3325-A R = 23
+
+2-
+
+Pinos standard curto  45 x  40 – M-942-A
+
+3-
+
+Roletes standard para dobra de curvas 45º, 90º e ganchos:
+- M-3324-A
+- M-2978-A
+- M-2979-A
+- M-2980-A
+- M-2981-A
+
+4-
+
+R = 28
+R = 35
+R = 40
+R = 50
+R = 60
+
+- M-2982-A
+- M-2983-A
+- M-3330-A
+- M-3331-A
+- M-3332-A
+
+R = 75
+R = 100
+R = 115
+R = 130
+R = 140
+
+Setor para dobras de 45º
+
+- M-3329-A
+
+R = 150 e 200
+
+FERRAMENTAS DE DOBRA OPCIONAIS
+A-
+
+SETORES PARA DOBRA DE CURVAS ATÉ 90º PARA
+GRANDES RAIOS.
+- M-1481-B R = 190 e 240
+- M-1482-B R = 285 e 330
+
+- M-1483-B R = 380 e 475
+- M-5072-B R = 360 e 450
+
+MÁQUINAS CONFIÁVEIS
+
+JOGOS DE FERRAMENTAS –OUTRAS MONTAGENS
+
+pág.17
+
+VISTA SUPERIOR
+
+PÁG-18
+
+Pág.18
+
+MÁQUINAS CONFIÁVEIS
+
+CORTE LONGITUDINAL
+
+pág. 19
+
+MÁQUINAS CONFIÁVEIS
+
+pág.20
+
+Lista de Material da Vista sup. e do Corte da Neocoude-HD
+
+Pos. Qtd.
+
+Nº Desenho Denominação
+
+01
+02
+03
+04
+05
+06
+07
+08
+09
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+26
+27
+28
+
+Expert-Atos
+2.022.000
+2.018.200
+2.003.307
+M-2619-B
+M-13956-A
+M-2626-C
+2.018.152
+M-2611-B
+M-7718-C
+M-2713-A
+M-2631-A
+5.900.951
+M-2629-A
+M-7719-A
+M-13910-A
+M-2717-C
+M-3853-A
+M-2621-A
+M-2716-A
+M-2620-A
+M-2711-A
+M-3854-A
+M-2769-C
+M-2768-C
+
+01
+01
+01
+01
+01
+01
+01
+01
+01
+01
+01
+01
+01
+01
+01
+01
+04
+04
+04
+08
+04
+04
+04
+02
+02
+
+Clp- (designação-“CJ”)
+Inversor
+Encoder
+Fim de Curso
+Engrenagem 62 dentes
+Engrenagem 18 dentes
+Placa
+Sensor
+Mancal superior
+Mancal inferior
+Espaçador
+Tampa (batente
+Retentor
+Tampa superior
+Tampa inferior
+Tampa do mancal inferior
+Porta ferramentas
+Eixo (reg. porta ferramentas)
+Suporte
+Suporte guia do porta ferramentas
+Suporte guia
+Arruela especial
+Volante
+Proteção
+Proteção
+
+MÁQUINAS CONFIÁVEIS
+
+pág.21
+
+Lista de Material da Vista sup. e do Corte da Neocoude-HD
+
+Pos. Qtd.
+
+29
+30
+31
+32
+33
+34
+35
+36
+37
+38
+39
+40
+41
+42
+43
+44
+45
+46
+47
+48
+49
+50
+51
+52
+53
+54
+55
+
+01
+01
+04
+02
+02
+-
+
+Nº Desenho
+
+Denominação:
+
+M-2628-B
+8.001.020
+
+Eixo
+Acoplamento:
+
+M-872-A
+M-2708-A
+
+Roda
+Eixo do rodeiro
+
+M-3754-C
+
+Rolete
+
+MÁQUINAS CONFIÁVEIS
+
+pág.22
+
+Lista de Material da Vista sup. e do Corte da Neocoude-HD
+
+Pos. Qtd.
+
+56
+57
+58
+59
+60
+61
+62
+
+01
+01
+
+63
+64
+65
+66
+67
+68
+
+01
+01
+01
+-
+
+69
+
+Nº Desenho
+
+Denominação:
+
+2.417.050 Redutor c/ Flange e Lanterna:MU-15
+2.102.041 Motor Elétrico:15CV-4P-1755RPM
+
+5.222.170
+5.222.140
+
+Rolamento:
+Rolamento:
+Fecho
+
+MÁQUINAS CONFIÁVEIS
+
+PÁG..23-1
+
+LIMPEZA, MANUTENÇÃO E LUBRIFICAÇÃO
+
+SENSOR
+
+MANTENHA AS PORCAS DO SENSOR SEMPRE APERTATADAS
+PARA QUE A MÁQUINA NÃO PERCA AS REFERÊNCIAS AUTOMÁTICAS DO CLP.
+CUIDADO PARA NÃO DANIFICAR O SENSOR.
+
+ACOPLAMENTO
+
+ENCODER
+
+MANTENHA O ENCODER SEMPRE FIXO, O MESMO FAÇA COM SEU
+ACOPLAMENTO, APERTE OS PARAFUSOS QUE O FIXAM NOS EIXOS.
+A NÃO OBSERVAÇÃO DISSO, PODERÁ DESORGANIZAR O AUTOMATISMO DA
+NEOC.HD-15
+
+.
+
+MÁQUINAS CONFIÁVEIS
+
+PÁG..23-2
+
+LIMPEZA, MANUTENÇÃO E LUBRIFICAÇÃO
+
+“AS PORTAS DIANTEIRA E TRASEIRA PERMITEM LIMPEZA, MANUTENÇÃO
+E A LUBRIFICAÇÃO”.
+
+.
+
+MÁQUINAS CONFIÁVEIS
+
+PÁG..23
+
+LIMPEZA, MANUTENÇÃO E LUBRIFICAÇÃO
+Limpar frequentemente a máquina para retirar a ferrugem desprendida durante a
+operação de dobra.
+Uma vez por semana fazer uma limpeza geral com ar comprimido e lubrificar a
+engrenagem aberta com graxa conforme indicado na letra G da lista de
+lubrificantes. Manter as ferramentas sempre limpas e oleadas.
+
+• MANUTENÇÃO DAS PARTES MECÂNICAS:
+O redutor trabalha em banho de óleo e não necessita de manutenção,
+Seguir as instruções do fabricante, que estão anexo neste manual.
+Verificar cada mês o nível do óleo e completar se necessário.
+Trocar o óleo a primeira vez após 500 horas ou 2 (dois) meses de trabalho, e
+depois de ano em ano ou 3.000 horas de trabalho.
+
+O óleo indicado para o redutor é:
+
+Castrol -ILO – SP 680
+ESSO -SPARTAN EP 6
+MOBIL -MOBIL GEAR 636
+SHELL-MACOMA R 82
+TEXACO-MEROPA LUBRIFICANT680
+
+Lubrificar os rolamentos do eixo principal na ocasião de uma possível desmontagem
+com graxa própria vide lista de lubrificantes letra A.
+Limpar e olear uma vez por semana a rosca de regulagem dos 4 (quatro) portas
+ferramentas (barras horizontais com furos para os pinos).
+
+.
+
+MÁQUINAS CONFIÁVEIS
+
+pág.25
+
+VISTA EXPLODIDA REDUTOR –XEVEX
+
+MÁQUINAS CONFIÁVEIS
+
+pág.26
+
+.
+
+ PEÇAS DE REPOSIÇÃO DO REDUTOR ROSCA SEM FIM
+Pos.
+
+Denominação
+
+1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+
+Rosca sem fim
+Coroa
+Coroa com eixo de saída tipo U05 e U06
+Eixo de saída
+Chaveta do eixo de entrada
+Chaveta da coroa
+Chaveta do eixo de saída
+Anel intermediário
+Anel de distância
+Anel “Nilos”
+Anel “Nilos”
+Rolamento da rosca sem fim
+Rolamento do eixo de saída
+Anel intermediário
+Anel de regulagem
+Retentor do eixo de entrada
+Retentor do eixo de saída
+Tampa aberta do eixo de entrada
+Tampa cega do eixo de entrada
+Tampa cega do eixo de saída
+Tampa aberta do eixo de saída
+Parafuso da tampa
+Parafuso da tampa
+Raspador de óleo
+Parafuso do raspador de óleo
+Porca do raspador de óleo
+Barragem de óleo
+Pino
+Ventilador
+Parafuso do ventilador
+Capa
+Parafuso da capa
+Placa de identificação
+Rebite
+Carcaça
+
+MÁQUINAS CONFIÁVEIS
+
+pág.27
+
+.
+
+ PEÇAS DE REPOSIÇÃO DO REDUTOR ROSCA SEM FIM
+Continuação:
+
+Pos.
+
+Denominação
+
+36
+37
+38
+39
+40
+41
+42
+43
+44
+45
+46
+47
+48
+49
+50
+51
+52
+53
+54
+55
+
+Respiro
+Bujão de inspeção
+Olhal de suspensão
+Pé lateral
+Bujão
+Niple (só tamanhos: 12-15-18-21)
+Flange para motor
+Parafuso do flange
+Flange intermediário
+Parafuso do flange do motor
+Porca do flange do motor
+Flange do acoplamento
+Cruzeta
+Flange do acoplamento
+Parafuso do acoplamento
+Lanterna
+Parafuso da lanterna
+Pé postiço
+Parafuso do pé
+Pino posicionador
+
+10- LISTA DE PEÇAS
+
+MÁQUINAS CONFIÁVEIS
+
+pág.28
+
+MÁQUINAS CONFIÁVEIS
+
+pág.29
+
+MÁQUINAS CONFIÁVEIS
+
+pág. 30
+
+Parâmetros para o Inversor de Freqüência
+5 RPM
+10 RPM
+15 RPM
+0.005=Fator clp/tenção entrada
+R.motor F.motor Rd
+
+R.redutor
+
+1755
+
+(58,5)
+
+60HZ
+
+1/30
+
+3.44
+
+R.prato
+
+Dds.int.CLP
+
+T.entrada
+
+(17.00)
+
+2000
+
+10V
+
+1389.7 47.50
+
+(46.32)
+
+(13.46)
+
+1583
+
+7.91V
+
+927.6
+
+31.66
+
+(30.92)
+
+(8.98)
+
+1055
+
+5.27V
+
+463.8
+
+15.83
+
+(15.46)
+
+(4.49)
+
+527
+
+2.63V
+
+Relação pinhão engrenagem: 3.44.....(62dentes/18)
+
+P 133 =4hz
+
+P 265 =11
+
+P 134 =47hz
+
+P 400 =380v
+
+P 202 =2
+
+P 401 =22.8a
+
+P 220 =1
+
+P 402 =1755rpm
+
+P 222 =1
+
+P 403 =60hz
+
+P 230 =1
+P 235 =0
+P 263 =8
+
+OBS: P 408 ( Destina-se ao auto ajuste das variáveis interna do
+motor)
+
+P 264 =8
+
+< VEJA O MANUAL DO INVERSOR WEG >
+
+MANUAL T CNICO
+NEOCOUDE- HD-CLP
+
+MANUAL T CNICO
+NEOCOUDE- HD-CLP
+
+MANUAL T CNICO
+NEOCOUDE- HD-CLP
+
+TERMINAL DE OPERAÇÃO / NEOC.HD-CLP
+
+TECLA
+
+SIGNIFICADO
+
+MANUAL T CNICO
+NEOCOUDE- HD-CLP
+
+PAINEL DE COMANDO-CLP / NEOC.HD
+
+TECLADO E DISPLAY
+DO
+CLP
+
+ATENÇÃO:
+
+MANTENHA O PAINEL FECHADO,
+LIVRE DE ÚMIDADE, CALOR
+EXCESSIVO E POEIRA.
+
+MANUAL T CNICO
+NEOCOUDE- HD-CLP
+
+MANUAL T CNICO
+NEOCOUDE- HD-CLP
+
+MANUAL T CNICO
+NEOCOUDE- HD-CLP
+
+MANUAL T CNICO
+NEOCOUDE- HD-CLP
+
+MANUAL T CNICO
+NEOCOUDE- HD-CLP
+
+MANUAL T CNICO
+NEOCOUDE- HD-CLP
+
+MANUAL T CNICO
+NEOCOUDE- HD-CLP
+
+MANUAL T CNICO
+NEOCOUDE- HD-CLP
+
+MANUAL T CNICO
+NEOCOUDE- HD-CLP
+
+MÁQUINAS CONFIÁVEIS
+
+MANUAL TÉCNICO DO ENCODER
+
+pág.43-1
+
+MÁQUINAS CONFIÁVEIS
+
+MANUAL TÉCNICO DO ENCODER
+
+pág.43
+
+MÁQUINAS CONFIÁVEIS
+
+pág. 44
+
+LISTA DE SOBRESSALENTES
+
+QTD.
+
+CÓDIGO
+
+DESCRIÇÃO
+
+01
+
+5.222.170
+
+Rolamento superior do eixo
+
+01
+
+5.222.140
+
+Rolamento inferior do eixo
+
+01
+
+5.900.268
+
+Retentor do flange
+
+02
+
+M-3854-A
+
+Volante de regulagem
+
+01
+
+6.002.101
+
+Bomba de graxa manual
+
+01
+
+2.0030319
+
+Botão de Emergência
+
+01
+
+2.018.152
+
+Sensor
+
+01
+
+2.003.300
+
+Fim de curso
+
+MÁQUINAS CONFIÁVEIS
+
+pág.45
+
+15- LINHA DE PRODUTOS TRILLOR MÁQUINAS
+LTDA.
+
+*Máquinas de blocos e briquetes de concreto
+*Máquinas de pistas
+*Matrizes
+*Escovas rotativas
+*Misturadores planetários
+*Misturadores de eixo horizontal
+*Misturadores duplo cone
+*Dobradeiras de ferro
+*Cortadeiras hidráulicas para ferro
+*Réguas vibratórias
+*Discos alisadores
+*Transportadores
+*Pórticos
+*Balanças dosadoras
+*Silos
+*Dosadores Volumétricos
+*Arrastador Radial
+*Instalação de pré-moldados
+*Implementos para automatização na fabricação de blocos
+*Centrais de concreto
+*Centrais de adubo
+*Centrais de Ferro
+
+

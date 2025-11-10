@@ -1,0 +1,71 @@
+/home/lucas-junges/Documents/clientes/w&co/ihm_v5_server.py:21: DeprecationWarning: websockets.server.WebSocketServerProtocol is deprecated
+  from websockets.server import WebSocketServerProtocol
+2025-11-09 19:56:23,846 - modbus_client - INFO - Modbus client initialized in LIVE MODE: /dev/ttyUSB0 @ 57600
+2025-11-09 19:56:23,847 - modbus_client - INFO - Connected to PLC on /dev/ttyUSB0
+2025-11-09 19:56:23,867 - modbus_client - ERROR - Error reading register 6536: ExceptionResponse(dev_id=1, function_code=131, exception_code=2)
+2025-11-09 19:56:23,867 - __main__ - INFO - ✓ Conexão Modbus estabelecida
+2025-11-09 19:56:23,868 - __main__ - INFO - 📺 Carregadas 256 telas do screens_map.json
+2025-11-09 19:56:23,868 - __main__ - INFO - 🚀 Iniciando IHM v5 Server (Mirror Mode) em ws://localhost:8085
+2025-11-09 19:56:23,870 - __main__ - INFO - 📡 Iniciando polling do registro de tela ativa...
+2025-11-09 19:56:23,871 - __main__ - INFO - 🏥 Iniciando monitor de saúde da conexão...
+2025-11-09 19:56:23,874 - websockets.server - INFO - server listening on 127.0.0.1:8085
+2025-11-09 19:56:23,874 - __main__ - INFO - ✓ IHM v5 Server rodando em ws://localhost:8085
+2025-11-09 19:56:23,874 - __main__ - INFO - 📱 Abra ihm_v5.html no navegador
+2025-11-09 19:56:23,874 - __main__ - INFO - 🔍 Monitorando registro 0x07F7 do CLP...
+2025-11-09 19:56:23,883 - __main__ - WARNING - ⚠️  Registro 2039 retornou valor inválido: 22988
+2025-11-09 19:56:23,883 - __main__ - INFO - 🔄 Tentando fallback para registro 4078...
+2025-11-09 19:56:24,401 - __main__ - INFO - 📺 Mudança de tela detectada: -1 → 0 (registro 4078)
+2025-11-09 19:56:24,577 - websockets.server - INFO - connection open
+2025-11-09 19:56:24,577 - __main__ - INFO - Cliente conectado: ('127.0.0.1', 45260)
+2025-11-09 19:56:24,678 - websockets.server - INFO - connection open
+2025-11-09 19:56:24,678 - __main__ - INFO - Cliente conectado: ('127.0.0.1', 45266)
+2025-11-09 19:56:24,690 - websockets.server - INFO - connection open
+2025-11-09 19:56:24,690 - __main__ - INFO - Cliente conectado: ('127.0.0.1', 45278)
+2025-11-09 19:56:24,701 - websockets.server - INFO - connection open
+2025-11-09 19:56:24,702 - __main__ - INFO - Cliente conectado: ('127.0.0.1', 45284)
+2025-11-09 19:56:31,232 - __main__ - INFO - ⌨️  Tecla pressionada: 172
+2025-11-09 19:56:31,470 - __main__ - INFO - ✓ Tecla 172 enviada ao CLP
+2025-11-09 19:56:32,360 - __main__ - INFO - ⌨️  Tecla pressionada: 220
+2025-11-09 19:56:32,596 - __main__ - INFO - ✓ Tecla 220 enviada ao CLP
+2025-11-09 19:56:43,301 - websockets.server - INFO - connection open
+2025-11-09 19:56:43,301 - __main__ - INFO - Cliente conectado: ('127.0.0.1', 37728)
+2025-11-09 20:01:24,379 - __main__ - INFO - ⌨️  Tecla pressionada: 220
+2025-11-09 20:01:24,624 - __main__ - INFO - ✓ Tecla 220 enviada ao CLP
+2025-11-09 20:01:25,348 - __main__ - INFO - ⌨️  Tecla pressionada: 220
+2025-11-09 20:01:25,602 - __main__ - INFO - ✓ Tecla 220 enviada ao CLP
+2025-11-09 20:01:26,261 - __main__ - INFO - ⌨️  Tecla pressionada: 221
+2025-11-09 20:01:26,507 - __main__ - INFO - ✓ Tecla 221 enviada ao CLP
+2025-11-09 20:01:26,996 - __main__ - INFO - ⌨️  Tecla pressionada: 173
+2025-11-09 20:01:27,240 - __main__ - INFO - ✓ Tecla 173 enviada ao CLP
+2025-11-09 20:01:27,617 - __main__ - INFO - ⌨️  Tecla pressionada: 173
+2025-11-09 20:01:27,850 - __main__ - INFO - ✓ Tecla 173 enviada ao CLP
+2025-11-09 20:01:27,850 - __main__ - INFO - ⌨️  Tecla pressionada: 173
+2025-11-09 20:01:28,094 - __main__ - INFO - ✓ Tecla 173 enviada ao CLP
+2025-11-09 20:01:28,963 - __main__ - INFO - ⌨️  Tecla pressionada: 172
+2025-11-09 20:01:29,190 - __main__ - INFO - ✓ Tecla 172 enviada ao CLP
+2025-11-09 20:01:30,046 - __main__ - INFO - ⌨️  Tecla pressionada: 160
+2025-11-09 20:01:30,287 - __main__ - INFO - ✓ Tecla 160 enviada ao CLP
+2025-11-09 20:01:30,973 - __main__ - INFO - ⌨️  Tecla pressionada: 161
+2025-11-09 20:01:31,213 - __main__ - INFO - ✓ Tecla 161 enviada ao CLP
+2025-11-09 20:01:31,574 - __main__ - INFO - ⌨️  Tecla pressionada: 162
+2025-11-09 20:01:31,814 - __main__ - INFO - ✓ Tecla 162 enviada ao CLP
+2025-11-09 20:01:32,117 - __main__ - INFO - ⌨️  Tecla pressionada: 163
+2025-11-09 20:01:32,370 - __main__ - INFO - ✓ Tecla 163 enviada ao CLP
+2025-11-09 20:01:32,636 - __main__ - INFO - ⌨️  Tecla pressionada: 164
+2025-11-09 20:01:32,889 - __main__ - INFO - ✓ Tecla 164 enviada ao CLP
+2025-11-09 20:01:33,706 - __main__ - INFO - ⌨️  Tecla pressionada: 166
+2025-11-09 20:01:33,949 - __main__ - INFO - ✓ Tecla 166 enviada ao CLP
+2025-11-09 20:01:35,063 - __main__ - INFO - ⌨️  Tecla pressionada: 167
+2025-11-09 20:01:35,303 - __main__ - INFO - ✓ Tecla 167 enviada ao CLP
+2025-11-09 20:01:35,642 - __main__ - INFO - ⌨️  Tecla pressionada: 168
+2025-11-09 20:01:35,875 - __main__ - INFO - ✓ Tecla 168 enviada ao CLP
+2025-11-09 20:01:36,154 - __main__ - INFO - ⌨️  Tecla pressionada: 169
+2025-11-09 20:01:36,393 - __main__ - INFO - ✓ Tecla 169 enviada ao CLP
+2025-11-09 20:01:37,487 - __main__ - INFO - ⌨️  Tecla pressionada: 188
+2025-11-09 20:01:37,719 - __main__ - INFO - ✓ Tecla 188 enviada ao CLP
+2025-11-09 20:01:39,060 - __main__ - INFO - ⌨️  Tecla pressionada: 38
+2025-11-09 20:01:39,296 - __main__ - INFO - ✓ Tecla 38 enviada ao CLP
+2025-11-09 20:01:39,706 - __main__ - INFO - ⌨️  Tecla pressionada: 37
+2025-11-09 20:01:39,948 - __main__ - INFO - ✓ Tecla 37 enviada ao CLP
+2025-11-09 20:01:40,812 - __main__ - INFO - ⌨️  Tecla pressionada: 161
+2025-11-09 20:01:41,045 - __main__ - INFO - ✓ Tecla 161 enviada ao CLP

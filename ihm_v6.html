@@ -1,0 +1,368 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>IHM v6 - Atos MPC4004</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Share+Tech+Mono&display=swap');
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Share Tech Mono', 'Courier New', monospace;
+            background: #1a1a1a;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .ihm-panel {
+            background: linear-gradient(145deg, #2a2a2a, #1a1a1a);
+            border: 4px solid #3a3a3a;
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.8);
+            max-width: 420px;
+            width: 100%;
+        }
+
+        .ihm-header {
+            text-align: center;
+            color: #888;
+            font-size: 11px;
+            margin-bottom: 15px;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            border-bottom: 1px solid #333;
+            padding-bottom: 10px;
+        }
+
+        .ihm-brand {
+            font-size: 16px;
+            color: #aaa;
+            font-weight: bold;
+            margin-bottom: 3px;
+        }
+
+        /* LCD DISPLAY */
+        .lcd-container {
+            background: #0a0a0a;
+            border: 3px solid #1a1a1a;
+            border-radius: 6px;
+            padding: 12px;
+            margin-bottom: 20px;
+            box-shadow: inset 0 2px 10px rgba(0,0,0,0.9);
+        }
+
+        .lcd-display {
+            background: linear-gradient(180deg, #9FBC2B 0%, #8FAC1F 100%);
+            border: 2px solid #7A9920;
+            border-radius: 3px;
+            padding: 10px 8px;
+            position: relative;
+            box-shadow: inset 0 1px 3px rgba(0,0,0,0.3);
+        }
+
+        .lcd-display::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: repeating-linear-gradient(0deg,
+                rgba(0,0,0,0.03) 0px, rgba(0,0,0,0.03) 1px,
+                transparent 1px, transparent 2px);
+            pointer-events: none;
+            border-radius: 3px;
+        }
+
+        .lcd-line {
+            font-size: 18px;
+            font-weight: bold;
+            color: #1a3a0a;
+            letter-spacing: 3px;
+            white-space: pre;
+            line-height: 1.4;
+            text-shadow: 0 1px 1px rgba(255,255,255,0.2);
+        }
+
+        /* STATUS BAR */
+        .status-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: #1a1a1a;
+            border: 1px solid #333;
+            padding: 6px 10px;
+            border-radius: 4px;
+            margin-bottom: 15px;
+            font-size: 10px;
+            color: #666;
+        }
+
+        .status-led {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #333;
+            display: inline-block;
+            margin-right: 4px;
+        }
+
+        .status-led.online {
+            background: #00ff00;
+            box-shadow: 0 0 8px #00ff00;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.6; }
+        }
+
+        /* BUTTONS */
+        .keyboard-section {
+            background: #222;
+            border: 2px solid #333;
+            border-radius: 6px;
+            padding: 12px;
+            margin-bottom: 12px;
+        }
+
+        .keyboard-label {
+            color: #666;
+            font-size: 9px;
+            text-transform: uppercase;
+            margin-bottom: 8px;
+            letter-spacing: 1px;
+        }
+
+        .keyboard-grid {
+            display: grid;
+            gap: 8px;
+        }
+
+        .row-7-keys { grid-template-columns: repeat(7, 1fr); }
+        .top-controls {
+            display: flex;
+            justify-content: space-between;
+            gap: 8px;
+            margin-bottom: 12px;
+        }
+
+        .btn {
+            background: linear-gradient(145deg, #4a4a4a, #3a3a3a);
+            border: 2px solid #555;
+            border-radius: 4px;
+            padding: 12px;
+            font-size: 14px;
+            font-weight: bold;
+            color: #ddd;
+            cursor: pointer;
+            transition: all 0.1s;
+            user-select: none;
+            box-shadow: 0 3px 0 #1a1a1a;
+            text-align: center;
+        }
+
+        .btn:hover {
+            background: linear-gradient(145deg, #5a5a5a, #4a4a4a);
+            border-color: #666;
+        }
+
+        .btn:active {
+            transform: translateY(2px);
+            box-shadow: 0 1px 0 #1a1a1a;
+        }
+
+        .btn-numeric {
+            background: linear-gradient(145deg, #f4a742, #e89732);
+            border-color: #d88722;
+            color: #1a1a1a;
+        }
+
+        .btn-function {
+            background: linear-gradient(145deg, #4a8acc, #3a7abc);
+            border-color: #2a6aac;
+            color: #fff;
+            font-size: 11px;
+            padding: 8px;
+        }
+
+        .btn-enter {
+            background: linear-gradient(145deg, #5cb85c, #4ca84c);
+            border-color: #3c983c;
+            color: #fff;
+        }
+
+        .btn-esc {
+            background: linear-gradient(145deg, #d95c5c, #c94c4c);
+            border-color: #b93c3c;
+            color: #fff;
+        }
+    </style>
+</head>
+<body>
+    <div class="ihm-panel">
+        <div class="ihm-header">
+            <div class="ihm-brand">ATOS MPC4004</div>
+            <div>Expert Series HMI v6</div>
+        </div>
+
+        <div class="status-bar">
+            <div>
+                <span class="status-led" id="wsLed"></span>
+                <span id="wsStatus">Conectando...</span>
+            </div>
+            <div>
+                <span class="status-led" id="clpLed"></span>
+                <span id="clpStatus">CLP: --</span>
+            </div>
+            <div>Tela: <span id="screenNum">0</span></div>
+        </div>
+
+        <div class="lcd-container">
+            <div class="lcd-display">
+                <div class="lcd-line" id="lcdLine1">**TRILLOR MAQUINAS**</div>
+                <div class="lcd-line" id="lcdLine2">**DOBRADEIRA HD    **</div>
+            </div>
+        </div>
+
+        <!-- Controles Principais -->
+        <div class="keyboard-section">
+            <div class="keyboard-label">Controles</div>
+            <div class="top-controls">
+                <button class="btn btn-function" onclick="navUp()" style="flex: 1;">↑</button>
+                <button class="btn btn-function" data-key="220" style="flex: 1;">S1</button>
+                <button class="btn btn-function" data-key="221" style="flex: 1;">S2</button>
+                <button class="btn btn-function" onclick="navDown()" style="flex: 1;">↓</button>
+            </div>
+        </div>
+
+        <!-- Linha 1: K1-K7 -->
+        <div class="keyboard-section">
+            <div class="keyboard-label">Teclado</div>
+            <div class="keyboard-grid row-7-keys">
+                <button class="btn btn-numeric" data-key="160">K1</button>
+                <button class="btn btn-numeric" data-key="161">K2</button>
+                <button class="btn btn-numeric" data-key="162">K3</button>
+                <button class="btn btn-numeric" data-key="163">K4</button>
+                <button class="btn btn-numeric" data-key="164">K5</button>
+                <button class="btn btn-numeric" data-key="165">K6</button>
+                <button class="btn btn-numeric" data-key="166">K7</button>
+            </div>
+        </div>
+
+        <!-- Linha 2 -->
+        <div class="keyboard-section">
+            <div class="keyboard-grid row-7-keys">
+                <button class="btn btn-numeric" data-key="167">K8</button>
+                <button class="btn btn-numeric" data-key="168">K9</button>
+                <button class="btn btn-numeric" data-key="169">K0</button>
+                <button class="btn btn-function" data-key="241">LOCK</button>
+                <button class="btn btn-esc" data-key="188">ESC</button>
+                <button class="btn btn-function" data-key="38">EDIT</button>
+                <button class="btn btn-enter" data-key="37">ENTER</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const WS_URL = 'ws://localhost:8086';
+        let ws = null;
+        let currentScreen = 0;
+        let clpData = { encoder: 0, inputs: [], outputs: [], connected: false };
+
+        // Elementos DOM
+        const lcdLine1 = document.getElementById('lcdLine1');
+        const lcdLine2 = document.getElementById('lcdLine2');
+        const screenNum = document.getElementById('screenNum');
+        const wsLed = document.getElementById('wsLed');
+        const clpLed = document.getElementById('clpLed');
+        const wsStatus = document.getElementById('wsStatus');
+        const clpStatus = document.getElementById('clpStatus');
+
+        // Definição das 11 telas
+        const screens = [
+            { line1: "**TRILLOR MAQUINAS**", line2: "**DOBRADEIRA HD    **" },
+            { line1: "CAMARGO CORREIA CONS", line2: "AQUISICAO AGOSTO- 06" },
+            { line1: "SELECAO DE AUTO/MAN ", line2: "                    " },
+            { line1: "DESLOCAMENTO ANGULAR", line2: () => `PV=${String(clpData.encoder).padStart(4, ' ')}° (${String(clpData.encoder).padStart(6, ' ')})` },
+            { line1: "AJUSTE DO ANGULO  01", line2: "AJ=    °    PV=    °" },
+            { line1: "AJUSTE DO ANGULO  02", line2: "AJ=    °    PV=    °" },
+            { line1: "AJUSTE DO ANGULO  03", line2: "AJ=    °    PV=    °" },
+            { line1: "*SELECAO DA ROTACAO*", line2: "                    " },
+            { line1: "CARENAGEM DOBRADEIRA", line2: "                    " },
+            { line1: "TOTALIZADOR DE TEMPO", line2: "*****     :  h *****" },
+            { line1: "ESTADO DA MAQUINA   ", line2: "                    " }
+        ];
+
+        function navUp() {
+            currentScreen = (currentScreen - 1 + screens.length) % screens.length;
+            updateDisplay();
+        }
+
+        function navDown() {
+            currentScreen = (currentScreen + 1) % screens.length;
+            updateDisplay();
+        }
+
+        function updateDisplay() {
+            const screen = screens[currentScreen];
+            lcdLine1.textContent = typeof screen.line1 === 'function' ? screen.line1() : screen.line1;
+            lcdLine2.textContent = typeof screen.line2 === 'function' ? screen.line2() : screen.line2;
+            screenNum.textContent = currentScreen;
+        }
+
+        function connectWebSocket() {
+            ws = new WebSocket(WS_URL);
+
+            ws.onopen = () => {
+                wsLed.classList.add('online');
+                wsStatus.textContent = 'Online';
+            };
+
+            ws.onmessage = (event) => {
+                const msg = JSON.parse(event.data);
+                if (msg.type === 'state' || msg.type === 'update') {
+                    clpData = msg.data;
+                    if (clpData.connected) {
+                        clpLed.classList.add('online');
+                        clpStatus.textContent = 'CLP: Online';
+                    } else {
+                        clpLed.classList.remove('online');
+                        clpStatus.textContent = 'CLP: Offline';
+                    }
+                    updateDisplay();
+                }
+            };
+
+            ws.onclose = () => {
+                wsLed.classList.remove('online');
+                wsStatus.textContent = 'Desconectado';
+                setTimeout(connectWebSocket, 2000);
+            };
+        }
+
+        // Enviar teclas ao CLP
+        document.querySelectorAll('[data-key]').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const keyCode = parseInt(btn.getAttribute('data-key'));
+                if (ws && ws.readyState === WebSocket.OPEN) {
+                    ws.send(JSON.stringify({ action: 'press_key', key_code: keyCode }));
+                }
+            });
+        });
+
+        // Suporte teclado
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowUp') { e.preventDefault(); navUp(); }
+            if (e.key === 'ArrowDown') { e.preventDefault(); navDown(); }
+        });
+
+        connectWebSocket();
+        updateDisplay();
+    </script>
+</body>
+</html>

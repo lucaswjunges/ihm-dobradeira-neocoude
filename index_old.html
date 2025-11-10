@@ -1,0 +1,755 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>NEOCOUDE-HD-15 - Dobradeira de Ferragens</title>
+    <style>
+        /* ============================================================================ */
+        /* RESET AND BASE */
+        /* ============================================================================ */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            font-family: 'Courier New', monospace;
+            background: #1a1a1a;
+            color: #00ff00;
+            height: 100vh;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* ============================================================================ */
+        /* HEADER */
+        /* ============================================================================ */
+        header {
+            background: #000;
+            padding: 10px 20px;
+            border-bottom: 2px solid #00ff00;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        header h1 {
+            font-size: 1.2rem;
+            color: #00ff00;
+        }
+
+        .connection-status {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.9rem;
+        }
+
+        .status-led {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: #ff0000;
+            animation: blink-red 1s infinite;
+        }
+
+        .status-led.connected {
+            background: #00ff00;
+            animation: none;
+        }
+
+        @keyframes blink-red {
+            0%, 50% { opacity: 1; }
+            51%, 100% { opacity: 0.3; }
+        }
+
+        /* ============================================================================ */
+        /* MAIN DISPLAY (LCD Simulator) */
+        /* ============================================================================ */
+        .lcd-container {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            padding: 20px;
+            gap: 20px;
+        }
+
+        .lcd-display {
+            background: #0a3d0a;
+            border: 4px solid #003300;
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: inset 0 0 20px rgba(0, 255, 0, 0.1);
+            font-family: 'Courier New', monospace;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .lcd-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px 0;
+            border-bottom: 1px solid rgba(0, 255, 0, 0.2);
+        }
+
+        .lcd-row:last-child {
+            border-bottom: none;
+        }
+
+        .lcd-label {
+            font-size: 1rem;
+            color: #00cc00;
+        }
+
+        .lcd-value {
+            font-size: 1.4rem;
+            color: #00ff00;
+            font-weight: bold;
+        }
+
+        .lcd-value.large {
+            font-size: 2rem;
+        }
+
+        /* LED Indicators */
+        .led-group {
+            display: flex;
+            gap: 10px;
+        }
+
+        .led {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: #003300;
+            border: 2px solid #006600;
+            position: relative;
+        }
+
+        .led.active {
+            background: #00ff00;
+            box-shadow: 0 0 15px #00ff00;
+        }
+
+        .led::after {
+            content: attr(data-label);
+            position: absolute;
+            top: 25px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 0.7rem;
+            color: #00cc00;
+            white-space: nowrap;
+        }
+
+        /* ============================================================================ */
+        /* MENU SYSTEM */
+        /* ============================================================================ */
+        .menu-container {
+            background: #0a3d0a;
+            border: 3px solid #003300;
+            border-radius: 6px;
+            padding: 15px;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+
+        .menu-item {
+            padding: 10px;
+            margin: 5px 0;
+            background: rgba(0, 255, 0, 0.05);
+            border: 1px solid #006600;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .menu-item:hover {
+            background: rgba(0, 255, 0, 0.15);
+        }
+
+        .menu-item.selected {
+            background: #00ff00;
+            color: #000;
+            border-color: #00ff00;
+            font-weight: bold;
+        }
+
+        .input-field {
+            background: #001a00;
+            border: 2px solid #00ff00;
+            color: #00ff00;
+            padding: 8px;
+            font-family: 'Courier New', monospace;
+            font-size: 1.2rem;
+            width: 100px;
+            text-align: center;
+            border-radius: 4px;
+        }
+
+        .input-field:focus {
+            outline: none;
+            box-shadow: 0 0 10px #00ff00;
+        }
+
+        /* ============================================================================ */
+        /* KEYPAD */
+        /* ============================================================================ */
+        .keypad-container {
+            background: #000;
+            padding: 20px;
+            border-top: 2px solid #00ff00;
+        }
+
+        .keypad-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 10px;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .key-button {
+            background: linear-gradient(145deg, #2a2a2a, #1a1a1a);
+            border: 2px solid #00ff00;
+            color: #00ff00;
+            padding: 20px;
+            font-size: 1.2rem;
+            font-family: 'Courier New', monospace;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.1s;
+            user-select: none;
+            font-weight: bold;
+        }
+
+        .key-button:active {
+            background: #00ff00;
+            color: #000;
+            transform: scale(0.95);
+        }
+
+        .key-button.special {
+            background: linear-gradient(145deg, #3a3a00, #2a2a00);
+            border-color: #ffff00;
+            color: #ffff00;
+        }
+
+        .key-button.special:active {
+            background: #ffff00;
+            color: #000;
+        }
+
+        .key-button.function {
+            background: linear-gradient(145deg, #3a0000, #2a0000);
+            border-color: #ff0000;
+            color: #ff0000;
+        }
+
+        .key-button.function:active {
+            background: #ff0000;
+            color: #fff;
+        }
+
+        /* ============================================================================ */
+        /* ERROR OVERLAY */
+        /* ============================================================================ */
+        .error-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(255, 0, 0, 0.9);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .error-overlay.active {
+            display: flex;
+        }
+
+        .error-message {
+            font-size: 2rem;
+            color: #fff;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header>
+        <h1>NEOCOUDE-HD-15 | DOBRADEIRA CLP</h1>
+        <div class="connection-status">
+            <div class="status-led" id="statusLed"></div>
+            <span id="statusText">DESCONECTADO</span>
+        </div>
+    </header>
+
+    <!-- Main LCD Display -->
+    <div class="lcd-container">
+        <div class="lcd-display">
+            <!-- Current Angle -->
+            <div class="lcd-row">
+                <span class="lcd-label">ÂNGULO ATUAL:</span>
+                <span class="lcd-value large" id="currentAngle">0°</span>
+            </div>
+
+            <!-- Mode and Speed -->
+            <div class="lcd-row">
+                <span class="lcd-label">MODO:</span>
+                <span class="lcd-value" id="currentMode">MANUAL</span>
+            </div>
+
+            <div class="lcd-row">
+                <span class="lcd-label">VELOCIDADE:</span>
+                <span class="lcd-value" id="currentSpeed">5 RPM (CLASSE 1)</span>
+            </div>
+
+            <!-- Bend Indicators (K1, K2, K3) -->
+            <div class="lcd-row">
+                <span class="lcd-label">DOBRA ATIVA:</span>
+                <div class="led-group">
+                    <div class="led active" data-label="K1" id="ledK1"></div>
+                    <div class="led" data-label="K2" id="ledK2"></div>
+                    <div class="led" data-label="K3" id="ledK3"></div>
+                </div>
+            </div>
+
+            <!-- Direction Indicators (K4 Left, K5 Right) -->
+            <div class="lcd-row">
+                <span class="lcd-label">DIREÇÃO:</span>
+                <div class="led-group">
+                    <div class="led" data-label="K4 ESQ" id="ledK4"></div>
+                    <div class="led" data-label="K5 DIR" id="ledK5"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Menu/Configuration Area -->
+        <div class="menu-container" id="menuContainer">
+            <div style="color: #ffff00; font-weight: bold; margin-bottom: 10px;">[ MENU PRINCIPAL ]</div>
+            <div class="menu-item selected" data-menu="angles-left">⚙ Configurar Ângulos Esquerda</div>
+            <div class="menu-item" data-menu="angles-right">⚙ Configurar Ângulos Direita</div>
+            <div class="menu-item" data-menu="diagnostics">🔍 Diagnóstico I/O</div>
+            <div class="menu-item" data-menu="info">ℹ Informações do Sistema</div>
+        </div>
+    </div>
+
+    <!-- Virtual Keypad -->
+    <div class="keypad-container">
+        <div class="keypad-grid">
+            <!-- Row 1: Numbers -->
+            <button class="key-button" data-key="K7">7</button>
+            <button class="key-button" data-key="K8">8</button>
+            <button class="key-button" data-key="K9">9</button>
+            <button class="key-button special" data-key="ARROW_UP">▲</button>
+
+            <!-- Row 2: Numbers -->
+            <button class="key-button" data-key="K4">4</button>
+            <button class="key-button" data-key="K5">5</button>
+            <button class="key-button" data-key="K6">6</button>
+            <button class="key-button special" data-key="ARROW_DOWN">▼</button>
+
+            <!-- Row 3: Numbers -->
+            <button class="key-button" data-key="K1">1</button>
+            <button class="key-button" data-key="K2">2</button>
+            <button class="key-button" data-key="K3">3</button>
+            <button class="key-button special" data-key="ESC">ESC</button>
+
+            <!-- Row 4: Special -->
+            <button class="key-button function" data-key="S1">S1</button>
+            <button class="key-button" data-key="K0">0</button>
+            <button class="key-button function" data-key="S2">S2</button>
+            <button class="key-button special" data-key="ENTER">ENTER</button>
+        </div>
+    </div>
+
+    <!-- Error Overlay -->
+    <div class="error-overlay" id="errorOverlay">
+        <div class="error-message" id="errorMessage">DESCONECTADO</div>
+        <div style="color: #fff;">Aguardando conexão com servidor...</div>
+    </div>
+
+    <script>
+        // ============================================================================
+        // STATE MANAGEMENT
+        // ============================================================================
+        const state = {
+            connected: false,
+            mode: 'MANUAL',  // MANUAL or AUTO
+            speed: 1,  // 1=5rpm, 2=10rpm, 3=15rpm
+            currentBend: 1,  // 1, 2, or 3
+            direction: null,  // 'LEFT' (K4) or 'RIGHT' (K5)
+            currentAngle: 0,
+            anglesLeft: [90, 90, 90],  // K1, K2, K3 for left bends
+            anglesRight: [90, 90, 90],  // K1, K2, K3 for right bends
+            digitalInputs: {},
+            digitalOutputs: {},
+            currentMenu: 'main',
+            selectedMenuItem: 0
+        };
+
+        let ws = null;
+        let reconnectInterval = null;
+
+        // ============================================================================
+        // WEBSOCKET CONNECTION
+        // ============================================================================
+        function connectWebSocket() {
+            const url = 'ws://localhost:8080';
+            ws = new WebSocket(url);
+
+            ws.onopen = () => {
+                console.log('✓ Connected to server');
+                state.connected = true;
+                updateConnectionStatus();
+                hideError();
+            };
+
+            ws.onclose = () => {
+                console.log('✗ Disconnected from server');
+                state.connected = false;
+                updateConnectionStatus();
+                showError('DESCONECTADO');
+                scheduleReconnect();
+            };
+
+            ws.onerror = (error) => {
+                console.error('WebSocket error:', error);
+            };
+
+            ws.onmessage = (event) => {
+                handleServerMessage(JSON.parse(event.data));
+            };
+        }
+
+        function scheduleReconnect() {
+            if (!reconnectInterval) {
+                reconnectInterval = setInterval(() => {
+                    if (!state.connected) {
+                        console.log('Attempting to reconnect...');
+                        connectWebSocket();
+                    }
+                }, 3000);
+            }
+        }
+
+        function handleServerMessage(message) {
+            console.log('Server message:', message);
+
+            switch (message.type) {
+                case 'initial_state':
+                    updateStateFromServer(message.data);
+                    break;
+                case 'state_update':
+                    updateStateFromServer(message.data);
+                    break;
+                case 'button_response':
+                    console.log(`Button ${message.button}: ${message.success ? 'OK' : 'FAIL'}`);
+                    break;
+                case 'alert':
+                    console.log('Alert:', message.data);
+                    break;
+            }
+        }
+
+        function updateStateFromServer(data) {
+            if (data.encoder_angle !== undefined) {
+                state.currentAngle = data.encoder_angle;
+                updateDisplay();
+            }
+
+            if (data.digital_inputs) {
+                state.digitalInputs = data.digital_inputs;
+            }
+
+            if (data.digital_outputs) {
+                state.digitalOutputs = data.digital_outputs;
+            }
+        }
+
+        // ============================================================================
+        // UI UPDATES
+        // ============================================================================
+        function updateDisplay() {
+            document.getElementById('currentAngle').textContent = state.currentAngle + '°';
+            document.getElementById('currentMode').textContent = state.mode;
+
+            const speedText = ['5 RPM (CLASSE 1)', '10 RPM (CLASSE 2)', '15 RPM (CLASSE 3)'];
+            document.getElementById('currentSpeed').textContent = speedText[state.speed - 1];
+
+            // Update bend LEDs
+            ['K1', 'K2', 'K3'].forEach((led, idx) => {
+                const element = document.getElementById('led' + led);
+                element.classList.toggle('active', state.currentBend === idx + 1);
+            });
+
+            // Update direction LEDs
+            document.getElementById('ledK4').classList.toggle('active', state.direction === 'LEFT');
+            document.getElementById('ledK5').classList.toggle('active', state.direction === 'RIGHT');
+        }
+
+        function updateConnectionStatus() {
+            const led = document.getElementById('statusLed');
+            const text = document.getElementById('statusText');
+
+            if (state.connected) {
+                led.classList.add('connected');
+                text.textContent = 'CONECTADO';
+            } else {
+                led.classList.remove('connected');
+                text.textContent = 'DESCONECTADO';
+            }
+        }
+
+        function showError(message) {
+            document.getElementById('errorMessage').textContent = message;
+            document.getElementById('errorOverlay').classList.add('active');
+        }
+
+        function hideError() {
+            document.getElementById('errorOverlay').classList.remove('active');
+        }
+
+        // ============================================================================
+        // BUTTON HANDLING
+        // ============================================================================
+        function sendButtonPress(buttonName) {
+            if (!state.connected) {
+                console.warn('Cannot send button - not connected');
+                return;
+            }
+
+            const message = {
+                action: 'press_button',
+                button: buttonName
+            };
+
+            ws.send(JSON.stringify(message));
+            console.log('Sent button press:', buttonName);
+        }
+
+        function handleKeyPress(key) {
+            console.log('Key pressed:', key);
+
+            // Special handling for certain keys
+            if (key === 'S1') {
+                // Toggle mode Manual <-> Auto
+                state.mode = state.mode === 'MANUAL' ? 'AUTO' : 'MANUAL';
+                updateDisplay();
+            }
+
+            if (key === 'ARROW_UP') {
+                navigateMenu('up');
+            } else if (key === 'ARROW_DOWN') {
+                navigateMenu('down');
+            } else if (key === 'ENTER') {
+                selectMenuItem();
+            } else if (key === 'ESC') {
+                backToMainMenu();
+            }
+
+            // Send to PLC
+            sendButtonPress(key);
+        }
+
+        // ============================================================================
+        // MENU NAVIGATION
+        // ============================================================================
+        function navigateMenu(direction) {
+            const items = Array.from(document.querySelectorAll('.menu-item'));
+
+            if (direction === 'up') {
+                state.selectedMenuItem = Math.max(0, state.selectedMenuItem - 1);
+            } else {
+                state.selectedMenuItem = Math.min(items.length - 1, state.selectedMenuItem + 1);
+            }
+
+            items.forEach((item, idx) => {
+                item.classList.toggle('selected', idx === state.selectedMenuItem);
+            });
+        }
+
+        function selectMenuItem() {
+            const items = Array.from(document.querySelectorAll('.menu-item'));
+            const selected = items[state.selectedMenuItem];
+            const menuType = selected?.dataset.menu;
+
+            if (menuType) {
+                loadMenu(menuType);
+            }
+        }
+
+        function loadMenu(menuType) {
+            const container = document.getElementById('menuContainer');
+
+            switch (menuType) {
+                case 'angles-left':
+                    container.innerHTML = `
+                        <div style="color: #ffff00; font-weight: bold; margin-bottom: 10px;">[ ÂNGULOS ESQUERDA (K4) ]</div>
+                        <div class="lcd-row">
+                            <span class="lcd-label">Dobra 1 (K1):</span>
+                            <input type="number" class="input-field" value="${state.anglesLeft[0]}" data-angle="left-0" />
+                        </div>
+                        <div class="lcd-row">
+                            <span class="lcd-label">Dobra 2 (K2):</span>
+                            <input type="number" class="input-field" value="${state.anglesLeft[1]}" data-angle="left-1" />
+                        </div>
+                        <div class="lcd-row">
+                            <span class="lcd-label">Dobra 3 (K3):</span>
+                            <input type="number" class="input-field" value="${state.anglesLeft[2]}" data-angle="left-2" />
+                        </div>
+                        <div style="margin-top: 10px; color: #00cc00;">Use ESC para voltar ao menu</div>
+                    `;
+                    break;
+
+                case 'angles-right':
+                    container.innerHTML = `
+                        <div style="color: #ffff00; font-weight: bold; margin-bottom: 10px;">[ ÂNGULOS DIREITA (K5) ]</div>
+                        <div class="lcd-row">
+                            <span class="lcd-label">Dobra 1 (K1):</span>
+                            <input type="number" class="input-field" value="${state.anglesRight[0]}" data-angle="right-0" />
+                        </div>
+                        <div class="lcd-row">
+                            <span class="lcd-label">Dobra 2 (K2):</span>
+                            <input type="number" class="input-field" value="${state.anglesRight[1]}" data-angle="right-1" />
+                        </div>
+                        <div class="lcd-row">
+                            <span class="lcd-label">Dobra 3 (K3):</span>
+                            <input type="number" class="input-field" value="${state.anglesRight[2]}" data-angle="right-2" />
+                        </div>
+                        <div style="margin-top: 10px; color: #00cc00;">Use ESC para voltar ao menu</div>
+                    `;
+                    break;
+
+                case 'diagnostics':
+                    container.innerHTML = `
+                        <div style="color: #ffff00; font-weight: bold; margin-bottom: 10px;">[ DIAGNÓSTICO I/O ]</div>
+                        <div class="lcd-row">
+                            <span class="lcd-label">Entradas (E0-E7):</span>
+                            <div id="inputsDisplay"></div>
+                        </div>
+                        <div class="lcd-row">
+                            <span class="lcd-label">Saídas (S0-S7):</span>
+                            <div id="outputsDisplay"></div>
+                        </div>
+                        <div style="margin-top: 10px; color: #00cc00;">Use ESC para voltar ao menu</div>
+                    `;
+                    updateIODisplay();
+                    break;
+
+                case 'info':
+                    container.innerHTML = `
+                        <div style="color: #ffff00; font-weight: bold; margin-bottom: 10px;">[ INFORMAÇÕES ]</div>
+                        <div class="lcd-row">
+                            <span class="lcd-label">Máquina:</span>
+                            <span class="lcd-value">NEOCOUDE-HD-15</span>
+                        </div>
+                        <div class="lcd-row">
+                            <span class="lcd-label">CLP:</span>
+                            <span class="lcd-value">ATOS MPC4004</span>
+                        </div>
+                        <div class="lcd-row">
+                            <span class="lcd-label">Versão IHM:</span>
+                            <span class="lcd-value">2.0</span>
+                        </div>
+                        <div style="margin-top: 10px; color: #00cc00;">Use ESC para voltar ao menu</div>
+                    `;
+                    break;
+            }
+        }
+
+        function backToMainMenu() {
+            const container = document.getElementById('menuContainer');
+            container.innerHTML = `
+                <div style="color: #ffff00; font-weight: bold; margin-bottom: 10px;">[ MENU PRINCIPAL ]</div>
+                <div class="menu-item selected" data-menu="angles-left">⚙ Configurar Ângulos Esquerda</div>
+                <div class="menu-item" data-menu="angles-right">⚙ Configurar Ângulos Direita</div>
+                <div class="menu-item" data-menu="diagnostics">🔍 Diagnóstico I/O</div>
+                <div class="menu-item" data-menu="info">ℹ Informações do Sistema</div>
+            `;
+            state.selectedMenuItem = 0;
+        }
+
+        function updateIODisplay() {
+            const inputsDiv = document.getElementById('inputsDisplay');
+            const outputsDiv = document.getElementById('outputsDisplay');
+
+            if (inputsDiv) {
+                let html = '<div class="led-group">';
+                for (let i = 0; i < 8; i++) {
+                    const active = state.digitalInputs[`E${i}`] ? 'active' : '';
+                    html += `<div class="led ${active}" data-label="E${i}"></div>`;
+                }
+                html += '</div>';
+                inputsDiv.innerHTML = html;
+            }
+
+            if (outputsDiv) {
+                let html = '<div class="led-group">';
+                for (let i = 0; i < 8; i++) {
+                    const active = state.digitalOutputs[`S${i}`] ? 'active' : '';
+                    html += `<div class="led ${active}" data-label="S${i}"></div>`;
+                }
+                html += '</div>';
+                outputsDiv.innerHTML = html;
+            }
+        }
+
+        // ============================================================================
+        // EVENT LISTENERS
+        // ============================================================================
+        document.addEventListener('DOMContentLoaded', () => {
+            // Connect to WebSocket
+            connectWebSocket();
+
+            // Initial display update
+            updateDisplay();
+
+            // Keypad button clicks
+            document.querySelectorAll('.key-button').forEach(button => {
+                button.addEventListener('click', () => {
+                    const key = button.dataset.key;
+                    handleKeyPress(key);
+                });
+            });
+
+            // Keyboard support
+            document.addEventListener('keydown', (e) => {
+                const keyMap = {
+                    '0': 'K0', '1': 'K1', '2': 'K2', '3': 'K3', '4': 'K4',
+                    '5': 'K5', '6': 'K6', '7': 'K7', '8': 'K8', '9': 'K9',
+                    'ArrowUp': 'ARROW_UP',
+                    'ArrowDown': 'ARROW_DOWN',
+                    'Escape': 'ESC',
+                    'Enter': 'ENTER'
+                };
+
+                if (keyMap[e.key]) {
+                    e.preventDefault();
+                    handleKeyPress(keyMap[e.key]);
+                }
+            });
+        });
+
+        // Update I/O display periodically if on diagnostics screen
+        setInterval(() => {
+            if (document.getElementById('inputsDisplay')) {
+                updateIODisplay();
+            }
+        }, 500);
+    </script>
+</body>
+</html>

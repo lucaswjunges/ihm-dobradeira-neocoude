@@ -1,0 +1,25 @@
+[Unit]
+Description=IHM Web Server - NEOCOUDE-HD-15
+Documentation=file:///home/lucas-junges/Documents/clientes/w&co/README_IHM_COMPLETA.md
+After=network.target
+
+[Service]
+Type=simple
+User=lucas-junges
+WorkingDirectory=/home/lucas-junges/Documents/clientes/w&co
+ExecStart=/usr/bin/python3 /home/lucas-junges/Documents/clientes/w&co/ihm_server_final.py --port /dev/ttyUSB0 --ws-port 8086
+Restart=always
+RestartSec=10
+StandardOutput=journal
+StandardError=journal
+
+# Configurações de segurança
+NoNewPrivileges=true
+PrivateTmp=true
+
+# Limites de recursos
+LimitNOFILE=4096
+MemoryLimit=256M
+
+[Install]
+WantedBy=multi-user.target

@@ -1,0 +1,12 @@
+---
+# Configuração ser2net para CLP Atos MPC4004
+# Porta TCP 5000 -> /dev/ttyUSB0 (57600 8N1)
+
+connection: &clp_connection
+  accepter: tcp,5000
+  enable: on
+  options:
+    kickolduser: true
+  connector: serialdev,/dev/ttyUSB0,57600n81,local
+  options:
+    banner: "Conectado ao CLP Atos MPC4004 via ser2net\r\n"

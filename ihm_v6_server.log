@@ -1,0 +1,139 @@
+/home/lucas-junges/Documents/clientes/w&co/ihm_v6_server.py:15: DeprecationWarning: websockets.server.WebSocketServerProtocol is deprecated
+  from websockets.server import WebSocketServerProtocol
+2025-11-09 20:08:14,406 - modbus_client - INFO - Modbus client initialized in LIVE MODE: /dev/ttyUSB0 @ 57600
+2025-11-09 20:08:14,407 - modbus_client - INFO - Connected to PLC on /dev/ttyUSB0
+2025-11-09 20:08:14,429 - modbus_client - ERROR - Error reading register 6536: ExceptionResponse(dev_id=1, function_code=131, exception_code=2)
+2025-11-09 20:08:14,429 - __main__ - INFO - ✓ Conexão Modbus OK
+2025-11-09 20:08:14,429 - __main__ - INFO - 🚀 Iniciando IHM v6 Server (Data Provider) em ws://localhost:8086
+2025-11-09 20:08:14,431 - __main__ - INFO - 📡 Iniciando polling de dados do CLP...
+2025-11-09 20:08:14,435 - websockets.server - INFO - server listening on 127.0.0.1:8086
+2025-11-09 20:08:14,435 - __main__ - INFO - ✓ IHM v6 Server rodando em ws://localhost:8086
+2025-11-09 20:08:14,435 - __main__ - INFO - 📱 Abra ihm_v6.html no navegador
+2025-11-09 20:08:24,542 - websockets.server - INFO - connection open
+2025-11-09 20:08:24,542 - __main__ - INFO - Cliente conectado: ('127.0.0.1', 51118)
+2025-11-09 20:08:41,634 - __main__ - INFO - ⌨️  Tecla 220
+2025-11-09 20:08:44,921 - __main__ - INFO - ⌨️  Tecla 220
+2025-11-09 20:08:45,621 - __main__ - INFO - ⌨️  Tecla 221
+2025-11-09 20:11:58,301 - __main__ - INFO - ⌨️  Tecla 220
+2025-11-09 20:12:03,662 - __main__ - INFO - ⌨️  Tecla 37
+2025-11-09 20:12:05,733 - __main__ - INFO - ⌨️  Tecla 37
+2025-11-09 20:12:07,926 - __main__ - INFO - ⌨️  Tecla 38
+2025-11-09 20:12:09,805 - __main__ - INFO - ⌨️  Tecla 220
+2025-11-09 20:12:11,318 - __main__ - INFO - ⌨️  Tecla 220
+2025-11-09 20:13:18,037 - __main__ - INFO - ⌨️  Tecla 220
+2025-11-09 20:13:19,860 - __main__ - INFO - ⌨️  Tecla 38
+2025-11-09 20:13:20,854 - __main__ - INFO - ⌨️  Tecla 37
+2025-11-09 20:13:23,406 - __main__ - INFO - ⌨️  Tecla 160
+2025-11-09 20:13:23,586 - __main__ - INFO - ⌨️  Tecla 160
+2025-11-09 20:13:24,239 - __main__ - INFO - ⌨️  Tecla 160
+2025-11-09 20:13:24,952 - __main__ - INFO - ⌨️  Tecla 161
+2025-11-09 20:13:25,560 - __main__ - INFO - ⌨️  Tecla 162
+2025-11-09 20:13:26,095 - __main__ - INFO - ⌨️  Tecla 163
+2025-11-09 20:13:26,585 - __main__ - INFO - ⌨️  Tecla 164
+2025-11-09 20:13:27,572 - __main__ - INFO - ⌨️  Tecla 166
+2025-11-09 20:13:29,606 - __main__ - INFO - ⌨️  Tecla 188
+2025-11-09 20:13:30,286 - __main__ - INFO - ⌨️  Tecla 188
+2025-11-09 20:13:31,577 - __main__ - INFO - ⌨️  Tecla 37
+2025-11-09 20:14:50,440 - __main__ - INFO - ⌨️  Tecla 37
+2025-11-09 20:14:52,700 - __main__ - INFO - ⌨️  Tecla 38
+2025-11-09 20:14:53,788 - __main__ - INFO - ⌨️  Tecla 241
+2025-11-09 20:14:54,404 - __main__ - INFO - ⌨️  Tecla 188
+2025-11-09 20:14:54,938 - __main__ - INFO - ⌨️  Tecla 188
+2025-11-09 20:14:56,949 - __main__ - INFO - ⌨️  Tecla 160
+2025-11-09 20:14:57,128 - __main__ - INFO - ⌨️  Tecla 160
+2025-11-09 20:14:58,724 - __main__ - INFO - ⌨️  Tecla 221
+2025-11-09 20:21:34,010 - websockets.server - INFO - connection open
+2025-11-09 20:21:34,011 - __main__ - INFO - Cliente conectado: ('127.0.0.1', 36758)
+2025-11-09 20:21:47,858 - __main__ - INFO - ⌨️  Tecla 220
+2025-11-09 20:21:50,604 - __main__ - INFO - ⌨️  Tecla 220
+2025-11-09 20:21:57,253 - __main__ - INFO - ⌨️  Tecla 220
+2025-11-09 20:21:58,300 - __main__ - INFO - ⌨️  Tecla 221
+2025-11-09 20:21:58,995 - __main__ - INFO - ⌨️  Tecla 221
+2025-11-09 20:21:59,938 - __main__ - INFO - ⌨️  Tecla 220
+2025-11-09 20:22:01,802 - __main__ - INFO - ⌨️  Tecla 220
+2025-11-09 20:22:05,309 - __main__ - INFO - ⌨️  Tecla 160
+2025-11-09 20:22:08,251 - __main__ - INFO - ⌨️  Tecla 160
+2025-11-09 20:22:10,116 - __main__ - INFO - ⌨️  Tecla 188
+2025-11-09 20:25:01,469 - websockets.server - INFO - connection open
+2025-11-09 20:25:01,469 - __main__ - INFO - Cliente conectado: ('127.0.0.1', 49522)
+2025-11-09 20:25:05,112 - __main__ - INFO - ⌨️  Tecla 220
+2025-11-09 20:25:07,511 - __main__ - INFO - ⌨️  Tecla 220
+2025-11-09 20:25:08,502 - __main__ - INFO - ⌨️  Tecla 220
+2025-11-09 20:25:09,209 - __main__ - INFO - ⌨️  Tecla 221
+2025-11-09 20:25:09,810 - __main__ - INFO - ⌨️  Tecla 221
+2025-11-09 20:25:10,575 - __main__ - INFO - ⌨️  Tecla 220
+2025-11-09 20:25:11,258 - __main__ - INFO - ⌨️  Tecla 221
+2025-11-09 20:25:24,533 - __main__ - INFO - ⌨️  Tecla 188
+2025-11-09 20:25:26,466 - __main__ - INFO - ⌨️  Tecla 160
+2025-11-09 20:25:47,286 - __main__ - INFO - ⌨️  Tecla 220
+2025-11-09 20:25:48,402 - __main__ - INFO - ⌨️  Tecla 220
+2025-11-09 20:25:49,220 - __main__ - INFO - ⌨️  Tecla 221
+2025-11-09 20:25:50,089 - __main__ - INFO - ⌨️  Tecla 220
+2025-11-09 20:25:51,213 - __main__ - INFO - ⌨️  Tecla 161
+2025-11-09 20:25:51,918 - __main__ - INFO - ⌨️  Tecla 162
+2025-11-09 20:25:52,453 - __main__ - INFO - ⌨️  Tecla 163
+2025-11-09 20:25:52,981 - __main__ - INFO - ⌨️  Tecla 164
+2025-11-09 20:25:53,798 - __main__ - INFO - ⌨️  Tecla 188
+2025-11-09 20:25:54,666 - __main__ - INFO - ⌨️  Tecla 241
+2025-11-09 20:25:55,228 - __main__ - INFO - ⌨️  Tecla 241
+2025-11-09 20:25:55,408 - __main__ - INFO - ⌨️  Tecla 241
+2025-11-09 20:25:56,560 - __main__ - INFO - ⌨️  Tecla 188
+2025-11-09 20:26:00,081 - __main__ - INFO - ⌨️  Tecla 167
+2025-11-09 20:26:00,734 - __main__ - INFO - ⌨️  Tecla 168
+2025-11-09 20:26:01,225 - __main__ - INFO - ⌨️  Tecla 169
+2025-11-09 20:29:39,591 - __main__ - INFO - ⌨️  Tecla 160
+2025-11-09 20:29:40,386 - __main__ - INFO - ⌨️  Tecla 161
+2025-11-09 20:31:59,024 - websockets.server - INFO - connection open
+2025-11-09 20:31:59,024 - __main__ - INFO - Cliente conectado: ('127.0.0.1', 38356)
+2025-11-09 20:35:47,625 - websockets.server - INFO - connection open
+2025-11-09 20:35:47,626 - __main__ - INFO - Cliente conectado: ('127.0.0.1', 59482)
+2025-11-09 20:36:02,271 - __main__ - INFO - ⌨️  Tecla 220
+2025-11-09 20:36:04,238 - __main__ - INFO - ⌨️  Tecla 220
+2025-11-09 20:36:05,131 - __main__ - INFO - ⌨️  Tecla 220
+2025-11-09 20:36:11,932 - __main__ - INFO - ⌨️  Tecla 37
+2025-11-09 20:36:13,640 - __main__ - INFO - ⌨️  Tecla 38
+2025-11-09 20:36:16,351 - __main__ - INFO - ⌨️  Tecla 160
+2025-11-09 20:36:18,203 - __main__ - INFO - ⌨️  Tecla 38
+2025-11-09 20:36:18,886 - __main__ - INFO - ⌨️  Tecla 188
+2025-11-09 20:36:19,344 - __main__ - INFO - ⌨️  Tecla 188
+2025-11-09 20:36:19,524 - __main__ - INFO - ⌨️  Tecla 188
+2025-11-09 20:36:26,104 - __main__ - INFO - ⌨️  Tecla 37
+2025-11-09 20:36:28,019 - __main__ - INFO - ⌨️  Tecla 220
+2025-11-09 20:39:51,124 - websockets.server - INFO - connection open
+2025-11-09 20:39:51,124 - __main__ - INFO - Cliente conectado: ('127.0.0.1', 56874)
+2025-11-09 20:39:54,210 - __main__ - INFO - ⌨️  Tecla 220
+2025-11-09 20:39:55,271 - __main__ - INFO - ⌨️  Tecla 220
+2025-11-09 20:39:56,160 - __main__ - INFO - ⌨️  Tecla 220
+2025-11-09 20:39:57,819 - __main__ - INFO - ⌨️  Tecla 220
+2025-11-09 20:39:58,805 - __main__ - INFO - ⌨️  Tecla 220
+2025-11-09 20:39:59,788 - __main__ - INFO - ⌨️  Tecla 220
+2025-11-09 20:40:01,790 - __main__ - INFO - ⌨️  Tecla 220
+2025-11-09 20:40:02,971 - __main__ - INFO - ⌨️  Tecla 220
+2025-11-09 20:40:04,012 - __main__ - INFO - ⌨️  Tecla 220
+2025-11-09 20:40:05,646 - __main__ - INFO - ⌨️  Tecla 220
+2025-11-09 20:40:09,221 - __main__ - INFO - ⌨️  Tecla 38
+2025-11-09 20:40:09,838 - __main__ - INFO - ⌨️  Tecla 188
+2025-11-09 20:40:10,415 - __main__ - INFO - ⌨️  Tecla 188
+2025-11-09 20:40:10,595 - __main__ - INFO - ⌨️  Tecla 188
+2025-11-09 20:40:11,724 - __main__ - INFO - ⌨️  Tecla 221
+2025-11-09 20:40:13,521 - __main__ - INFO - ⌨️  Tecla 221
+2025-11-09 20:40:14,412 - __main__ - INFO - ⌨️  Tecla 162
+2025-11-09 20:40:15,193 - __main__ - INFO - ⌨️  Tecla 161
+2025-11-09 20:40:15,809 - __main__ - INFO - ⌨️  Tecla 160
+2025-11-09 20:40:17,985 - __main__ - INFO - ⌨️  Tecla 163
+2025-11-09 20:40:19,054 - __main__ - INFO - ⌨️  Tecla 165
+2025-11-09 20:40:19,544 - __main__ - INFO - ⌨️  Tecla 166
+2025-11-09 21:30:00,150 - websockets.server - INFO - connection open
+2025-11-09 21:30:00,150 - __main__ - INFO - Cliente conectado: ('127.0.0.1', 56672)
+2025-11-09 21:30:13,486 - __main__ - INFO - ⌨️  Tecla 220
+2025-11-09 21:30:19,921 - __main__ - INFO - ⌨️  Tecla 37
+2025-11-09 21:30:23,283 - __main__ - INFO - ⌨️  Tecla 37
+2025-11-09 21:44:00,524 - websockets.server - INFO - connection open
+2025-11-09 21:44:00,524 - __main__ - INFO - Cliente conectado: ('127.0.0.1', 55988)
+2025-11-09 21:44:05,045 - __main__ - INFO - ⌨️  Tecla 220
+2025-11-09 21:44:06,519 - __main__ - INFO - ⌨️  Tecla 220
+2025-11-09 21:44:11,464 - __main__ - INFO - ⌨️  Tecla 160
+2025-11-09 21:44:12,830 - __main__ - INFO - ⌨️  Tecla 38
+2025-11-09 21:44:13,694 - __main__ - INFO - ⌨️  Tecla 37
+2025-11-09 21:44:14,898 - __main__ - INFO - ⌨️  Tecla 188
+2025-11-09 21:44:15,732 - __main__ - INFO - ⌨️  Tecla 241

@@ -2,894 +2,750 @@
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-    <title>NEOCOUDE-HD-15 HMI</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>IHM NEOCOUDE-HD-15 - Trillor</title>
     <style>
-        /* ============================================================================ */
-        /* RESET AND BASE STYLES */
-        /* ============================================================================ */
+        /* ===== RESET E GLOBAL ===== */
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-            -webkit-tap-highlight-color: transparent;
         }
 
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-family: Arial, sans-serif;
             background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
             color: #fff;
-            height: 100vh;
-            overflow: hidden;
+            overflow-y: auto;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            padding: 10px 0;
+        }
+
+        /* ===== CONTAINER PRINCIPAL ===== */
+        #ihm-container {
+            background: linear-gradient(180deg, #2c3e50 0%, #34495e 100%);
+            border-radius: 12px;
+            padding: 10px;
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.5);
+            max-width: 850px;
+            width: 95%;
+            margin: 5px auto;
+        }
+
+        /* ===== HEADER ===== */
+        .ihm-header {
+            text-align: center;
+            margin-bottom: 6px;
+            padding-bottom: 5px;
+            border-bottom: 2px solid #3498db;
+        }
+
+        .ihm-header h1 {
+            font-size: 16px;
+            color: #3498db;
+            text-shadow: 0 0 10px rgba(52, 152, 219, 0.5);
+            margin-bottom: 2px;
+        }
+
+        .ihm-header .subtitle {
+            font-size: 10px;
+            color: #95a5a6;
+        }
+
+        /* ===== STATUS GERAL ===== */
+        .status-bar {
+            display: flex;
+            justify-content: space-around;
+            margin-bottom: 6px;
+            padding: 4px;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 6px;
+        }
+
+        .status-item {
+            text-align: center;
+        }
+
+        .status-item .label {
+            font-size: 8px;
+            color: #95a5a6;
+            margin-bottom: 1px;
+        }
+
+        .status-item .value {
+            font-size: 12px;
+            font-weight: bold;
+            color: #ecf0f1;
+        }
+
+        .status-item .value.active {
+            color: #2ecc71;
+        }
+
+        .status-item .value.error {
+            color: #e74c3c;
+        }
+
+        /* ===== DISPLAY LCD VIRTUAL ===== */
+        .lcd-container {
+            background: #1a1a1a;
+            border: 2px solid #333;
+            border-radius: 5px;
+            padding: 6px;
+            margin-bottom: 6px;
+            box-shadow: inset 0 0 12px rgba(0, 0, 0, 0.8);
+        }
+
+        .lcd-screen {
+            background: #2a4a2a;
+            color: #90ff90;
+            font-family: 'Courier New', monospace;
+            font-size: 16px;
+            line-height: 1.3;
+            padding: 8px;
+            border-radius: 3px;
+            box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.5);
+            text-shadow: 0 0 6px #90ff90;
+            min-height: 52px;
             position: relative;
         }
 
-        /* ============================================================================ */
-        /* HEADER */
-        /* ============================================================================ */
-        header {
-            background: rgba(0, 0, 0, 0.4);
-            padding: 15px 20px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            border-bottom: 2px solid rgba(255, 255, 255, 0.1);
+        .lcd-line {
+            white-space: pre;
+            letter-spacing: 1px;
         }
 
-        header h1 {
-            font-size: 1.5rem;
-            font-weight: 600;
-        }
-
-        .connection-status {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            font-size: 0.9rem;
-        }
-
-        .status-indicator {
+        .lcd-cursor {
+            display: inline-block;
             width: 12px;
-            height: 12px;
-            border-radius: 50%;
-            background: #f44336;
-            box-shadow: 0 0 10px rgba(244, 67, 54, 0.5);
-            animation: pulse-red 2s infinite;
+            height: 24px;
+            background: #90ff90;
+            vertical-align: middle;
+            animation: blink 1s step-start infinite;
         }
 
-        .status-indicator.connected {
-            background: #4caf50;
-            box-shadow: 0 0 10px rgba(76, 175, 80, 0.5);
-            animation: pulse-green 2s infinite;
+        @keyframes blink {
+            50% { opacity: 0; }
         }
 
-        @keyframes pulse-red {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0.5; }
-        }
-
-        @keyframes pulse-green {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0.7; }
-        }
-
-        /* ============================================================================ */
-        /* TAB NAVIGATION */
-        /* ============================================================================ */
-        .tab-nav {
+        /* ===== LEDS INDICADORES ===== */
+        .led-panel {
             display: flex;
-            background: rgba(0, 0, 0, 0.3);
-            padding: 10px 20px;
-            gap: 10px;
-            overflow-x: auto;
-        }
-
-        .tab-button {
-            flex: 1;
-            padding: 12px 20px;
-            background: rgba(255, 255, 255, 0.1);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            border-radius: 8px;
-            color: #fff;
-            font-size: 1rem;
-            cursor: pointer;
-            transition: all 0.3s;
-            white-space: nowrap;
-        }
-
-        .tab-button:hover {
-            background: rgba(255, 255, 255, 0.2);
-        }
-
-        .tab-button.active {
-            background: rgba(76, 175, 80, 0.3);
-            border-color: #4caf50;
-            box-shadow: 0 0 15px rgba(76, 175, 80, 0.3);
-        }
-
-        /* ============================================================================ */
-        /* TAB CONTENT */
-        /* ============================================================================ */
-        .tab-content {
-            display: none;
-            padding: 20px;
-            height: calc(100vh - 140px);
-            overflow-y: auto;
-        }
-
-        .tab-content.active {
-            display: block;
-        }
-
-        /* ============================================================================ */
-        /* OPERAÇÃO TAB */
-        /* ============================================================================ */
-        .encoder-display {
-            background: rgba(0, 0, 0, 0.4);
-            padding: 30px;
-            border-radius: 12px;
-            text-align: center;
-            margin-bottom: 20px;
-        }
-
-        .encoder-display h2 {
-            font-size: 1rem;
-            opacity: 0.8;
-            margin-bottom: 10px;
-        }
-
-        .encoder-value {
-            font-size: 3.5rem;
-            font-weight: 700;
-            color: #4caf50;
-            text-shadow: 0 0 20px rgba(76, 175, 80, 0.5);
-        }
-
-        .virtual-keyboard {
-            background: rgba(0, 0, 0, 0.4);
-            padding: 20px;
-            border-radius: 12px;
-        }
-
-        .keyboard-row {
-            display: flex;
-            gap: 10px;
-            margin-bottom: 10px;
             justify-content: center;
+            gap: 8px;
+            margin-bottom: 6px;
+            padding: 4px;
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 5px;
         }
 
-        .key-button {
-            flex: 1;
-            max-width: 80px;
-            padding: 20px;
-            background: linear-gradient(145deg, #3a3a3a, #2a2a2a);
-            border: 2px solid #555;
-            border-radius: 8px;
-            color: #fff;
-            font-size: 1.2rem;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.2s;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
-            user-select: none;
-        }
-
-        .key-button:active {
-            transform: scale(0.95);
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
-        }
-
-        .key-button:disabled {
-            opacity: 0.3;
-            cursor: not-allowed;
-        }
-
-        .key-button.function {
-            background: linear-gradient(145deg, #2196f3, #1976d2);
-            border-color: #1565c0;
-        }
-
-        .key-button.control {
-            background: linear-gradient(145deg, #ff9800, #f57c00);
-            border-color: #e65100;
-        }
-
-        /* ============================================================================ */
-        /* DIAGNÓSTICO TAB */
-        /* ============================================================================ */
-        .io-section {
-            background: rgba(0, 0, 0, 0.4);
-            padding: 20px;
-            border-radius: 12px;
-            margin-bottom: 20px;
-        }
-
-        .io-section h3 {
-            margin-bottom: 15px;
-            font-size: 1.2rem;
-        }
-
-        .io-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
-            gap: 15px;
-        }
-
-        .io-indicator {
+        .led-group {
             display: flex;
             flex-direction: column;
             align-items: center;
-            gap: 8px;
+        }
+
+        .led-group .label {
+            font-size: 9px;
+            color: #95a5a6;
+            margin-bottom: 3px;
+        }
+
+        .leds {
+            display: flex;
+            gap: 6px;
         }
 
         .led {
-            width: 40px;
-            height: 40px;
+            width: 16px;
+            height: 16px;
             border-radius: 50%;
-            background: #333;
-            border: 3px solid #555;
-            box-shadow: inset 0 2px 5px rgba(0, 0, 0, 0.5);
-            transition: all 0.3s;
+            background: #222;
+            border: 2px solid #333;
+            box-shadow: inset 0 0 4px rgba(0, 0, 0, 0.8);
+            position: relative;
         }
 
-        .led.on {
-            background: #4caf50;
-            border-color: #66bb6a;
-            box-shadow: 0 0 20px rgba(76, 175, 80, 0.8),
-                        inset 0 0 10px rgba(255, 255, 255, 0.5);
+        .led::after {
+            content: attr(data-label);
+            position: absolute;
+            bottom: -16px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 8px;
+            color: #7f8c8d;
+            white-space: nowrap;
         }
 
-        .io-label {
-            font-size: 0.9rem;
-            font-weight: 600;
+        .led.on.green {
+            background: #2ecc71;
+            box-shadow: 0 0 15px #2ecc71, inset 0 0 5px rgba(255, 255, 255, 0.5);
         }
 
-        /* ============================================================================ */
-        /* LOGS TAB */
-        /* ============================================================================ */
-        .runtime-counter {
-            background: rgba(0, 0, 0, 0.4);
-            padding: 20px;
-            border-radius: 12px;
+        .led.on.yellow {
+            background: #f1c40f;
+            box-shadow: 0 0 15px #f1c40f, inset 0 0 5px rgba(255, 255, 255, 0.5);
+        }
+
+        .led.on.blue {
+            background: #3498db;
+            box-shadow: 0 0 15px #3498db, inset 0 0 5px rgba(255, 255, 255, 0.5);
+        }
+
+        .led.on.red {
+            background: #e74c3c;
+            box-shadow: 0 0 15px #e74c3c, inset 0 0 5px rgba(255, 255, 255, 0.5);
+        }
+
+        /* ===== TECLADO VIRTUAL ===== */
+        .keypad {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 3px;
+            margin-bottom: 5px;
+        }
+
+        .key {
+            background: linear-gradient(180deg, #555 0%, #333 100%);
+            border: 1px solid #666;
+            border-radius: 3px;
+            color: white;
+            font-weight: bold;
+            font-size: 10px;
+            padding: 8px 4px;
+            cursor: pointer;
             text-align: center;
-            margin-bottom: 20px;
+            transition: all 0.1s;
+            box-shadow: 0 2px 0 #222, 0 3px 6px rgba(0, 0, 0, 0.3);
+            user-select: none;
         }
 
-        .runtime-value {
-            font-size: 2.5rem;
-            font-weight: 700;
-            color: #2196f3;
-            margin-top: 10px;
+        .key:active {
+            transform: translateY(3px);
+            box-shadow: 0 0 0 #222, 0 1px 4px rgba(0, 0, 0, 0.3);
         }
 
-        .alert-log {
-            background: rgba(0, 0, 0, 0.4);
-            padding: 20px;
-            border-radius: 12px;
-            max-height: 400px;
-            overflow-y: auto;
+        .key.pressed {
+            transform: translateY(3px);
+            box-shadow: 0 0 0 #222;
+            background: linear-gradient(180deg, #3498db 0%, #2980b9 100%);
         }
 
-        .alert-item {
-            padding: 12px;
-            background: rgba(255, 255, 255, 0.05);
-            border-left: 4px solid #2196f3;
-            margin-bottom: 10px;
-            border-radius: 4px;
+        .key.num {
+            background: linear-gradient(180deg, #5a6268 0%, #3d4247 100%);
         }
 
-        .alert-item.warning {
-            border-color: #ff9800;
+        .key.func {
+            background: linear-gradient(180deg, #f39c12 0%, #e67e22 100%);
+            font-size: 9px;
         }
 
-        .alert-item.error {
-            border-color: #f44336;
+        .key.nav {
+            background: linear-gradient(180deg, #3498db 0%, #2980b9 100%);
+            font-size: 13px;
         }
 
-        .alert-time {
-            font-size: 0.8rem;
-            opacity: 0.7;
+        .key.special {
+            background: linear-gradient(180deg, #e74c3c 0%, #c0392b 100%);
+            font-size: 9px;
         }
 
-        /* ============================================================================ */
-        /* CONFIGURAÇÃO TAB */
-        /* ============================================================================ */
-        .config-section {
-            background: rgba(0, 0, 0, 0.4);
-            padding: 20px;
-            border-radius: 12px;
-            opacity: 0.5;
+        .key.enter {
+            background: linear-gradient(180deg, #27ae60 0%, #229954 100%);
+            font-size: 10px;
         }
 
-        .config-notice {
-            background: rgba(255, 152, 0, 0.2);
-            padding: 15px;
-            border-radius: 8px;
-            border-left: 4px solid #ff9800;
-            margin-top: 15px;
+        /* ===== BOTÕES DE CONTROLE DO PAINEL ===== */
+        .control-panel {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 4px;
+            margin-bottom: 6px;
+            padding: 5px;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 6px;
         }
 
-        /* ============================================================================ */
-        /* ERROR OVERLAYS */
-        /* ============================================================================ */
-        .error-overlay {
+        .control-btn {
+            padding: 10px 6px;
+            border-radius: 5px;
+            font-weight: bold;
+            font-size: 10px;
+            cursor: pointer;
+            border: 2px solid;
+            text-align: center;
+            transition: all 0.1s;
+            box-shadow: 0 2px 0 rgba(0, 0, 0, 0.3), 0 4px 8px rgba(0, 0, 0, 0.2);
+            user-select: none;
+        }
+
+        .control-btn:active {
+            transform: translateY(3px);
+            box-shadow: 0 0 0 rgba(0, 0, 0, 0.3), 0 2px 6px rgba(0, 0, 0, 0.2);
+        }
+
+        .control-btn.pressed {
+            transform: translateY(3px);
+            box-shadow: 0 0 0 rgba(0, 0, 0, 0.3);
+        }
+
+        /* Botão EMERGÊNCIA - Vermelho grande */
+        .control-btn.emergency {
+            background: linear-gradient(180deg, #e74c3c 0%, #c0392b 100%);
+            border-color: #a93226;
+            color: white;
+            grid-column: span 1;
+            font-size: 11px;
+            animation: pulse-emergency 2s ease-in-out infinite;
+        }
+
+        @keyframes pulse-emergency {
+            0%, 100% { box-shadow: 0 5px 0 rgba(0, 0, 0, 0.3), 0 8px 15px rgba(231, 76, 60, 0.5); }
+            50% { box-shadow: 0 5px 0 rgba(0, 0, 0, 0.3), 0 8px 20px rgba(231, 76, 60, 0.8); }
+        }
+
+        .control-btn.emergency:hover {
+            background: linear-gradient(180deg, #ff5e4d 0%, #e74c3c 100%);
+        }
+
+        /* Botão COMANDO GERAL - Verde */
+        .control-btn.power {
+            background: linear-gradient(180deg, #27ae60 0%, #229954 100%);
+            border-color: #1e8449;
+            color: white;
+        }
+
+        .control-btn.power.active {
+            background: linear-gradient(180deg, #2ecc71 0%, #27ae60 100%);
+            box-shadow: 0 5px 0 rgba(0, 0, 0, 0.3), 0 8px 15px rgba(46, 204, 113, 0.6);
+        }
+
+        /* Botão AVANÇAR - Azul */
+        .control-btn.forward {
+            background: linear-gradient(180deg, #3498db 0%, #2980b9 100%);
+            border-color: #21618c;
+            color: white;
+        }
+
+        .control-btn.forward:active {
+            background: linear-gradient(180deg, #5dade2 0%, #3498db 100%);
+        }
+
+        /* Botão RECUAR - Laranja */
+        .control-btn.backward {
+            background: linear-gradient(180deg, #e67e22 0%, #d68910 100%);
+            border-color: #ba6f0a;
+            color: white;
+        }
+
+        .control-btn.backward:active {
+            background: linear-gradient(180deg, #f39c12 0%, #e67e22 100%);
+        }
+
+        /* Botão PARADA - Amarelo */
+        .control-btn.stop {
+            background: linear-gradient(180deg, #f1c40f 0%, #f39c12 100%);
+            border-color: #d68910;
+            color: #2c3e50;
+        }
+
+        .control-btn.stop:active {
+            background: linear-gradient(180deg, #f4d03f 0%, #f1c40f 100%);
+        }
+
+        /* Ícones nos botões */
+        .control-btn::before {
+            display: block;
+            font-size: 14px;
+            margin-bottom: 2px;
+        }
+
+        .control-btn.emergency::before {
+            content: "⛔";
+        }
+
+        .control-btn.power::before {
+            content: "⚡";
+        }
+
+        .control-btn.forward::before {
+            content: "↻";
+        }
+
+        .control-btn.backward::before {
+            content: "↺";
+        }
+
+        .control-btn.stop::before {
+            content: "■";
+        }
+
+        /* ===== OVERLAY DE ERRO/OFFLINE ===== */
+        .overlay {
             display: none;
             position: fixed;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            background: rgba(244, 67, 54, 0.95);
+            background: rgba(0, 0, 0, 0.9);
             z-index: 9999;
             justify-content: center;
             align-items: center;
             flex-direction: column;
         }
 
-        .error-overlay.show {
+        .overlay.active {
             display: flex;
         }
 
-        .error-overlay h1 {
-            font-size: 3rem;
+        .overlay h1 {
+            font-size: 48px;
             margin-bottom: 20px;
-            animation: pulse 1s infinite;
-        }
-
-        .error-overlay p {
-            font-size: 1.2rem;
-            opacity: 0.9;
+            animation: pulse 1.5s ease-in-out infinite;
         }
 
         @keyframes pulse {
             0%, 100% { opacity: 1; }
-            50% { opacity: 0.7; }
+            50% { opacity: 0.5; }
         }
 
-        /* ============================================================================ */
-        /* SCROLLBAR STYLING */
-        /* ============================================================================ */
-        ::-webkit-scrollbar {
-            width: 8px;
+        .overlay.offline h1 {
+            color: #e74c3c;
         }
 
-        ::-webkit-scrollbar-track {
-            background: rgba(0, 0, 0, 0.2);
+        .overlay.clp-error h1 {
+            color: #f39c12;
         }
 
-        ::-webkit-scrollbar-thumb {
-            background: rgba(255, 255, 255, 0.3);
-            border-radius: 4px;
+        /* ===== RESPONSIVE ===== */
+        @media (max-width: 768px) {
+            #ihm-container {
+                padding: 8px;
+            }
+
+            .lcd-screen {
+                font-size: 15px;
+            }
+
+            .key {
+                padding: 7px 3px;
+                font-size: 9px;
+            }
+
+            .ihm-header h1 {
+                font-size: 15px;
+            }
         }
 
-        ::-webkit-scrollbar-thumb:hover {
-            background: rgba(255, 255, 255, 0.5);
+        /* ===== ANIMAÇÕES ===== */
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: scale(0.95);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        #ihm-container {
+            animation: fadeIn 0.5s ease-out;
+        }
+
+        /* Connection status indicator */
+        .connection-indicator {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: #e74c3c;
+        }
+
+        .connection-indicator.connected {
+            background: #2ecc71;
+            box-shadow: 0 0 10px #2ecc71;
         }
     </style>
 </head>
 <body>
-    <!-- ============================================================================ -->
-    <!-- ERROR OVERLAYS -->
-    <!-- ============================================================================ -->
-    <div id="offlineOverlay" class="error-overlay">
-        <h1>⚠️ DESLIGADO</h1>
-        <p>Conexão com servidor perdida</p>
-        <p style="font-size: 0.9rem; margin-top: 10px;">Tentando reconectar...</p>
+    <!-- Overlay de DESLIGADO/OFFLINE -->
+    <div class="overlay offline" id="overlay-offline">
+        <h1>⚠ DESLIGADO</h1>
+        <p>Servidor desconectado. Tentando reconectar...</p>
     </div>
 
-    <div id="plcErrorOverlay" class="error-overlay" style="background: rgba(255, 152, 0, 0.95);">
-        <h1>⚠️ FALHA CLP</h1>
-        <p>Erro de comunicação com CLP</p>
+    <!-- Overlay de FALHA CLP -->
+    <div class="overlay clp-error" id="overlay-clp-error">
+        <h1>⚠ FALHA CLP</h1>
+        <p>Erro de comunicação Modbus</p>
     </div>
 
-    <!-- ============================================================================ -->
-    <!-- HEADER -->
-    <!-- ============================================================================ -->
-    <header>
-        <h1>NEOCOUDE-HD-15</h1>
-        <div class="connection-status">
-            <div id="statusIndicator" class="status-indicator"></div>
-            <span id="statusText">Desconectado</span>
-        </div>
-    </header>
-
-    <!-- ============================================================================ -->
-    <!-- TAB NAVIGATION -->
-    <!-- ============================================================================ -->
-    <nav class="tab-nav">
-        <button class="tab-button active" onclick="switchTab('operacao')">Operação</button>
-        <button class="tab-button" onclick="switchTab('diagnostico')">Diagnóstico</button>
-        <button class="tab-button" onclick="switchTab('logs')">Logs e Produção</button>
-        <button class="tab-button" onclick="switchTab('config')">Configuração</button>
-    </nav>
-
-    <!-- ============================================================================ -->
-    <!-- TAB CONTENT: OPERAÇÃO -->
-    <!-- ============================================================================ -->
-    <div id="operacao" class="tab-content active">
-        <div class="encoder-display">
-            <h2>ÂNGULO DO ENCODER (PV)</h2>
-            <div class="encoder-value" id="encoderAngle">0°</div>
+    <!-- Container principal da IHM -->
+    <div id="ihm-container">
+        <!-- Header -->
+        <div class="ihm-header">
+            <h1>NEOCOUDE-HD-15</h1>
+            <div class="subtitle">Dobradeira de Ferros Trillor - IHM Web Virtual</div>
+            <div class="connection-indicator" id="conn-indicator"></div>
         </div>
 
-        <!-- Display IHM - Replica o visor físico -->
-        <div style="background: rgba(0, 0, 0, 0.4); padding: 20px; border-radius: 12px; margin-bottom: 20px;">
-            <h3 style="margin-bottom: 15px; color: #4caf50;">📺 DISPLAY IHM (Réplica do Visor Físico)</h3>
-
-            <!-- Cabeçalho igual ao visor físico original -->
-            <div style="background: rgba(0, 150, 0, 0.2); border: 2px solid #4caf50; padding: 15px; border-radius: 8px; margin-bottom: 20px; text-align: center; font-family: monospace; font-size: 1.2rem; font-weight: bold;">
-                <div style="color: #ffeb3b; letter-spacing: 2px; margin-bottom: 5px;">★★ TRILLOR MAQUINAS ★★</div>
-                <div style="color: #ff9800; letter-spacing: 2px;">★★ DOBRADEIRA HD ★★</div>
+        <!-- Barra de Status -->
+        <div class="status-bar">
+            <div class="status-item">
+                <div class="label">MODO</div>
+                <div class="value" id="status-modo">MANUAL</div>
             </div>
+            <div class="status-item">
+                <div class="label">VELOCIDADE</div>
+                <div class="value" id="status-vel">5 RPM</div>
+            </div>
+            <div class="status-item">
+                <div class="label">ÂNGULO</div>
+                <div class="value" id="status-angle">0.0°</div>
+            </div>
+            <div class="status-item">
+                <div class="label">CICLO</div>
+                <div class="value" id="status-ciclo">PARADO</div>
+            </div>
+        </div>
 
-            <!-- Dobra 1 -->
-            <div style="background: rgba(255, 255, 255, 0.05); padding: 15px; border-radius: 8px; margin-bottom: 10px; font-family: monospace; font-size: 1.1rem;">
-                <div style="color: #ff9800; margin-bottom: 5px;">AJUSTE ÂNGULO 01:</div>
-                <div style="display: flex; gap: 30px;">
-                    <span>AJ= <span id="aj1" style="color: #4caf50; font-weight: bold;">----</span>°</span>
-                    <span>PV= <span id="pv1" style="color: #2196f3; font-weight: bold;">----</span>°</span>
+        <!-- Display LCD Virtual -->
+        <div class="lcd-container">
+            <div class="lcd-screen" id="lcd-display">
+                <div class="lcd-line" id="lcd-line1">ANG:   0.0° D1 --- </div>
+                <div class="lcd-line" id="lcd-line2">PV:    0.0° [MANUAL]</div>
+            </div>
+        </div>
+
+        <!-- Painel de LEDs -->
+        <div class="led-panel">
+            <div class="led-group">
+                <div class="label">DOBRAS</div>
+                <div class="leds">
+                    <div class="led green" id="led-k1" data-label="D1"></div>
+                    <div class="led green" id="led-k2" data-label="D2"></div>
+                    <div class="led green" id="led-k3" data-label="D3"></div>
                 </div>
             </div>
-
-            <!-- Dobra 2 -->
-            <div style="background: rgba(255, 255, 255, 0.05); padding: 15px; border-radius: 8px; margin-bottom: 10px; font-family: monospace; font-size: 1.1rem;">
-                <div style="color: #ff9800; margin-bottom: 5px;">AJUSTE ÂNGULO 02:</div>
-                <div style="display: flex; gap: 30px;">
-                    <span>AJ= <span id="aj2" style="color: #4caf50; font-weight: bold;">----</span>°</span>
-                    <span>PV= <span id="pv2" style="color: #2196f3; font-weight: bold;">----</span>°</span>
+            <div class="led-group">
+                <div class="label">DIREÇÃO</div>
+                <div class="leds">
+                    <div class="led yellow" id="led-k4" data-label="ESQ"></div>
+                    <div class="led yellow" id="led-k5" data-label="DIR"></div>
                 </div>
             </div>
-
-            <!-- Dobra 3 -->
-            <div style="background: rgba(255, 255, 255, 0.05); padding: 15px; border-radius: 8px; margin-bottom: 10px; font-family: monospace; font-size: 1.1rem;">
-                <div style="color: #ff9800; margin-bottom: 5px;">AJUSTE ÂNGULO 03:</div>
-                <div style="display: flex; gap: 30px;">
-                    <span>AJ= <span id="aj3" style="color: #4caf50; font-weight: bold;">----</span>°</span>
-                    <span>PV= <span id="pv3" style="color: #2196f3; font-weight: bold;">----</span>°</span>
+            <div class="led-group">
+                <div class="label">AUTO</div>
+                <div class="leds">
+                    <div class="led blue" id="led-s1" data-label="AUTO"></div>
                 </div>
             </div>
         </div>
 
-        <div class="virtual-keyboard">
-            <h3 style="margin-bottom: 15px;">Teclado Virtual</h3>
+        <!-- Botões de Controle do Painel -->
+        <div class="control-panel">
+            <button class="control-btn emergency" data-control="EMERGENCY">
+                EMERGÊNCIA
+            </button>
+            <button class="control-btn power" data-control="POWER">
+                COMANDO<br>GERAL
+            </button>
+            <button class="control-btn forward" data-control="FORWARD">
+                AVANÇAR
+            </button>
+            <button class="control-btn backward" data-control="BACKWARD">
+                RECUAR
+            </button>
+            <button class="control-btn stop" data-control="STOP">
+                PARADA
+            </button>
+        </div>
 
-            <!-- Numeric Keys -->
-            <div class="keyboard-row">
-                <button class="key-button" onclick="pressKey('K1')">1</button>
-                <button class="key-button" onclick="pressKey('K2')">2</button>
-                <button class="key-button" onclick="pressKey('K3')">3</button>
-            </div>
-            <div class="keyboard-row">
-                <button class="key-button" onclick="pressKey('K4')">4</button>
-                <button class="key-button" onclick="pressKey('K5')">5</button>
-                <button class="key-button" onclick="pressKey('K6')">6</button>
-            </div>
-            <div class="keyboard-row">
-                <button class="key-button" onclick="pressKey('K7')">7</button>
-                <button class="key-button" onclick="pressKey('K8')">8</button>
-                <button class="key-button" onclick="pressKey('K9')">9</button>
-            </div>
-            <div class="keyboard-row">
-                <button class="key-button" onclick="pressKey('K0')">0</button>
-            </div>
+        <!-- Teclado Virtual -->
+        <div class="keypad">
+            <!-- Linha 1 -->
+            <button class="key num" data-key="K7">7</button>
+            <button class="key num" data-key="K8">8</button>
+            <button class="key num" data-key="K9">9</button>
+            <div></div> <!-- Espaço -->
+            <button class="key nav" data-key="UP">↑</button>
+            <div></div> <!-- Espaço -->
+            <button class="key func" data-key="EDIT">EDIT</button>
 
-            <!-- Function Keys -->
-            <div class="keyboard-row" style="margin-top: 20px;">
-                <button class="key-button function" onclick="pressKey('S1')">S1</button>
-                <button class="key-button function" onclick="pressKey('S2')">S2</button>
-            </div>
+            <!-- Linha 2 -->
+            <button class="key num" data-key="K4">4</button>
+            <button class="key num" data-key="K5">5</button>
+            <button class="key num" data-key="K6">6</button>
+            <button class="key nav" data-key="LEFT">←</button>
+            <button class="key enter" data-key="ENTER">OK</button>
+            <button class="key nav" data-key="RIGHT">→</button>
+            <button class="key special" data-key="ESC">ESC</button>
 
-            <!-- Navigation -->
-            <div class="keyboard-row">
-                <button class="key-button function" onclick="pressKey('ARROW_UP')">▲</button>
-                <button class="key-button function" onclick="pressKey('ARROW_DOWN')">▼</button>
-            </div>
+            <!-- Linha 3 -->
+            <button class="key num" data-key="K1">1</button>
+            <button class="key num" data-key="K2">2</button>
+            <button class="key num" data-key="K3">3</button>
+            <div></div> <!-- Espaço -->
+            <button class="key nav" data-key="DOWN">↓</button>
+            <div></div> <!-- Espaço -->
+            <button class="key enter" data-key="ENTER">ENTER</button>
 
-            <!-- Control Keys -->
-            <div class="keyboard-row">
-                <button class="key-button control" onclick="pressKey('EDIT')">EDIT</button>
-                <button class="key-button control" onclick="pressKey('ENTER')">ENTER</button>
-                <button class="key-button control" onclick="pressKey('ESC')">ESC</button>
-            </div>
+            <!-- Linha 4 -->
+            <button class="key func" data-key="S1">S1</button>
+            <button class="key num" data-key="K0">0</button>
+            <button class="key func" data-key="S2">S2</button>
+            <div></div>
+            <div></div>
+            <div></div>
+            <button class="key special" data-key="LOCK">LOCK</button>
         </div>
     </div>
 
-    <!-- ============================================================================ -->
-    <!-- TAB CONTENT: DIAGNÓSTICO -->
-    <!-- ============================================================================ -->
-    <div id="diagnostico" class="tab-content">
-        <div class="io-section">
-            <h3>Entradas Digitais (E0-E7)</h3>
-            <div class="io-grid" id="digitalInputs">
-                <!-- Generated by JavaScript -->
-            </div>
-        </div>
-
-        <div class="io-section">
-            <h3>Saídas Digitais (S0-S7)</h3>
-            <div class="io-grid" id="digitalOutputs">
-                <!-- Generated by JavaScript -->
-            </div>
-        </div>
-
-        <div class="io-section">
-            <h3>Sensores ESP32 (Futuro)</h3>
-            <div class="config-notice">
-                Sensores adicionais serão disponibilizados após migração para ESP32
-            </div>
-        </div>
-    </div>
-
-    <!-- ============================================================================ -->
-    <!-- TAB CONTENT: LOGS E PRODUÇÃO -->
-    <!-- ============================================================================ -->
-    <div id="logs" class="tab-content">
-        <div class="runtime-counter">
-            <h3>Tempo de Ciclo</h3>
-            <div class="runtime-value" id="runtimeCounter">00:00:00</div>
-            <p style="opacity: 0.7; margin-top: 10px;">Contador ativo quando ciclo iniciado</p>
-        </div>
-
-        <div class="alert-log">
-            <h3 style="margin-bottom: 15px;">Registro de Alertas</h3>
-            <div id="alertLog">
-                <!-- Generated by JavaScript -->
-            </div>
-        </div>
-    </div>
-
-    <!-- ============================================================================ -->
-    <!-- TAB CONTENT: CONFIGURAÇÃO -->
-    <!-- ============================================================================ -->
-    <div id="config" class="tab-content">
-        <div class="config-section">
-            <h3>Configurações WiFi</h3>
-            <p>Configuração de WiFi estará disponível após migração para ESP32</p>
-
-            <div class="config-notice">
-                ⚠️ Esta seção será habilitada quando o sistema for migrado para ESP32/MicroPython.
-                Atualmente rodando em modo de desenvolvimento Ubuntu.
-            </div>
-        </div>
-    </div>
-
-    <!-- ============================================================================ -->
-    <!-- JAVASCRIPT -->
-    <!-- ============================================================================ -->
     <script>
-        // ============================================================================
-        // GLOBAL STATE
-        // ============================================================================
+        const WS_URL = 'ws://localhost:8080';
         let ws = null;
         let reconnectInterval = null;
-        let connected = false;
-        let machineState = {};
-        let runtimeStartTime = null;
-        let runtimeInterval = null;
 
-        // ============================================================================
-        // WEBSOCKET CONNECTION
-        // ============================================================================
+        const el = {
+            lcdLine1: document.getElementById('lcd-line1'),
+            lcdLine2: document.getElementById('lcd-line2'),
+            statusModo: document.getElementById('status-modo'),
+            statusVel: document.getElementById('status-vel'),
+            statusAngle: document.getElementById('status-angle'),
+            statusCiclo: document.getElementById('status-ciclo'),
+            ledK1: document.getElementById('led-k1'),
+            ledK2: document.getElementById('led-k2'),
+            ledK3: document.getElementById('led-k3'),
+            ledK4: document.getElementById('led-k4'),
+            ledK5: document.getElementById('led-k5'),
+            ledS1: document.getElementById('led-s1'),
+            overlayOffline: document.getElementById('overlay-offline'),
+            connIndicator: document.getElementById('conn-indicator'),
+            allKeys: document.querySelectorAll('.key'),
+            controlButtons: document.querySelectorAll('.control-btn')
+        };
+
         function connect() {
-            try {
-                ws = new WebSocket('ws://localhost:8080');
-
-                ws.onopen = () => {
-                    console.log('✓ Connected to server');
-                    connected = true;
-                    updateConnectionStatus(true);
-                    hideOverlay('offlineOverlay');
-
-                    if (reconnectInterval) {
-                        clearInterval(reconnectInterval);
-                        reconnectInterval = null;
-                    }
-                };
-
-                ws.onmessage = (event) => {
-                    try {
-                        const message = JSON.parse(event.data);
-                        handleMessage(message);
-                    } catch (e) {
-                        console.error('Error parsing message:', e);
-                    }
-                };
-
-                ws.onclose = () => {
-                    console.log('✗ Disconnected from server');
-                    connected = false;
-                    updateConnectionStatus(false);
-                    showOverlay('offlineOverlay');
-                    disableAllButtons();
-
-                    // Auto-reconnect every 3 seconds
-                    if (!reconnectInterval) {
-                        reconnectInterval = setInterval(connect, 3000);
-                    }
-                };
-
-                ws.onerror = (error) => {
-                    console.error('WebSocket error:', error);
-                };
-
-            } catch (e) {
-                console.error('Connection error:', e);
-            }
-        }
-
-        // ============================================================================
-        // MESSAGE HANDLING
-        // ============================================================================
-        function handleMessage(message) {
-            console.log('Received:', message);
-
-            switch (message.type) {
-                case 'initial_state':
-                    machineState = message.data;
-                    updateUI(machineState);
-                    enableAllButtons();
-                    break;
-
-                case 'state_update':
-                    // Merge deltas into state
-                    mergeState(machineState, message.data);
-                    updateUI(message.data);
-                    break;
-
-                case 'alert':
-                    addAlert(message.data);
-                    break;
-
-                case 'alert_log':
-                    // Initial alert log
-                    message.data.forEach(alert => addAlert(alert));
-                    break;
-
-                case 'button_response':
-                    console.log(`Button ${message.button}: ${message.success ? 'OK' : 'FAIL'}`);
-                    break;
-
-                case 'error':
-                    console.error('Server error:', message.message);
-                    break;
-            }
-        }
-
-        function mergeState(target, source) {
-            for (let key in source) {
-                if (typeof source[key] === 'object' && !Array.isArray(source[key])) {
-                    if (!target[key]) target[key] = {};
-                    mergeState(target[key], source[key]);
-                } else {
-                    target[key] = source[key];
-                }
-            }
-        }
-
-        // ============================================================================
-        // UI UPDATES
-        // ============================================================================
-        function updateUI(state) {
-            // Update encoder angle
-            if (state.encoder_angle !== undefined) {
-                document.getElementById('encoderAngle').textContent = state.encoder_angle + '°';
-
-                // Update PV (Process Value) para todas as 3 dobras
-                document.getElementById('pv1').textContent = state.encoder_angle;
-                document.getElementById('pv2').textContent = state.encoder_angle;
-                document.getElementById('pv3').textContent = state.encoder_angle;
-            }
-
-            // Update setpoints (AJ - Ajuste) do display IHM
-            if (state.angle_setpoints) {
-                // Dobra 1: usa bend_1_a
-                if (state.angle_setpoints.bend_1_a !== undefined) {
-                    document.getElementById('aj1').textContent = state.angle_setpoints.bend_1_a;
-                }
-                // Dobra 2: usa bend_2_a
-                if (state.angle_setpoints.bend_2_a !== undefined) {
-                    document.getElementById('aj2').textContent = state.angle_setpoints.bend_2_a;
-                }
-                // Dobra 3: usa bend_3_a
-                if (state.angle_setpoints.bend_3_a !== undefined) {
-                    document.getElementById('aj3').textContent = state.angle_setpoints.bend_3_a;
-                }
-            }
-
-            // Update digital inputs
-            if (state.digital_inputs) {
-                for (let [name, value] of Object.entries(state.digital_inputs)) {
-                    const led = document.getElementById(`led-input-${name}`);
-                    if (led) {
-                        led.classList.toggle('on', value);
-                    }
-                }
-            }
-
-            // Update digital outputs
-            if (state.digital_outputs) {
-                for (let [name, value] of Object.entries(state.digital_outputs)) {
-                    const led = document.getElementById(`led-output-${name}`);
-                    if (led) {
-                        led.classList.toggle('on', value);
-                    }
-                }
-            }
-
-            // Update runtime counter
-            if (state.cycle_active !== undefined) {
-                if (state.cycle_active && !runtimeStartTime) {
-                    startRuntimeCounter();
-                } else if (!state.cycle_active && runtimeStartTime) {
-                    stopRuntimeCounter();
-                }
-            }
-        }
-
-        function updateConnectionStatus(isConnected) {
-            const indicator = document.getElementById('statusIndicator');
-            const text = document.getElementById('statusText');
-
-            if (isConnected) {
-                indicator.classList.add('connected');
-                text.textContent = 'Conectado';
-            } else {
-                indicator.classList.remove('connected');
-                text.textContent = 'Desconectado';
-            }
-        }
-
-        // ============================================================================
-        // BUTTON HANDLING
-        // ============================================================================
-        function pressKey(button) {
-            if (!connected) {
-                console.warn('Not connected');
-                return;
-            }
-
-            console.log(`Pressing button: ${button}`);
-
-            const message = {
-                action: 'press_button',
-                button: button
+            ws = new WebSocket(WS_URL);
+            ws.onopen = () => {
+                el.connIndicator.classList.add('connected');
+                el.overlayOffline.classList.remove('active');
+                clearInterval(reconnectInterval);
             };
-
-            ws.send(JSON.stringify(message));
+            ws.onclose = () => {
+                el.connIndicator.classList.remove('connected');
+                el.overlayOffline.classList.add('active');
+                if (!reconnectInterval) {
+                    reconnectInterval = setInterval(connect, 2000);
+                }
+            };
+            ws.onmessage = (event) => {
+                const msg = JSON.parse(event.data);
+                if (msg.display) {
+                    el.lcdLine1.textContent = msg.display.line1 || '';
+                    el.lcdLine2.textContent = msg.display.line2 || '';
+                }
+                if (msg.operation_state) {
+                    const s = msg.operation_state;
+                    if (s.modo) el.statusModo.textContent = s.modo;
+                    if (s.velocidade_rpm !== undefined) el.statusVel.textContent = s.velocidade_rpm + ' RPM';
+                    if (s.encoder_angle !== undefined) el.statusAngle.textContent = s.encoder_angle.toFixed(1) + '°';
+                    if (s.ciclo_ativo !== undefined) el.statusCiclo.textContent = s.ciclo_ativo ? 'DOBRANDO' : 'PARADO';
+                    el.ledK1.classList.toggle('on', s.led_k1);
+                    el.ledK2.classList.toggle('on', s.led_k2);
+                    el.ledK3.classList.toggle('on', s.led_k3);
+                    el.ledK4.classList.toggle('on', s.led_k4);
+                    el.ledK5.classList.toggle('on', s.led_k5);
+                    el.ledS1.classList.toggle('on', s.led_s1);
+                }
+            };
         }
 
-        function enableAllButtons() {
-            document.querySelectorAll('.key-button').forEach(btn => {
-                btn.disabled = false;
-            });
-        }
+        function send(action, data = {}) {
+            console.log('send() chamada:', action, data);
+            console.log('WebSocket estado:', ws ? ws.readyState : 'não existe', 'OPEN=', WebSocket.OPEN);
 
-        function disableAllButtons() {
-            document.querySelectorAll('.key-button').forEach(btn => {
-                btn.disabled = true;
-            });
-        }
-
-        // ============================================================================
-        // TAB SWITCHING
-        // ============================================================================
-        function switchTab(tabName) {
-            // Hide all tabs
-            document.querySelectorAll('.tab-content').forEach(tab => {
-                tab.classList.remove('active');
-            });
-
-            // Remove active from all buttons
-            document.querySelectorAll('.tab-button').forEach(btn => {
-                btn.classList.remove('active');
-            });
-
-            // Show selected tab
-            document.getElementById(tabName).classList.add('active');
-
-            // Activate button
-            event.target.classList.add('active');
-        }
-
-        // ============================================================================
-        // OVERLAYS
-        // ============================================================================
-        function showOverlay(id) {
-            document.getElementById(id).classList.add('show');
-        }
-
-        function hideOverlay(id) {
-            document.getElementById(id).classList.remove('show');
-        }
-
-        // ============================================================================
-        // RUNTIME COUNTER
-        // ============================================================================
-        function startRuntimeCounter() {
-            runtimeStartTime = Date.now();
-            runtimeInterval = setInterval(updateRuntimeDisplay, 100);
-        }
-
-        function stopRuntimeCounter() {
-            if (runtimeInterval) {
-                clearInterval(runtimeInterval);
-                runtimeInterval = null;
-            }
-            runtimeStartTime = null;
-        }
-
-        function updateRuntimeDisplay() {
-            if (!runtimeStartTime) return;
-
-            const elapsed = Date.now() - runtimeStartTime;
-            const hours = Math.floor(elapsed / 3600000);
-            const minutes = Math.floor((elapsed % 3600000) / 60000);
-            const seconds = Math.floor((elapsed % 60000) / 1000);
-
-            const display = `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
-            document.getElementById('runtimeCounter').textContent = display;
-        }
-
-        // ============================================================================
-        // ALERT LOG
-        // ============================================================================
-        function addAlert(alert) {
-            const log = document.getElementById('alertLog');
-            const item = document.createElement('div');
-            item.className = `alert-item ${alert.level}`;
-
-            const time = new Date(alert.timestamp).toLocaleTimeString('pt-BR');
-
-            item.innerHTML = `
-                <div class="alert-time">${time}</div>
-                <div>${alert.message}</div>
-            `;
-
-            log.insertBefore(item, log.firstChild);
-
-            // Keep only last 50 alerts in DOM
-            while (log.children.length > 50) {
-                log.removeChild(log.lastChild);
+            if (ws && ws.readyState === WebSocket.OPEN) {
+                const message = JSON.stringify({ action, ...data });
+                console.log('Enviando mensagem:', message);
+                ws.send(message);
+            } else {
+                console.error('WebSocket não está conectado! Estado:', ws ? ws.readyState : 'null');
             }
         }
 
-        // ============================================================================
-        // INITIALIZATION
-        // ============================================================================
-        function init() {
-            // Generate digital I/O indicators
-            const inputsContainer = document.getElementById('digitalInputs');
-            const outputsContainer = document.getElementById('digitalOutputs');
+        let keyCombo = [];
+        let comboTimeout = null;
 
-            for (let i = 0; i < 8; i++) {
-                // Inputs
-                const inputDiv = document.createElement('div');
-                inputDiv.className = 'io-indicator';
-                inputDiv.innerHTML = `
-                    <div class="led" id="led-input-E${i}"></div>
-                    <div class="io-label">E${i}</div>
-                `;
-                inputsContainer.appendChild(inputDiv);
+        el.allKeys.forEach(btn => {
+            const key = btn.dataset.key;
+            btn.addEventListener('click', () => {
+                if (key.match(/^K[0-9]$/)) {
+                    clearTimeout(comboTimeout);
+                    keyCombo.push(key);
+                    if (keyCombo.length === 2) {
+                        send('key_combo', { keys: keyCombo });
+                        keyCombo = [];
+                    } else {
+                        comboTimeout = setTimeout(() => {
+                            if (keyCombo.length === 1) send('key_press', { key: keyCombo[0] });
+                            keyCombo = [];
+                        }, 500);
+                    }
+                } else {
+                    send('key_press', { key });
+                }
+            });
+            btn.addEventListener('mousedown', () => btn.classList.add('pressed'));
+            btn.addEventListener('mouseup', () => btn.classList.remove('pressed'));
+        });
 
-                // Outputs
-                const outputDiv = document.createElement('div');
-                outputDiv.className = 'io-indicator';
-                outputDiv.innerHTML = `
-                    <div class="led" id="led-output-S${i}"></div>
-                    <div class="io-label">S${i}</div>
-                `;
-                outputsContainer.appendChild(outputDiv);
-            }
+        // Botões de Controle do Painel
+        el.controlButtons.forEach(btn => {
+            const control = btn.dataset.control;
 
-            // Connect to WebSocket
-            connect();
+            // Feedback visual ao pressionar
+            btn.addEventListener('mousedown', () => btn.classList.add('pressed'));
+            btn.addEventListener('mouseup', () => btn.classList.remove('pressed'));
+            btn.addEventListener('touchstart', (e) => {
+                e.preventDefault();
+                btn.classList.add('pressed');
+            });
+            btn.addEventListener('touchend', (e) => {
+                e.preventDefault();
+                btn.classList.remove('pressed');
+            });
 
-            // Disable buttons initially
-            disableAllButtons();
-        }
+            // Click handler
+            btn.addEventListener('click', (e) => {
+                e.preventDefault();
 
-        // Start application
-        window.addEventListener('load', init);
+                // Mapear botões de controle para ações
+                const controlMap = {
+                    'EMERGENCY': 'EMERGENCY_STOP',
+                    'POWER': 'COMMAND_ON',
+                    'FORWARD': 'FORWARD',
+                    'BACKWARD': 'BACKWARD',
+                    'STOP': 'STOP'
+                };
+
+                const action = controlMap[control];
+                if (action) {
+                    console.log(`Botão de controle pressionado: ${control} (${action})`);
+                    send('control_button', { control: action });
+                }
+            });
+        });
+
+        connect();
+        setInterval(() => { if (ws && ws.readyState === WebSocket.OPEN) send('ping'); }, 30000);
     </script>
 </body>
 </html>

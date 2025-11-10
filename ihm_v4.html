@@ -1,0 +1,544 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>IHM v4 - NEOCOUDE HD-15</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            padding: 10px;
+        }
+
+        .ihm-container {
+            background: #2a2a2a;
+            border-radius: 8px;
+            padding: 15px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.5);
+            max-width: 500px;
+            width: 100%;
+        }
+
+        .ihm-header {
+            text-align: center;
+            color: #ffffff;
+            margin-bottom: 10px;
+        }
+
+        .ihm-header h1 {
+            font-size: 18px;
+            margin-bottom: 2px;
+        }
+
+        .ihm-header p {
+            font-size: 11px;
+            color: #aaaaaa;
+        }
+
+        /* ==================== LCD DISPLAY ==================== */
+
+        .lcd-container {
+            background: #1a1a1a;
+            padding: 10px;
+            border-radius: 6px;
+            box-shadow: inset 0 0 15px rgba(0,0,0,0.7);
+            margin-bottom: 12px;
+        }
+
+        .lcd-display {
+            background: #2a4a2a;
+            border: 2px solid #1a3a1a;
+            border-radius: 4px;
+            padding: 8px 10px;
+        }
+
+        .lcd-line {
+            font-family: 'Courier New', monospace;
+            font-size: 16px;
+            font-weight: bold;
+            color: #000000;
+            letter-spacing: 2px;
+            white-space: pre;
+            line-height: 1.3;
+            text-shadow: 0 0 2px rgba(0,0,0,0.3);
+        }
+
+        /* ==================== STATUS BAR ==================== */
+
+        .status-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: #1a1a1a;
+            padding: 6px 10px;
+            border-radius: 4px;
+            margin-bottom: 10px;
+        }
+
+        .connection-status {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 10px;
+            color: #aaa;
+        }
+
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #666;
+            animation: pulse 2s infinite;
+        }
+
+        .status-dot.online {
+            background: #00ff00;
+            box-shadow: 0 0 10px #00ff00;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        .screen-info {
+            font-size: 10px;
+            color: #aaa;
+        }
+
+        /* ==================== TECLADO VIRTUAL ==================== */
+
+        .keyboard-container {
+            display: grid;
+            gap: 8px;
+        }
+
+        .keyboard-section {
+            background: #333;
+            padding: 8px;
+            border-radius: 5px;
+        }
+
+        .keyboard-label {
+            color: #aaa;
+            font-size: 9px;
+            text-transform: uppercase;
+            margin-bottom: 6px;
+            letter-spacing: 0.5px;
+        }
+
+        /* Teclado numérico */
+        .numeric-pad {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 6px;
+        }
+
+        .key-btn {
+            padding: 12px;
+            font-size: 16px;
+            font-weight: bold;
+            border: 2px solid #555;
+            background: linear-gradient(to bottom, #f0f0f0, #d0d0d0);
+            border-radius: 5px;
+            cursor: pointer;
+            transition: all 0.1s;
+            position: relative;
+            user-select: none;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        .key-btn:active {
+            transform: translateY(2px);
+            box-shadow: inset 0 2px 5px rgba(0,0,0,0.3);
+        }
+
+        .key-btn.key-wide {
+            grid-column: span 3;
+        }
+
+        /* LED indicator */
+        .key-btn[data-led="true"]::before {
+            content: '';
+            position: absolute;
+            top: 3px;
+            right: 3px;
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: #666;
+            border: 1px solid #333;
+        }
+
+        .key-btn.led-on[data-led="true"]::before {
+            background: #00ff00;
+            box-shadow: 0 0 8px #00ff00, inset 0 0 4px #00ff00;
+        }
+
+        /* LEDs específicos por tecla */
+        .key-btn[data-key="K1"].led-on {
+            background: linear-gradient(to bottom, #e0ffe0, #c0ffc0);
+        }
+
+        .key-btn[data-key="K2"].led-on {
+            background: linear-gradient(to bottom, #ffe0e0, #ffc0c0);
+        }
+
+        .key-btn[data-key="K3"].led-on {
+            background: linear-gradient(to bottom, #e0e0ff, #c0c0ff);
+        }
+
+        .key-btn[data-key="K4"].led-on {
+            background: linear-gradient(to bottom, #ffffe0, #ffffc0);
+        }
+
+        .key-btn[data-key="K5"].led-on {
+            background: linear-gradient(to bottom, #ffe0ff, #ffc0ff);
+        }
+
+        .key-btn[data-key="S1"].led-on {
+            background: linear-gradient(to bottom, #e0ffff, #c0ffff);
+        }
+
+        /* Teclas de função */
+        .function-keys, .navigation-keys, .edit-keys {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 6px;
+        }
+
+        .key-fn, .key-nav, .key-edit {
+            padding: 10px;
+            font-size: 14px;
+        }
+
+        /* Overlay de desconexão */
+        .offline-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(200, 0, 0, 0.9);
+            color: white;
+            font-size: 48px;
+            font-weight: bold;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+        }
+
+        .offline-overlay.active {
+            display: flex;
+        }
+
+        /* Modo EDIT */
+        .edit-indicator {
+            display: none;
+            background: #ff9900;
+            color: #000;
+            padding: 6px;
+            text-align: center;
+            font-weight: bold;
+            font-size: 11px;
+            border-radius: 4px;
+            margin-bottom: 8px;
+        }
+
+        .edit-indicator.active {
+            display: block;
+        }
+
+        /* Responsive */
+        @media (max-width: 600px) {
+            .ihm-container {
+                padding: 12px;
+            }
+
+            .lcd-line {
+                font-size: 14px;
+                letter-spacing: 1.5px;
+            }
+
+            .key-btn {
+                padding: 10px;
+                font-size: 14px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Overlay de desconexão -->
+    <div class="offline-overlay" id="offlineOverlay">
+        DESLIGADO
+    </div>
+
+    <div class="ihm-container">
+        <!-- Header -->
+        <div class="ihm-header">
+            <h1>IHM v4 - NEOCOUDE HD-15</h1>
+            <p>Expert Series Web Emulator</p>
+        </div>
+
+        <!-- Status bar -->
+        <div class="status-bar">
+            <div class="connection-status">
+                <div class="status-dot" id="statusDot"></div>
+                <span id="connectionText">Conectando...</span>
+            </div>
+            <div class="screen-info">
+                Tela: <span id="screenNumber">0</span>/10
+            </div>
+        </div>
+
+        <!-- Indicador de modo EDIT -->
+        <div class="edit-indicator" id="editIndicator">
+            MODO EDIÇÃO ATIVO
+        </div>
+
+        <!-- LCD Display -->
+        <div class="lcd-container">
+            <div class="lcd-display">
+                <div class="lcd-line" id="lcdLine1">**TRILLOR MAQUINAS**</div>
+                <div class="lcd-line" id="lcdLine2">**DOBRADEIRA HD    **</div>
+            </div>
+        </div>
+
+        <!-- Teclado Virtual -->
+        <div class="keyboard-container">
+            <!-- Teclado Numérico -->
+            <div class="keyboard-section">
+                <div class="keyboard-label">Teclado Numérico</div>
+                <div class="numeric-pad">
+                    <button class="key-btn key-num" data-key="K7" data-addr="166" data-led="false">7</button>
+                    <button class="key-btn key-num" data-key="K8" data-addr="167" data-led="false">8</button>
+                    <button class="key-btn key-num" data-key="K9" data-addr="168" data-led="false">9</button>
+
+                    <button class="key-btn key-num" data-key="K4" data-addr="163" data-led="true">4</button>
+                    <button class="key-btn key-num" data-key="K5" data-addr="164" data-led="true">5</button>
+                    <button class="key-btn key-num" data-key="K6" data-addr="165" data-led="false">6</button>
+
+                    <button class="key-btn key-num" data-key="K1" data-addr="160" data-led="true">1</button>
+                    <button class="key-btn key-num" data-key="K2" data-addr="161" data-led="true">2</button>
+                    <button class="key-btn key-num" data-key="K3" data-addr="162" data-led="true">3</button>
+
+                    <button class="key-btn key-num key-wide" data-key="K0" data-addr="169" data-led="false">0</button>
+                </div>
+            </div>
+
+            <!-- Teclas de Função -->
+            <div class="keyboard-section">
+                <div class="keyboard-label">Funções</div>
+                <div class="function-keys">
+                    <button class="key-btn key-fn" data-key="S1" data-addr="220" data-led="true">S1</button>
+                    <button class="key-btn key-fn" data-key="S2" data-addr="221" data-led="false">S2</button>
+                </div>
+            </div>
+
+            <!-- Navegação -->
+            <div class="keyboard-section">
+                <div class="keyboard-label">Navegação</div>
+                <div class="navigation-keys">
+                    <button class="key-btn key-nav" data-key="UP" data-addr="172">↑</button>
+                    <button class="key-btn key-nav" data-key="DOWN" data-addr="173">↓</button>
+                    <button class="key-btn key-nav" data-key="ESC" data-addr="188">ESC</button>
+                    <button class="key-btn key-nav" data-key="LOCK" data-addr="241">🔒</button>
+                </div>
+            </div>
+
+            <!-- Edição -->
+            <div class="keyboard-section">
+                <div class="keyboard-label">Edição</div>
+                <div class="edit-keys">
+                    <button class="key-btn key-edit" data-key="EDIT" data-addr="38">EDIT</button>
+                    <button class="key-btn key-edit" data-key="ENTER" data-addr="37">ENTER</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // ==================== CONFIGURAÇÃO ====================
+
+        const WS_URL = 'ws://localhost:8080';
+        let ws = null;
+        let reconnectTimer = null;
+
+        // ==================== ELEMENTOS DOM ====================
+
+        const lcdLine1 = document.getElementById('lcdLine1');
+        const lcdLine2 = document.getElementById('lcdLine2');
+        const screenNumber = document.getElementById('screenNumber');
+        const statusDot = document.getElementById('statusDot');
+        const connectionText = document.getElementById('connectionText');
+        const offlineOverlay = document.getElementById('offlineOverlay');
+        const editIndicator = document.getElementById('editIndicator');
+
+        // ==================== WEBSOCKET ====================
+
+        function connectWebSocket() {
+            console.log('Conectando ao servidor WebSocket...');
+
+            ws = new WebSocket(WS_URL);
+
+            ws.onopen = () => {
+                console.log('WebSocket conectado!');
+                statusDot.classList.add('online');
+                connectionText.textContent = 'Online';
+                offlineOverlay.classList.remove('active');
+
+                // Solicitar estado inicial
+                ws.send(JSON.stringify({ action: 'get_ihm_v4_state' }));
+            };
+
+            ws.onmessage = (event) => {
+                try {
+                    const data = JSON.parse(event.data);
+                    handleServerMessage(data);
+                } catch (error) {
+                    console.error('Erro ao processar mensagem:', error);
+                }
+            };
+
+            ws.onerror = (error) => {
+                console.error('Erro WebSocket:', error);
+            };
+
+            ws.onclose = () => {
+                console.log('WebSocket desconectado');
+                statusDot.classList.remove('online');
+                connectionText.textContent = 'Desconectado';
+                offlineOverlay.classList.add('active');
+
+                // Tentar reconectar
+                reconnectTimer = setTimeout(connectWebSocket, 2000);
+            };
+        }
+
+        // ==================== HANDLERS ====================
+
+        function handleServerMessage(data) {
+            // Atualizar display
+            if (data.line1 !== undefined) {
+                lcdLine1.textContent = data.line1;
+            }
+
+            if (data.line2 !== undefined) {
+                lcdLine2.textContent = data.line2;
+            }
+
+            // Atualizar número da tela
+            if (data.screen !== undefined) {
+                screenNumber.textContent = data.screen;
+            }
+
+            // Atualizar LEDs
+            if (data.leds) {
+                updateLEDs(data.leds);
+            }
+
+            // Atualizar indicador de modo EDIT
+            if (data.edit_mode !== undefined) {
+                if (data.edit_mode) {
+                    editIndicator.classList.add('active');
+                } else {
+                    editIndicator.classList.remove('active');
+                }
+            }
+        }
+
+        function updateLEDs(leds) {
+            // Atualizar cada LED
+            for (const [key, isOn] of Object.entries(leds)) {
+                const btn = document.querySelector(`[data-key="${key}"]`);
+                if (btn) {
+                    if (isOn) {
+                        btn.classList.add('led-on');
+                    } else {
+                        btn.classList.remove('led-on');
+                    }
+                }
+            }
+        }
+
+        function sendKeyPress(keyCode) {
+            if (ws && ws.readyState === WebSocket.OPEN) {
+                const message = {
+                    action: 'press_ihm_v4_key',
+                    key_code: keyCode
+                };
+
+                ws.send(JSON.stringify(message));
+                console.log('Tecla enviada:', keyCode);
+            } else {
+                console.warn('WebSocket não conectado');
+            }
+        }
+
+        // ==================== EVENT LISTENERS ====================
+
+        // Adicionar listeners para todos os botões
+        document.querySelectorAll('.key-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const keyCode = parseInt(btn.getAttribute('data-addr'));
+                sendKeyPress(keyCode);
+
+                // Feedback visual
+                btn.style.transform = 'translateY(2px)';
+                setTimeout(() => {
+                    btn.style.transform = '';
+                }, 100);
+            });
+        });
+
+        // Suporte a teclado físico
+        document.addEventListener('keydown', (event) => {
+            const keyMap = {
+                'ArrowUp': 172,
+                'ArrowDown': 173,
+                'Escape': 188,
+                'Enter': 37,
+                '0': 169, '1': 160, '2': 161, '3': 162, '4': 163,
+                '5': 164, '6': 165, '7': 166, '8': 167, '9': 168
+            };
+
+            const keyCode = keyMap[event.key];
+            if (keyCode) {
+                event.preventDefault();
+                sendKeyPress(keyCode);
+
+                // Destacar tecla virtual
+                const btn = document.querySelector(`[data-addr="${keyCode}"]`);
+                if (btn) {
+                    btn.classList.add('pressed');
+                    setTimeout(() => btn.classList.remove('pressed'), 200);
+                }
+            }
+        });
+
+        // ==================== INICIALIZAÇÃO ====================
+
+        connectWebSocket();
+
+        // Polling de estado (fallback)
+        setInterval(() => {
+            if (ws && ws.readyState === WebSocket.OPEN) {
+                ws.send(JSON.stringify({ action: 'get_ihm_v4_state' }));
+            }
+        }, 100);  // Atualizar display a cada 100ms
+    </script>
+</body>
+</html>

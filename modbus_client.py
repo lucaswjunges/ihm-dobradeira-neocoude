@@ -41,7 +41,7 @@ class ModbusConfig:
     port: str = '/dev/ttyUSB0'
     baudrate: int = 57600
     parity: str = 'N'  # None
-    stopbits: int = 1
+    stopbits: int = 2  # CRITICAL: Atos MPC4004 requires 2 stop bits!
     bytesize: int = 8
     timeout: float = 1.0
     slave_address: int = 1  # Default, will be read from PLC register 0x1988
@@ -129,7 +129,9 @@ class ModbusClient:
                 parity=self.config.parity,
                 stopbits=self.config.stopbits,
                 bytesize=self.config.bytesize,
-                timeout=self.config.timeout
+                timeout=self.config.timeout,
+                # RTS control for RS485 (toggle with 1ms delay as per working Windows config)
+                handle_local_echo=False
             )
 
             self.connected = self.client.connect()
@@ -380,6 +382,35 @@ class ModbusClient:
         logger.info(f"Button {button_name} press completed")
         return True
 
+    def write_register_32bit(self, msw_address: int, lsw_address: int, value: int) -> bool:
+        """
+        Write 32-bit value to two consecutive registers.
+
+        Args:
+            msw_address: Most Significant Word address (even)
+            lsw_address: Least Significant Word address (odd)
+            value: 32-bit integer to write
+
+        Returns:
+            True if successful, False otherwise
+        """
+        # Split 32-bit value into MSW (high 16 bits) and LSW (low 16 bits)
+        msw = (value >> 16) & 0xFFFF
+        lsw = value & 0xFFFF
+
+        # Write MSW first
+        if not self.write_register(msw_address, msw):
+            logger.error(f"Failed to write MSW at {msw_address}")
+            return False
+
+        # Write LSW
+        if not self.write_register(lsw_address, lsw):
+            logger.error(f"Failed to write LSW at {lsw_address}")
+            return False
+
+        logger.info(f"32-bit value {value} written to registers {msw_address}/{lsw_address}")
+        return True
+
     def get_encoder_angle(self) -> Optional[int]:
         """
         Read current encoder angle (32-bit value).
@@ -392,30 +423,136 @@ class ModbusClient:
             mm.ENCODER['ANGLE_LSW']
         )
 
+    def write_angle_1(self, angle: int) -> bool:
+        """
+        Write angle setpoint 1 (Tela 4).
+
+        Args:
+            angle: Angle in degrees (0-360)
+
+        Returns:
+            True if successful, False otherwise
+        """
+        if angle < 0 or angle > 360:
+            logger.error(f"Angle {angle} out of range (0-360)")
+            return False
+
+        # Registers: 2114 (MSW) / 2112 (LSW)
+        success = self.write_register_32bit(2114, 2112, angle)
+        if success:
+            logger.info(f"Angle 1 set to {angle}°")
+        return success
+
+    def write_angle_2(self, angle: int) -> bool:
+        """
+        Write angle setpoint 2 (Tela 5).
+
+        Args:
+            angle: Angle in degrees (0-360)
+
+        Returns:
+            True if successful, False otherwise
+        """
+        if angle < 0 or angle > 360:
+            logger.error(f"Angle {angle} out of range (0-360)")
+            return False
+
+        # Registers: 2120 (MSW) / 2118 (LSW)
+        success = self.write_register_32bit(2120, 2118, angle)
+        if success:
+            logger.info(f"Angle 2 set to {angle}°")
+        return success
+
+    def write_angle_3(self, angle: int) -> bool:
+        """
+        Write angle setpoint 3 (Tela 6).
+
+        Args:
+            angle: Angle in degrees (0-360)
+
+        Returns:
+            True if successful, False otherwise
+        """
+        if angle < 0 or angle > 360:
+            logger.error(f"Angle {angle} out of range (0-360)")
+            return False
+
+        # Registers: 2130 (MSW) / 2128 (LSW)
+        success = self.write_register_32bit(2130, 2128, angle)
+        if success:
+            logger.info(f"Angle 3 set to {angle}°")
+        return success
+
+    def read_angle_1(self) -> Optional[int]:
+        """Read angle setpoint 1"""
+        return self.read_register_32bit(2114, 2112)
+
+    def read_angle_2(self) -> Optional[int]:
+        """Read angle setpoint 2"""
+        return self.read_register_32bit(2120, 2118)
+
+    def read_angle_3(self) -> Optional[int]:
+        """Read angle setpoint 3"""
+        return self.read_register_32bit(2130, 2128)
+
+    def read_discrete_input(self, address: int) -> Optional[bool]:
+        """
+        Read single discrete input status (Function 0x02).
+
+        Args:
+            address: Discrete input address (decimal)
+
+        Returns:
+            Input state (True/False) or None on error
+        """
+        if self.stub_mode:
+            return self._stub_registers.get(address, 0) & 0x0001
+
+        if not self.connected:
+            logger.warning("Cannot read discrete input: Not connected")
+            return None
+
+        try:
+            response = self.client.read_discrete_inputs(
+                address=address,
+                count=1,
+                device_id=self.config.slave_address
+            )
+
+            if response.isError():
+                logger.error(f"Error reading discrete input {address}: {response}")
+                return None
+
+            return response.bits[0]
+
+        except Exception as e:
+            logger.error(f"Unexpected error reading discrete input {address}: {e}")
+            return None
+
     def get_digital_inputs(self) -> dict:
         """
-        Read all digital inputs (E0-E7).
+        Read all digital inputs (E0-E7) using Read Discrete Inputs (0x02).
 
         Returns:
             Dictionary with input states {name: bool}
         """
         inputs = {}
         for name, addr in mm.DIGITAL_INPUTS.items():
-            value = self.read_coil(addr)
+            value = self.read_discrete_input(addr)
             inputs[name] = value if value is not None else None
 
         return inputs
 
     def get_digital_outputs(self) -> dict:
         """
-        Read all digital outputs (S0-S7).
+        Read all digital outputs (S0-S7) using Read Coils (0x01).
 
         Returns:
             Dictionary with output states {name: bool}
         """
         outputs = {}
         for name, addr in mm.DIGITAL_OUTPUTS.items():
-            value = self.read_coil(addr)
+            value = self.read_coil(addr)  # Coils is correct for outputs
             outputs[name] = value if value is not None else None
 
         return outputs
