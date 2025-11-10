@@ -437,8 +437,8 @@ class ModbusClient:
             logger.error(f"Angle {angle} out of range (0-360)")
             return False
 
-        # Registers: 2114 (MSW) / 2112 (LSW)
-        success = self.write_register_32bit(2114, 2112, angle)
+        # Register: 2114 (16-bit único)
+        success = self.write_register(2114, angle)
         if success:
             logger.info(f"Angle 1 set to {angle}°")
         return success
@@ -457,8 +457,8 @@ class ModbusClient:
             logger.error(f"Angle {angle} out of range (0-360)")
             return False
 
-        # Registers: 2120 (MSW) / 2118 (LSW)
-        success = self.write_register_32bit(2120, 2118, angle)
+        # Register: 2120 (16-bit único)
+        success = self.write_register(2120, angle)
         if success:
             logger.info(f"Angle 2 set to {angle}°")
         return success
@@ -477,23 +477,23 @@ class ModbusClient:
             logger.error(f"Angle {angle} out of range (0-360)")
             return False
 
-        # Registers: 2130 (MSW) / 2128 (LSW)
-        success = self.write_register_32bit(2130, 2128, angle)
+        # Register: 2130 (16-bit único)
+        success = self.write_register(2130, angle)
         if success:
             logger.info(f"Angle 3 set to {angle}°")
         return success
 
     def read_angle_1(self) -> Optional[int]:
-        """Read angle setpoint 1"""
-        return self.read_register_32bit(2114, 2112)
+        """Read angle setpoint 1 (16-bit único)"""
+        return self.read_register(2114)
 
     def read_angle_2(self) -> Optional[int]:
-        """Read angle setpoint 2"""
-        return self.read_register_32bit(2120, 2118)
+        """Read angle setpoint 2 (16-bit único)"""
+        return self.read_register(2120)
 
     def read_angle_3(self) -> Optional[int]:
-        """Read angle setpoint 3"""
-        return self.read_register_32bit(2130, 2128)
+        """Read angle setpoint 3 (16-bit único)"""
+        return self.read_register(2130)
 
     def read_discrete_input(self, address: int) -> Optional[bool]:
         """

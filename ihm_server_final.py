@@ -97,31 +97,16 @@ async def poll_clp_data():
             angle3 = modbus.read_angle_3()
 
             # Ler entradas digitais E0-E7
-            inputs = []
-            for i in range(8):
-                reg_addr = 256 + i  # E0=256, E1=257, ..., E7=263
-                result = modbus.read_register(reg_addr)
-                if result is not None:
-                    inputs.append(bool(result & 0x0001))
-                else:
-                    inputs.append(False)
+            # DESABILITADO: Registros 256-263 não existem neste CLP
+            inputs = [False] * 8
 
             # Ler saídas digitais S0-S7
-            outputs = []
-            for i in range(8):
-                # Para saídas, usar read_coil em vez de read_register
-                # Saídas estão na área de coils (0x0180-0x0187 = 384-391)
-                # Mas segundo o manual, S0-S7 podem estar em registros também
-                # Vamos tentar ler como registros primeiro
-                reg_addr = 384 + i  # S0=384, S1=385, ..., S7=391
-                result = modbus.read_register(reg_addr)
-                if result is not None:
-                    outputs.append(bool(result & 0x0001))
-                else:
-                    outputs.append(False)
+            # DESABILITADO: Registros 384-391 não existem neste CLP
+            outputs = [False] * 8
 
             # Ler classe de velocidade (registro 2304)
-            velocidade_classe = modbus.read_register(2304) or 0
+            # DESABILITADO: Registro não validado ainda
+            velocidade_classe = 0
 
             # Montar dados
             data = {

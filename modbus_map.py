@@ -30,9 +30,11 @@ BUTTONS = {
     'S1': 220,      # 0x00DC
     'S2': 221,      # 0x00DD
 
-    # Navigation arrows
+    # Navigation arrows (with aliases)
     'ARROW_UP': 172,    # 0x00AC
+    'UP': 172,          # Alias for ARROW_UP
     'ARROW_DOWN': 173,  # 0x00AD
+    'DOWN': 173,        # Alias for ARROW_DOWN
 
     # Control keys
     'ESC': 188,     # 0x00BC

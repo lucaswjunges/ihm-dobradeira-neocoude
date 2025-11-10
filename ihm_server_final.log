@@ -1,0 +1,123 @@
+2025-11-10 07:19:14,436 - __main__ - INFO - ================================================================================
+2025-11-10 07:19:14,436 - __main__ - INFO - IHM SERVIDOR FINAL - NEOCOUDE-HD-15
+2025-11-10 07:19:14,436 - __main__ - INFO - ================================================================================
+2025-11-10 07:19:14,436 - __main__ - INFO - Porta serial: /dev/ttyUSB0
+2025-11-10 07:19:14,436 - __main__ - INFO - WebSocket: localhost:8086
+2025-11-10 07:19:14,436 - __main__ - INFO - Modo: LIVE (CLP real)
+2025-11-10 07:19:14,436 - __main__ - INFO - ================================================================================
+2025-11-10 07:19:14,436 - modbus_client - INFO - Modbus client initialized in LIVE MODE: /dev/ttyUSB0 @ 57600
+2025-11-10 07:19:14,437 - modbus_client - INFO - Connected to PLC on /dev/ttyUSB0
+2025-11-10 07:19:14,453 - modbus_client - ERROR - Error reading register 6536: ExceptionResponse(dev_id=1, function_code=131, exception_code=2)
+2025-11-10 07:19:14,453 - __main__ - INFO - ✓ Conectado ao CLP via Modbus RTU
+2025-11-10 07:19:14,453 - __main__ - INFO - Iniciando servidor WebSocket na porta 8086...
+2025-11-10 07:19:14,487 - websockets.server - INFO - server listening on 127.0.0.1:8086
+2025-11-10 07:19:14,487 - __main__ - INFO - ✓ Servidor WebSocket rodando em ws://localhost:8086
+2025-11-10 07:19:14,488 - __main__ - INFO - Iniciando polling do CLP...
+2025-11-10 07:19:14,926 - websockets.server - INFO - connection open
+2025-11-10 07:19:14,926 - __main__ - INFO - Cliente conectado. Total de clientes: 1
+2025-11-10 07:19:31,613 - __main__ - INFO - Cliente removido. Total de clientes: 0
+2025-11-10 07:19:31,642 - websockets.server - INFO - connection open
+2025-11-10 07:19:31,642 - __main__ - INFO - Cliente conectado. Total de clientes: 1
+2025-11-10 07:19:33,097 - __main__ - INFO - Cliente removido. Total de clientes: 0
+2025-11-10 07:19:33,315 - websockets.server - INFO - connection open
+2025-11-10 07:19:33,315 - __main__ - INFO - Cliente conectado. Total de clientes: 1
+2025-11-10 07:19:35,886 - __main__ - INFO - Ação recebida: press_key
+2025-11-10 07:19:35,886 - modbus_client - INFO - Pressing button S1 (address 220)
+2025-11-10 07:19:36,030 - modbus_client - INFO - Button S1 press completed
+2025-11-10 07:19:36,030 - __main__ - INFO - Tecla 220 enviada com sucesso
+2025-11-10 07:19:36,919 - __main__ - INFO - Ação recebida: press_key
+2025-11-10 07:19:36,919 - modbus_client - INFO - Pressing button S1 (address 220)
+2025-11-10 07:19:37,053 - modbus_client - INFO - Button S1 press completed
+2025-11-10 07:19:37,053 - __main__ - INFO - Tecla 220 enviada com sucesso
+2025-11-10 07:19:37,637 - __main__ - INFO - Ação recebida: press_key
+2025-11-10 07:19:37,637 - modbus_client - INFO - Pressing button S2 (address 221)
+2025-11-10 07:19:37,778 - modbus_client - INFO - Button S2 press completed
+2025-11-10 07:19:37,778 - __main__ - INFO - Tecla 221 enviada com sucesso
+2025-11-10 07:19:38,555 - __main__ - INFO - Ação recebida: press_key
+2025-11-10 07:19:38,556 - modbus_client - INFO - Pressing button S2 (address 221)
+2025-11-10 07:19:38,691 - modbus_client - INFO - Button S2 press completed
+2025-11-10 07:19:38,691 - __main__ - INFO - Tecla 221 enviada com sucesso
+2025-11-10 07:19:39,505 - __main__ - INFO - Ação recebida: press_key
+2025-11-10 07:19:39,505 - modbus_client - INFO - Pressing button S1 (address 220)
+2025-11-10 07:19:39,636 - modbus_client - INFO - Button S1 press completed
+2025-11-10 07:19:39,637 - __main__ - INFO - Tecla 220 enviada com sucesso
+2025-11-10 07:19:40,157 - __main__ - INFO - Ação recebida: press_key
+2025-11-10 07:19:40,157 - modbus_client - INFO - Pressing button S1 (address 220)
+2025-11-10 07:19:40,294 - modbus_client - INFO - Button S1 press completed
+2025-11-10 07:19:40,294 - __main__ - INFO - Tecla 220 enviada com sucesso
+2025-11-10 07:19:42,153 - __main__ - INFO - Ação recebida: press_key
+2025-11-10 07:19:42,153 - modbus_client - INFO - Pressing button S1 (address 220)
+2025-11-10 07:19:42,295 - modbus_client - INFO - Button S1 press completed
+2025-11-10 07:19:42,295 - __main__ - INFO - Tecla 220 enviada com sucesso
+2025-11-10 07:19:43,788 - __main__ - INFO - Ação recebida: press_key
+2025-11-10 07:19:43,788 - modbus_client - INFO - Pressing button S1 (address 220)
+2025-11-10 07:19:43,926 - modbus_client - INFO - Button S1 press completed
+2025-11-10 07:19:43,926 - __main__ - INFO - Tecla 220 enviada com sucesso
+2025-11-10 07:19:48,127 - __main__ - INFO - Ação recebida: press_key
+2025-11-10 07:19:48,127 - modbus_client - INFO - Pressing button K4 (address 163)
+2025-11-10 07:19:48,268 - modbus_client - INFO - Button K4 press completed
+2025-11-10 07:19:48,268 - __main__ - INFO - Tecla 163 enviada com sucesso
+2025-11-10 07:19:49,523 - __main__ - INFO - Ação recebida: press_key
+2025-11-10 07:19:49,523 - modbus_client - INFO - Pressing button K5 (address 164)
+2025-11-10 07:19:49,655 - modbus_client - INFO - Button K5 press completed
+2025-11-10 07:19:49,656 - __main__ - INFO - Tecla 164 enviada com sucesso
+2025-11-10 07:19:50,201 - __main__ - INFO - Ação recebida: press_key
+2025-11-10 07:19:50,201 - modbus_client - INFO - Pressing button K6 (address 165)
+2025-11-10 07:19:50,343 - modbus_client - INFO - Button K6 press completed
+2025-11-10 07:19:50,343 - __main__ - INFO - Tecla 165 enviada com sucesso
+2025-11-10 07:19:50,700 - __main__ - INFO - Ação recebida: press_key
+2025-11-10 07:19:50,700 - modbus_client - INFO - Pressing button K7 (address 166)
+2025-11-10 07:19:50,835 - modbus_client - INFO - Button K7 press completed
+2025-11-10 07:19:50,835 - __main__ - INFO - Tecla 166 enviada com sucesso
+2025-11-10 07:19:51,469 - __main__ - INFO - Ação recebida: press_key
+2025-11-10 07:19:51,469 - modbus_client - INFO - Pressing button K8 (address 167)
+2025-11-10 07:19:51,611 - modbus_client - INFO - Button K8 press completed
+2025-11-10 07:19:51,611 - __main__ - INFO - Tecla 167 enviada com sucesso
+2025-11-10 07:19:52,053 - __main__ - INFO - Ação recebida: press_key
+2025-11-10 07:19:52,053 - modbus_client - INFO - Pressing button K9 (address 168)
+2025-11-10 07:19:52,195 - modbus_client - INFO - Button K9 press completed
+2025-11-10 07:19:52,195 - __main__ - INFO - Tecla 168 enviada com sucesso
+2025-11-10 07:19:52,593 - __main__ - INFO - Ação recebida: press_key
+2025-11-10 07:19:52,593 - modbus_client - INFO - Pressing button K0 (address 169)
+2025-11-10 07:19:52,724 - modbus_client - INFO - Button K0 press completed
+2025-11-10 07:19:52,724 - __main__ - INFO - Tecla 169 enviada com sucesso
+2025-11-10 07:19:55,059 - __main__ - INFO - Ação recebida: press_key
+2025-11-10 07:19:55,059 - modbus_client - INFO - Pressing button K3 (address 162)
+2025-11-10 07:19:55,200 - modbus_client - INFO - Button K3 press completed
+2025-11-10 07:19:55,200 - __main__ - INFO - Tecla 162 enviada com sucesso
+2025-11-10 07:19:56,701 - __main__ - INFO - Ação recebida: press_key
+2025-11-10 07:19:56,701 - modbus_client - INFO - Pressing button ESC (address 188)
+2025-11-10 07:19:56,843 - modbus_client - INFO - Button ESC press completed
+2025-11-10 07:19:56,843 - __main__ - INFO - Tecla 188 enviada com sucesso
+2025-11-10 07:19:59,000 - __main__ - INFO - Ação recebida: press_key
+2025-11-10 07:19:59,000 - modbus_client - INFO - Pressing button ESC (address 188)
+2025-11-10 07:19:59,145 - modbus_client - INFO - Button ESC press completed
+2025-11-10 07:19:59,145 - __main__ - INFO - Tecla 188 enviada com sucesso
+2025-11-10 07:20:01,001 - __main__ - INFO - Ação recebida: press_key
+2025-11-10 07:20:01,001 - modbus_client - INFO - Pressing button ESC (address 188)
+2025-11-10 07:20:01,145 - modbus_client - INFO - Button ESC press completed
+2025-11-10 07:20:01,145 - __main__ - INFO - Tecla 188 enviada com sucesso
+2025-11-10 07:20:03,138 - __main__ - INFO - Ação recebida: press_key
+2025-11-10 07:20:03,138 - modbus_client - INFO - Pressing button ENTER (address 37)
+2025-11-10 07:20:03,278 - modbus_client - INFO - Button ENTER press completed
+2025-11-10 07:20:03,278 - __main__ - INFO - Tecla 37 enviada com sucesso
+2025-11-10 07:20:09,810 - __main__ - INFO - Ação recebida: press_key
+2025-11-10 07:20:09,810 - modbus_client - INFO - Pressing button EDIT (address 38)
+2025-11-10 07:20:09,943 - modbus_client - INFO - Button EDIT press completed
+2025-11-10 07:20:09,943 - __main__ - INFO - Tecla 38 enviada com sucesso
+2025-11-10 07:20:13,187 - __main__ - INFO - Ação recebida: press_key
+2025-11-10 07:20:13,188 - modbus_client - INFO - Pressing button EDIT (address 38)
+2025-11-10 07:20:13,322 - modbus_client - INFO - Button EDIT press completed
+2025-11-10 07:20:13,322 - __main__ - INFO - Tecla 38 enviada com sucesso
+2025-11-10 07:20:21,423 - __main__ - INFO - Ação recebida: press_key
+2025-11-10 07:20:21,423 - modbus_client - INFO - Pressing button ENTER (address 37)
+2025-11-10 07:20:21,566 - modbus_client - INFO - Button ENTER press completed
+2025-11-10 07:20:21,566 - __main__ - INFO - Tecla 37 enviada com sucesso
+2025-11-10 07:20:23,059 - __main__ - INFO - Ação recebida: press_key
+2025-11-10 07:20:23,060 - modbus_client - INFO - Pressing button S1 (address 220)
+2025-11-10 07:20:23,200 - modbus_client - INFO - Button S1 press completed
+2025-11-10 07:20:23,200 - __main__ - INFO - Tecla 220 enviada com sucesso
+2025-11-10 07:20:23,787 - __main__ - INFO - Ação recebida: press_key
+2025-11-10 07:20:23,788 - modbus_client - INFO - Pressing button S1 (address 220)
+2025-11-10 07:20:23,924 - modbus_client - INFO - Button S1 press completed
+2025-11-10 07:20:23,924 - __main__ - INFO - Tecla 220 enviada com sucesso

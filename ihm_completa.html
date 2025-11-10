@@ -381,6 +381,12 @@
             connected: false
         };
 
+        // Estado do editor inline
+        let editMode = false;
+        let editBuffer = '';
+        let editField = null;  // 'angle1', 'angle2', ou 'angle3'
+        let editTela = null;   // 4, 5, ou 6
+
         const screens = [
             // Tela 0
             {
@@ -463,18 +469,33 @@
             document.getElementById('line1').innerHTML = line1Text;
 
             // Linha 2
-            const line2Text = typeof s.line2 === 'function' ? s.line2() : s.line2;
+            let line2Text = typeof s.line2 === 'function' ? s.line2() : s.line2;
+
+            // Se em modo de edição e na tela correta, mostrar buffer
+            if (editMode && screen === editTela) {
+                const angleNum = editTela - 3;
+                const bufferDisplay = editBuffer.padEnd(4, '_');
+                line2Text = `AJ=<span class="editable-field editing">${bufferDisplay}</span>°    PV=${pad(data.encoder, 4)}°`;
+            }
+
             document.getElementById('line2').innerHTML = line2Text;
 
             document.getElementById('screenNum').textContent = screen;
         }
 
         function editAngle(tela, currentValue) {
-            const novoValor = prompt(`Digite o ângulo (0-360):`, currentValue || '');
+            // Ativar modo de edição inline
+            editMode = true;
+            editBuffer = '';
+            editField = `angle${tela-3}`;
+            editTela = tela;
 
-            if (novoValor === null) return;  // Cancelado
+            updateScreen();
+            showFeedback(`EDIT: Digite 0-360 + ENTER`, false);
+        }
 
-            const valor = parseInt(novoValor);
+        function saveAngle() {
+            const valor = parseInt(editBuffer);
 
             // Validação
             if (isNaN(valor) || valor < 0 || valor > 360) {
@@ -482,20 +503,96 @@
                 return;
             }
 
-            // Enviar ao backend
-            ws.send(JSON.stringify({
-                action: 'write_angle',
-                tela: tela,
-                value: valor
-            }));
+            // Enviar ao backend - CLP irá atualizar e retornar o valor
+            if (ws && ws.readyState === WebSocket.OPEN) {
+                ws.send(JSON.stringify({
+                    action: 'write_angle',
+                    tela: editTela,
+                    value: valor
+                }));
 
-            showFeedback(`✓ Ângulo ${tela-3} = ${valor}°`);
+                showFeedback(`✓ Salvando ${valor}°... Aguarde CLP`);
+            }
+
+            // Sair do modo de edição
+            exitEditMode();
+        }
+
+        function exitEditMode() {
+            editMode = false;
+            editBuffer = '';
+            editField = null;
+            editTela = null;
+            updateScreen();
         }
 
         function sendKey(code, event) {
+            // ========== MODO DE EDIÇÃO ==========
+            if (editMode) {
+                // K0-K9: Adicionar dígito ao buffer (máximo 3 dígitos)
+                if (code >= 160 && code <= 169) {
+                    if (editBuffer.length < 3) {
+                        const digit = (code === 169) ? '0' : String(code - 159);
+                        editBuffer += digit;
+                        updateScreen();
+                        showFeedback(`Digitando: ${editBuffer}`);
+                    }
+                    return;  // Não envia ao CLP durante edição
+                }
+
+                // ENTER: Confirmar e salvar
+                if (code === 37) {
+                    if (editBuffer.length > 0) {
+                        saveAngle();
+                    } else {
+                        showFeedback('Digite um valor primeiro!', true);
+                    }
+                    return;
+                }
+
+                // ESC: Cancelar edição
+                if (code === 188) {
+                    showFeedback('Edição cancelada');
+                    exitEditMode();
+                    return;
+                }
+
+                // Outras teclas: não fazem nada em modo de edição
+                showFeedback('Em edição: use K0-K9, ENTER ou ESC');
+                return;
+            }
+
+            // ========== MODO NORMAL ==========
             if (ws && ws.readyState === WebSocket.OPEN) {
+                // EDIT: Ativar modo de edição se estiver em tela de ângulo
+                if (code === 38) { // EDIT
+                    if (screen >= 4 && screen <= 6) {
+                        const currentAngle = data[`angle${screen-3}`];
+                        editAngle(screen, currentAngle);
+                    } else {
+                        showFeedback('EDIT: Vá para Tela 4/5/6');
+                    }
+                }
+
+                // Enviar tecla ao CLP
                 ws.send(JSON.stringify({ action: 'press_key', key_code: code }));
-                showFeedback(`✓ Tecla ${code}`);
+
+                // Navegação especial para K1/K2/K3 - vai para tela de ângulo
+                if (code === 160) { // K1
+                    screen = 4; // Tela 4: Ângulo 1
+                    updateScreen();
+                    showFeedback('✓ K1 → Tela 4 (Ângulo 1)');
+                } else if (code === 161) { // K2
+                    screen = 5; // Tela 5: Ângulo 2
+                    updateScreen();
+                    showFeedback('✓ K2 → Tela 5 (Ângulo 2)');
+                } else if (code === 162) { // K3
+                    screen = 6; // Tela 6: Ângulo 3
+                    updateScreen();
+                    showFeedback('✓ K3 → Tela 6 (Ângulo 3)');
+                } else if (code !== 38) {  // Não repetir feedback do EDIT
+                    showFeedback(`✓ Tecla ${code}`);
+                }
 
                 // Feedback visual
                 if (event && event.target) {
