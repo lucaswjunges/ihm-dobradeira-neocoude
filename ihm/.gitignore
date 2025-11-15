@@ -1,0 +1,36 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+venv/
+*.egg-info/
+dist/
+build/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Logs
+*.log
+logs/
+
+# Databases (futuro)
+*.db
+*.sqlite
+*.sqlite3
+
+# Configurações locais
+config.local.py
+.env
+
+# Temporários
+*.tmp
+*.bak
+.DS_Store

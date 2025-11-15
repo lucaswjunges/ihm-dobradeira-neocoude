@@ -1,0 +1,199 @@
+═══════════════════════════════════════════════════════════════
+              ⭐ USAR ESTE ARQUIVO! v25 FINAL ⭐
+═══════════════════════════════════════════════════════════════
+
+📦 CLP_10_ROTINAS_v25_SAFE.sup
+
+   MD5: f04fb1e8cb9c3e45181cfd13e56031d6
+   Tamanho: 29 KB
+   Status: ✅ APENAS REGISTROS VÁLIDOS COMO ORIGEM
+
+═══════════════════════════════════════════════════════════════
+
+🎯 PROBLEMA RESOLVIDO!
+
+A questão era: Como espelhar I/O (E0-E7, S0-S7) para Modbus se MOV não
+consegue ler os registros 0100-0107 e 0180-0187?
+
+💡 SOLUÇÃO DESCOBERTA:
+
+  1. MOV NO CLP:
+     ❌ NÃO pode ler 0100-0107 (E0-E7) - restrição interna
+     ❌ NÃO pode ler 0180-0187 (S0-S7) - restrição interna
+     ✅ PODE ler 0840-0852 (ângulos) - validado em ROT4
+     ✅ PODE ler 04D6, 05F0 (especiais) - validado em ROT4
+
+  2. PYTHON VIA MODBUS RTU:
+     ✅ CONSEGUE ler 0100-0107 com Function 0x03!
+     ✅ CONSEGUE ler 0180-0187 com Function 0x03!
+     ✅ Manual confirma: "Read Holding Registers (0x03)"
+
+     Método:
+     ```python
+     # Ler E0-E7 (entradas digitais)
+     for addr in range(0x0100, 0x0108):
+         reg = client.read_holding_register(addr)
+         status = reg & 0x0001  # Bit 0 = estado
+
+     # Ler S0-S7 (saídas digitais)
+     for addr in range(0x0180, 0x0188):
+         reg = client.read_holding_register(addr)
+         status = reg & 0x0001  # Bit 0 = estado
+     ```
+
+═══════════════════════════════════════════════════════════════
+
+📋 CONTEÚDO v25 (71 INSTRUÇÕES MOV):
+
+ROT5 (6 linhas):
+  MOV 0840 → 0944  (ângulo esquerdo 1 MSW)
+  MOV 0842 → 0942  (ângulo esquerdo 1 LSW)
+  MOV 0846 → 0944  (ângulo esquerdo 2 MSW)
+  MOV 0848 → 0942  (ângulo esquerdo 2 LSW)
+  MOV 0850 → 0944  (ângulo esquerdo 3 MSW)
+  MOV 0852 → 0942  (ângulo esquerdo 3 LSW)
+
+ROT6 (18 linhas):
+  Copia ângulos 0840-0852 alternadamente para 0942/0944
+  (ciclo repetido para garantir disponibilidade)
+
+ROT7 (12 linhas):
+  Copia ângulos 0840-0852 alternadamente para 0942/0944
+
+ROT8 (15 linhas):
+  Copia ângulos 0840-0852 alternadamente para 0942/0944
+
+ROT9 (20 linhas):
+  Copia ângulos 0840-0852 alternadamente para 0942/0944
+
+═══════════════════════════════════════════════════════════════
+
+📋 PADRÃO USADO (copiado de ROT4 original):
+
+```
+[LineXXXXX]
+  [Features]
+    Branchs:01
+    Type:0
+    Label:0
+    Comment:0
+    Out:MOV     T:0028 Size:003 E:0840 E:0944
+    Height:03          ← VISUAL SPACING!
+  [Branch01]
+    X1position:00
+    X2position:13
+    Yposition:00
+    Height:01
+    B1:00
+    B2:00
+    BInputnumber:00    ← SEM CONDIÇÃO
+    {0;00;00F7;-1;-1;-1;-1;00}  ← ALWAYS TRUE
+    ###
+```
+
+═══════════════════════════════════════════════════════════════
+
+🚀 TESTAR NO WINSUP:
+
+1. Abrir CLP_10_ROTINAS_v25_SAFE.sup
+2. Verificar:
+   ✅ Abre sem erros?
+   ✅ Todas as ROT5-9 mostram linhas MOV (não FIM)?
+   ✅ Nenhum erro "registro fora do range"?
+3. Compilar → deve compilar SEM ERROS!
+
+═══════════════════════════════════════════════════════════════
+
+💻 INTEGRAÇÃO PYTHON:
+
+modbus_client.py:
+```python
+class ModbusClientWrapper:
+    def read_digital_inputs(self):
+        """Lê E0-E7 via Modbus Function 0x03"""
+        inputs = {}
+        for i in range(8):
+            addr = 0x0100 + i  # E0-E7
+            reg = self.client.read_holding_registers(addr, 1)
+            inputs[f'E{i}'] = reg.registers[0] & 0x0001
+        return inputs
+
+    def read_digital_outputs(self):
+        """Lê S0-S7 via Modbus Function 0x03"""
+        outputs = {}
+        for i in range(8):
+            addr = 0x0180 + i  # S0-S7
+            reg = self.client.read_holding_registers(addr, 1)
+            outputs[f'S{i}'] = reg.registers[0] & 0x0001
+        return outputs
+```
+
+state_manager.py:
+```python
+async def poll_once(self):
+    """Polling loop - atualiza estado completo"""
+    # I/O digitais (NÃO espelhados pelo CLP!)
+    self.machine_state['inputs'] = self.modbus.read_digital_inputs()
+    self.machine_state['outputs'] = self.modbus.read_digital_outputs()
+
+    # Encoder (espelhado em 04D6/04D7)
+    encoder_msw = self.modbus.read_register(0x04D6)
+    encoder_lsw = self.modbus.read_register(0x04D7)
+    self.machine_state['encoder_raw'] = (encoder_msw << 16) | encoder_lsw
+
+    # Ângulos (espelhados em 0942/0944 via ROT5-9)
+    self.machine_state['mirror_a'] = self.modbus.read_register(0x0942)
+    self.machine_state['mirror_b'] = self.modbus.read_register(0x0944)
+```
+
+═══════════════════════════════════════════════════════════════
+
+📈 EVOLUÇÃO ATÉ v25:
+
+v19: ❌ Usou instruções inválidas (NOT, ADD, MUL, DIV)
+  ↓
+v20-v22: ❌ Tentou escrever em registros 08xx (inválidos)
+  ↓
+v23: ❌ Tentou ler registros I/O com MOV (não funciona)
+  ↓
+v24: ❌ Ainda tentava ler I/O, timers, status com MOV
+  ↓
+v25: ✅ USA APENAS ÂNGULOS (0840-0852) + PYTHON LÊ I/O DIRETAMENTE!
+
+═══════════════════════════════════════════════════════════════
+
+💡 LIÇÕES APRENDIDAS:
+
+1. ✅ MOV tem restrições de fonte - só alguns registros funcionam
+2. ✅ Modbus externo (Python) tem MAIS acesso que MOV interno
+3. ✅ Registros 0100-0107 e 0180-0187 são acessíveis via Modbus
+4. ✅ Ler bit 0 de cada registro: `status = register & 0x0001`
+5. ✅ Manual MPC4004 confirma: "Read Holding Registers (0x03)"
+6. ✅ SEMPRE testar contra originais (ROT0-4) antes de inventar
+
+═══════════════════════════════════════════════════════════════
+
+🎯 RESULTADO FINAL:
+
+CLP:
+  - ROT0-4: Preservados 100% (controle da máquina)
+  - ROT5-9: 71 MOV copiando ângulos para 0942/0944
+
+Python:
+  - Lê I/O diretamente: Function 0x03, endereços 0100-0107, 0180-0187
+  - Lê ângulos espelhados: 0942, 0944
+  - Lê encoder: 04D6, 04D7
+  - Envia comandos: Function 0x05, endereços 00A0-00A9, 00DC, etc.
+
+IHM Web:
+  - Supervisão completa: I/O, encoder, ângulos, status
+  - Comandos de teclado: K0-K9, S1, S2, ENTER, ESC, EDIT
+  - Sem modificar lógica original da máquina
+
+═══════════════════════════════════════════════════════════════
+
+Versão atual:
+  ✅ CLP_10_ROTINAS_v25_SAFE.sup
+  MD5: f04fb1e8cb9c3e45181cfd13e56031d6
+
+═══════════════════════════════════════════════════════════════

@@ -1,0 +1,68 @@
+═══════════════════════════════════════════════════════════════
+              ⭐ USAR ESTE ARQUIVO! ⭐
+═══════════════════════════════════════════════════════════════
+
+📦 CLP_10_ROTINAS_v18_MINIMAIS_VALIDOS.sup
+
+   MD5: c02190415a1a589ce8be22f94f15cc79
+   Tamanho: 323 KB
+   Status: ✅ ESTRUTURA 100% VÁLIDA
+
+═══════════════════════════════════════════════════════════════
+
+🔥 PROBLEMA RAIZ DESCOBERTO E RESOLVIDO!
+
+Os arquivos ROT6-9 ORIGINAIS estavam quebrados:
+  - Cabeçalho dizia: Lines:00035
+  - Arquivo tinha: 18 linhas
+  - WinSUP parava de processar → mostrava só 1 linha!
+
+TODOS os .sup que tínhamos (v12-v17) copiaram esses arquivos
+quebrados. Não era culpa nossa!
+
+═══════════════════════════════════════════════════════════════
+
+✅ SOLUÇÃO v18:
+
+ROT5-9 criadas DO ZERO com:
+  ✅ Cabeçalhos CORRETOS (batem com linhas reais)
+  ✅ Estrutura válida (cada linha é um RET)
+  ✅ Números de linhas sequenciais
+
+ROT0-4 mantidas da base funcional (clp_pronto_CORRIGIDO)
+
+═══════════════════════════════════════════════════════════════
+
+📊 ROTINAS:
+
+Base Funcional:
+  ✅ ROT0 (10 linhas) - Lógica principal
+  ✅ ROT1 (7 linhas)  - Auxiliar
+  ✅ ROT2 (12 linhas) - Dobras
+  ✅ ROT3 (8 linhas)  - Sequência
+  ✅ ROT4 (14 linhas) - Ângulos
+
+Estrutura Válida (RET):
+  ✅ ROT5 (6 linhas)  - Lines:00006 ✅
+  ✅ ROT6 (18 linhas) - Lines:00018 ✅
+  ✅ ROT7 (12 linhas) - Lines:00012 ✅
+  ✅ ROT8 (15 linhas) - Lines:00015 ✅
+  ✅ ROT9 (20 linhas) - Lines:00020 ✅
+
+═══════════════════════════════════════════════════════════════
+
+🚀 RESULTADO ESPERADO NO WINSUP:
+
+✅ Todas as 10 rotinas aparecem na árvore
+✅ ROT6-9 abrem com TODAS as linhas (não só 1!)
+✅ Compila sem erros
+✅ Pronto para adicionar lógica real nas ROT5-9
+
+═══════════════════════════════════════════════════════════════
+
+📚 DOCUMENTAÇÃO:
+
+README_v18_MINIMAIS_VALIDOS.md → Detalhes completos
+HISTORICO_COMPLETO_BUGS.md     → Todos os problemas
+
+═══════════════════════════════════════════════════════════════

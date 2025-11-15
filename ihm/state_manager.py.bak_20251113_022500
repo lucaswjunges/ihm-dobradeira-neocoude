@@ -1,0 +1,351 @@
+"""
+State Manager - Gerenciador de Estado da Máquina
+=================================================
+
+Polling loop asyncio que mantém estado atualizado da máquina.
+Single source of truth para todos os dados do CLP.
+"""
+
+import asyncio
+import time
+from typing import Dict, Any, Optional
+from modbus_client import ModbusClientWrapper
+import modbus_map as mm
+
+
+class MachineStateManager:
+    """
+    Gerencia estado da máquina com polling periódico
+    """
+    
+    def __init__(self, modbus_client: ModbusClientWrapper, poll_interval: float = 0.25):
+        """
+        Inicializa gerenciador de estado
+        
+        Args:
+            modbus_client: Cliente Modbus (stub ou live)
+            poll_interval: Intervalo de polling em segundos (padrão 250ms)
+        """
+        self.client = modbus_client
+        self.poll_interval = poll_interval
+        self.running = False
+        
+        # Estado completo da máquina
+        self.machine_state: Dict[str, Any] = {
+            # Encoder
+            'encoder_angle': 0,          # Ângulo atual (0-360°)
+            'encoder_raw': 0,            # Valor bruto 32-bit
+            
+            # Ângulos setpoint (3 dobras)
+            'bend_1_left': 0,
+            'bend_2_left': 0,
+            'bend_3_left': 0,
+            
+            # Status da máquina
+            'modbus_connected': False,
+            'cycle_active': False,
+            'bend_number': 1,           # 1, 2 ou 3
+            
+            # Entradas digitais
+            'inputs': {
+                'E0': False, 'E1': False, 'E2': False, 'E3': False,
+                'E4': False, 'E5': False, 'E6': False, 'E7': False
+            },
+            
+            # Saídas digitais
+            'outputs': {
+                'S0': False, 'S1': False, 'S2': False, 'S3': False,
+                'S4': False, 'S5': False, 'S6': False, 'S7': False
+            },
+            
+            # LEDs
+            'leds': {
+                'LED1': False, 'LED2': False, 'LED3': False,
+                'LED4': False, 'LED5': False
+            },
+            
+            # Botões (estado atual)
+            'buttons': {
+                'K0': False, 'K1': False, 'K2': False, 'K3': False, 'K4': False,
+                'K5': False, 'K6': False, 'K7': False, 'K8': False, 'K9': False,
+                'S1': False, 'S2': False, 'UP': False, 'DOWN': False,
+                'ESC': False, 'ENTER': False, 'EDIT': False, 'LOCK': False
+            },
+
+            # ROT6 - Supervisão Modbus
+            'heartbeat': 0,              # Contador incremental (detecta travamento CLP)
+            'encoder_web': 0,            # Cópia do encoder para leitura contínua
+            'screen_num_web': 0,         # Número da tela IHM física
+
+            # ROT7 - Inversor WEG CFW-08
+            'inverter': {
+                'speed_class': 0,        # 0=Parado, 1=5rpm, 2=10rpm, 3=15rpm
+                'rpm_current': 0,        # RPM atual estimado
+                'power_est': 0,          # Potência estimada (W)
+                'status': 0,             # Bits: 0=Run, 1=Alarm, 2=Overload
+                'runtime_hours': 0       # Horas de operação
+            },
+
+            # ROT8 - SCADA/Grafana
+            'production': {
+                'timestamp_minutes': 0,  # Minutos desde power-on
+                'total_pieces': 0,       # Total de peças produzidas
+                'efficiency': 0,         # Peças por hora
+                'cycle_count': 0,        # Ciclos completos
+                'alarm_count': 0,        # Total de alarmes
+                'speed_changes': 0,      # Mudanças de velocidade
+                'mode_changes': 0,       # Trocas Manual↔Auto
+                'current_bend': 0,       # 1, 2 ou 3
+                'status_bits': 0         # Consolidado (bit0=Ciclo, bit1=Emerg, etc)
+            },
+
+            # ROT9 - Emulação de teclado
+            'keyboard': {
+                'last_key': 0,           # Última tecla pressionada
+                'press_counter': 0,      # Total de pressionamentos
+                'lock_status': 0         # 0=Desbloqueado, 1=Bloqueado
+            },
+
+            # Timestamp
+            'last_update': 0,
+            'update_count': 0
+        }
+        
+        # Estado anterior (para detectar mudanças)
+        self.previous_state = self.machine_state.copy()
+        
+    def get_state(self) -> Dict[str, Any]:
+        """
+        Retorna estado completo atual
+        
+        Returns:
+            Dicionário com estado da máquina
+        """
+        return self.machine_state.copy()
+        
+    def get_changes(self) -> Dict[str, Any]:
+        """
+        Retorna apenas valores que mudaram desde última leitura
+        
+        Returns:
+            Dicionário com deltas
+        """
+        changes = {}
+        
+        for key, value in self.machine_state.items():
+            if isinstance(value, dict):
+                # Comparar sub-dicionários
+                sub_changes = {}
+                for subkey, subvalue in value.items():
+                    if self.previous_state.get(key, {}).get(subkey) != subvalue:
+                        sub_changes[subkey] = subvalue
+                if sub_changes:
+                    changes[key] = sub_changes
+            else:
+                # Comparar valores diretos
+                if self.previous_state.get(key) != value:
+                    changes[key] = value
+                    
+        return changes
+        
+    async def poll_once(self):
+        """
+        Executa um ciclo de polling (lê todos os dados vitais)
+        """
+        try:
+            # Encoder (32-bit)
+            encoder_raw = self.client.read_32bit(
+                mm.ENCODER_ANGLE_MSW,
+                mm.ENCODER_ANGLE_LSW
+            )
+            if encoder_raw is not None:
+                self.machine_state['encoder_raw'] = encoder_raw
+                # Converte para graus (assumindo fator 10: 900 = 90.0°)
+                self.machine_state['encoder_angle'] = encoder_raw / 10.0
+                
+            # Ângulos setpoint
+            bend1 = self.client.read_32bit(mm.BEND_1_LEFT_MSW, mm.BEND_1_LEFT_LSW)
+            if bend1 is not None:
+                self.machine_state['bend_1_left'] = bend1 / 10.0
+                
+            bend2 = self.client.read_32bit(mm.BEND_2_LEFT_MSW, mm.BEND_2_LEFT_LSW)
+            if bend2 is not None:
+                self.machine_state['bend_2_left'] = bend2 / 10.0
+                
+            bend3 = self.client.read_32bit(mm.BEND_3_LEFT_MSW, mm.BEND_3_LEFT_LSW)
+            if bend3 is not None:
+                self.machine_state['bend_3_left'] = bend3 / 10.0
+                
+            # Entradas digitais
+            for name, addr in mm.DIGITAL_INPUTS.items():
+                value = self.client.read_register(addr)
+                if value is not None:
+                    self.machine_state['inputs'][name] = bool(value & 0x0001)
+                    
+            # Saídas digitais
+            for name, addr in mm.DIGITAL_OUTPUTS.items():
+                value = self.client.read_register(addr)
+                if value is not None:
+                    self.machine_state['outputs'][name] = bool(value & 0x0001)
+                    
+            # LEDs
+            for name, addr in mm.LEDS.items():
+                value = self.client.read_coil(addr)
+                if value is not None:
+                    self.machine_state['leds'][name] = value
+                    
+            # Estado Modbus slave
+            modbus_enabled = self.client.read_coil(mm.STATE_MODBUS_SLAVE_ENABLE)
+            self.machine_state['modbus_connected'] = (modbus_enabled == True)
+
+            # ROT6 - Supervisão Modbus
+            heartbeat = self.client.read_register(mm.HEARTBEAT)
+            if heartbeat is not None:
+                self.machine_state['heartbeat'] = heartbeat
+
+            encoder_web = self.client.read_32bit(mm.ENCODER_WEB_MSW, mm.ENCODER_WEB_LSW)
+            if encoder_web is not None:
+                self.machine_state['encoder_web'] = encoder_web / 10.0
+
+            screen_num = self.client.read_register(mm.SCREEN_NUM_WEB)
+            if screen_num is not None:
+                self.machine_state['screen_num_web'] = screen_num
+
+            # ROT7 - Inversor WEG CFW-08
+            inv_speed = self.client.read_register(mm.INVERTER_CLASS_SPEED)
+            if inv_speed is not None:
+                self.machine_state['inverter']['speed_class'] = inv_speed
+
+            inv_rpm = self.client.read_register(mm.INVERTER_RPM_CURRENT)
+            if inv_rpm is not None:
+                self.machine_state['inverter']['rpm_current'] = inv_rpm
+
+            inv_power = self.client.read_register(mm.INVERTER_POWER_EST)
+            if inv_power is not None:
+                self.machine_state['inverter']['power_est'] = inv_power
+
+            inv_status = self.client.read_register(mm.INVERTER_STATUS)
+            if inv_status is not None:
+                self.machine_state['inverter']['status'] = inv_status
+
+            inv_runtime = self.client.read_32bit(mm.INVERTER_RUNTIME_MSW, mm.INVERTER_RUNTIME_LSW)
+            if inv_runtime is not None:
+                # Converter minutos para horas
+                self.machine_state['inverter']['runtime_hours'] = inv_runtime / 60.0
+
+            # ROT8 - SCADA/Grafana
+            timestamp = self.client.read_32bit(mm.TIMESTAMP_MSW, mm.TIMESTAMP_LSW)
+            if timestamp is not None:
+                self.machine_state['production']['timestamp_minutes'] = timestamp
+
+            total_pieces = self.client.read_32bit(mm.PROD_TOTAL_MSW, mm.PROD_TOTAL_LSW)
+            if total_pieces is not None:
+                self.machine_state['production']['total_pieces'] = total_pieces
+
+            efficiency = self.client.read_register(mm.PROD_EFFICIENCY)
+            if efficiency is not None:
+                self.machine_state['production']['efficiency'] = efficiency
+
+            cycle_count = self.client.read_register(mm.PROD_CYCLE_COUNTER)
+            if cycle_count is not None:
+                self.machine_state['production']['cycle_count'] = cycle_count
+
+            alarm_count = self.client.read_register(mm.PROD_ALARM_COUNTER)
+            if alarm_count is not None:
+                self.machine_state['production']['alarm_count'] = alarm_count
+
+            speed_changes = self.client.read_register(mm.PROD_SPEED_CHANGES)
+            if speed_changes is not None:
+                self.machine_state['production']['speed_changes'] = speed_changes
+
+            mode_changes = self.client.read_register(mm.PROD_MODE_CHANGES)
+            if mode_changes is not None:
+                self.machine_state['production']['mode_changes'] = mode_changes
+
+            current_bend = self.client.read_register(mm.PROD_CURRENT_BEND)
+            if current_bend is not None:
+                self.machine_state['production']['current_bend'] = current_bend
+
+            status_bits = self.client.read_register(mm.PROD_STATUS_CONSOLIDATED)
+            if status_bits is not None:
+                self.machine_state['production']['status_bits'] = status_bits
+
+            # ROT9 - Emulação de teclado
+            last_key = self.client.read_register(mm.KEY_HISTORY_5)
+            if last_key is not None:
+                self.machine_state['keyboard']['last_key'] = last_key
+
+            press_counter = self.client.read_register(mm.KEY_PRESS_COUNTER)
+            if press_counter is not None:
+                self.machine_state['keyboard']['press_counter'] = press_counter
+
+            lock_status = self.client.read_register(mm.KEY_LOCK_STATUS)
+            if lock_status is not None:
+                self.machine_state['keyboard']['lock_status'] = lock_status
+
+            # Atualiza timestamp
+            self.machine_state['last_update'] = time.time()
+            self.machine_state['update_count'] += 1
+            
+        except Exception as e:
+            print(f"✗ Erro no polling: {e}")
+            self.machine_state['modbus_connected'] = False
+            
+    async def poll_loop(self):
+        """
+        Loop principal de polling (roda continuamente)
+        """
+        self.running = True
+        print(f"✓ State Manager iniciado (polling: {self.poll_interval}s)")
+        
+        while self.running:
+            # Salva estado anterior
+            self.previous_state = self.machine_state.copy()
+            
+            # Executa polling
+            await self.poll_once()
+            
+            # Aguarda próximo ciclo
+            await asyncio.sleep(self.poll_interval)
+            
+        print("✓ State Manager encerrado")
+        
+    def stop(self):
+        """Para o loop de polling"""
+        self.running = False
+
+
+# Teste standalone
+async def test_state_manager():
+    """Testa state manager em modo stub"""
+    from modbus_client import ModbusClientWrapper
+    
+    print("=== TESTE STATE MANAGER ===")
+    
+    # Cria cliente em modo stub
+    client = ModbusClientWrapper(stub_mode=True)
+    
+    # Cria state manager
+    manager = MachineStateManager(client, poll_interval=1.0)
+    
+    # Executa alguns ciclos
+    for i in range(5):
+        await manager.poll_once()
+        state = manager.get_state()
+        
+        print(f"\n--- Ciclo {i+1} ---")
+        print(f"Encoder: {state['encoder_angle']:.1f}°")
+        print(f"Bend 1: {state['bend_1_left']:.1f}°")
+        print(f"Bend 2: {state['bend_2_left']:.1f}°")
+        print(f"Bend 3: {state['bend_3_left']:.1f}°")
+        print(f"Modbus: {'CONECTADO' if state['modbus_connected'] else 'DESCONECTADO'}")
+        print(f"Updates: {state['update_count']}")
+        
+        await asyncio.sleep(1)
+    
+    client.close()
+    print("\n✓ Teste concluído")
+
+
+if __name__ == "__main__":
+    asyncio.run(test_state_manager())

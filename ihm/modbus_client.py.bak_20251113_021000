@@ -1,0 +1,354 @@
+"""
+Modbus Client - IHM Web Dobradeira
+===================================
+
+Cliente Modbus RTU com suporte a modo stub para desenvolvimento web-first.
+
+Modo Stub: Desenvolve/testa interface sem CLP conectado
+Modo Live: Comunicação real via RS485-B
+"""
+
+import time
+import random
+from typing import Optional, Union
+from pymodbus.client import ModbusSerialClient
+from pymodbus.exceptions import ModbusException
+import modbus_map as mm
+
+
+class ModbusClientWrapper:
+    """
+    Wrapper para pyModbus com modo stub e tratamento robusto de erros
+    """
+    
+    def __init__(self, stub_mode: bool = False, port: str = '/dev/ttyUSB0', 
+                 baudrate: int = 57600, slave_id: int = 1):
+        """
+        Inicializa cliente Modbus
+        
+        Args:
+            stub_mode: True para modo simulado (sem CLP)
+            port: Porta serial (ex: /dev/ttyUSB0)
+            baudrate: Taxa de comunicação (padrão 57600)
+            slave_id: Endereço slave do CLP (padrão 1)
+        """
+        self.stub_mode = stub_mode
+        self.port = port
+        self.baudrate = baudrate
+        self.slave_id = slave_id
+        self.client = None
+        self.connected = False
+        
+        # Estado simulado para modo stub
+        self.stub_coils = {}  # Coils/bits
+        self.stub_registers = {}  # Registros 16-bit
+        
+        if not stub_mode:
+            self._connect_live()
+        else:
+            self._init_stub_data()
+            
+    def _connect_live(self):
+        """Conecta ao CLP real via RS485"""
+        try:
+            self.client = ModbusSerialClient(
+                port=self.port,
+                baudrate=self.baudrate,
+                parity='N',
+                stopbits=1,
+                bytesize=8,
+                timeout=1.0
+            )
+            self.connected = self.client.connect()
+            if self.connected:
+                print(f"✓ Modbus conectado: {self.port} @ {self.baudrate} bps")
+            else:
+                print(f"✗ Falha ao conectar em {self.port}")
+        except Exception as e:
+            print(f"✗ Erro ao conectar Modbus: {e}")
+            self.connected = False
+            
+    def _init_stub_data(self):
+        """Inicializa dados simulados para modo stub"""
+        self.connected = True
+        
+        # Simula encoder em 45.5 graus
+        self.stub_registers[mm.ENCODER_ANGLE_MSW] = 0x0000
+        self.stub_registers[mm.ENCODER_ANGLE_LSW] = 0x01C9  # 457 = 45.7°
+        
+        # Ângulos setpoint iniciais
+        self.stub_registers[mm.BEND_1_LEFT_MSW] = 0x0000
+        self.stub_registers[mm.BEND_1_LEFT_LSW] = 0x0384  # 900 = 90°
+        self.stub_registers[mm.BEND_2_LEFT_MSW] = 0x0000
+        self.stub_registers[mm.BEND_2_LEFT_LSW] = 0x04B0  # 1200 = 120°
+        self.stub_registers[mm.BEND_3_LEFT_MSW] = 0x0000
+        self.stub_registers[mm.BEND_3_LEFT_LSW] = 0x0230  # 560 = 56°
+        
+        # Entradas digitais (todos OFF)
+        for addr in mm.DIGITAL_INPUTS.values():
+            self.stub_registers[addr] = 0x0000
+            
+        # Saídas digitais (todos OFF)
+        for addr in mm.DIGITAL_OUTPUTS.values():
+            self.stub_registers[addr] = 0x0000
+            
+        # Botões (todos soltos)
+        for addr in list(mm.KEYBOARD_NUMERIC.values()) + list(mm.KEYBOARD_FUNCTION.values()):
+            self.stub_coils[addr] = False
+            
+        # LEDs (LED1 aceso = dobra 1 ativa)
+        for i, addr in enumerate(mm.LEDS.values(), 1):
+            self.stub_coils[addr] = (i == 1)  # Apenas LED1 ON
+            
+        # Estado Modbus slave habilitado
+        self.stub_coils[mm.STATE_MODBUS_SLAVE_ENABLE] = True
+        
+        print("✓ Modo STUB ativado (simulação sem CLP)")
+        
+    def read_coil(self, address: int) -> Optional[bool]:
+        """
+        Lê um coil/bit (Function 0x01)
+        
+        Args:
+            address: Endereço do coil (ex: 0x00A0 para K1)
+            
+        Returns:
+            True/False ou None se erro
+        """
+        if self.stub_mode:
+            return self.stub_coils.get(address, False)
+            
+        if not self.connected:
+            return None
+            
+        try:
+            result = self.client.read_coils(address, 1, device_id=self.slave_id)
+            if result.isError():
+                return None
+            return result.bits[0]
+        except Exception as e:
+            print(f"✗ Erro lendo coil 0x{address:04X}: {e}")
+            return None
+            
+    def read_register(self, address: int) -> Optional[int]:
+        """
+        Lê um registro 16-bit (Function 0x03)
+        
+        Args:
+            address: Endereço do registro (ex: 0x04D6)
+            
+        Returns:
+            Valor 0-65535 ou None se erro
+        """
+        if self.stub_mode:
+            return self.stub_registers.get(address, 0)
+            
+        if not self.connected:
+            return None
+            
+        try:
+            result = self.client.read_holding_registers(address, 1, device_id=self.slave_id)
+            if result.isError():
+                return None
+            return result.registers[0]
+        except Exception as e:
+            print(f"✗ Erro lendo registro 0x{address:04X}: {e}")
+            return None
+            
+    def read_32bit(self, msw_address: int, lsw_address: int) -> Optional[int]:
+        """
+        Lê valor 32-bit (MSW + LSW)
+        
+        Args:
+            msw_address: Endereço MSW (bits 31-16)
+            lsw_address: Endereço LSW (bits 15-0)
+            
+        Returns:
+            Valor 32-bit ou None se erro
+        """
+        msw = self.read_register(msw_address)
+        lsw = self.read_register(lsw_address)
+        
+        if msw is None or lsw is None:
+            return None
+            
+        return mm.read_32bit(msw, lsw)
+        
+    def write_coil(self, address: int, value: bool) -> bool:
+        """
+        Escreve um coil/bit (Function 0x05)
+        
+        Args:
+            address: Endereço do coil
+            value: True (ON) ou False (OFF)
+            
+        Returns:
+            True se sucesso, False se erro
+        """
+        if self.stub_mode:
+            self.stub_coils[address] = value
+            return True
+            
+        if not self.connected:
+            return False
+            
+        try:
+            result = self.client.write_coil(address, value, device_id=self.slave_id)
+            return not result.isError()
+        except Exception as e:
+            print(f"✗ Erro escrevendo coil 0x{address:04X}: {e}")
+            return False
+            
+    def write_register(self, address: int, value: int) -> bool:
+        """
+        Escreve um registro 16-bit (Function 0x06)
+        
+        Args:
+            address: Endereço do registro
+            value: Valor 0-65535
+            
+        Returns:
+            True se sucesso, False se erro
+        """
+        if self.stub_mode:
+            self.stub_registers[address] = value & 0xFFFF
+            return True
+            
+        if not self.connected:
+            return False
+            
+        try:
+            result = self.client.write_register(address, value, device_id=self.slave_id)
+            return not result.isError()
+        except Exception as e:
+            print(f"✗ Erro escrevendo registro 0x{address:04X}: {e}")
+            return False
+            
+    def write_32bit(self, msw_address: int, lsw_address: int, value: int) -> bool:
+        """
+        Escreve valor 32-bit (MSW + LSW)
+        
+        Args:
+            msw_address: Endereço MSW
+            lsw_address: Endereço LSW
+            value: Valor 32-bit (0 a 4294967295)
+            
+        Returns:
+            True se sucesso, False se erro
+        """
+        msw, lsw = mm.split_32bit(value)
+        
+        ok_msw = self.write_register(msw_address, msw)
+        ok_lsw = self.write_register(lsw_address, lsw)
+        
+        return ok_msw and ok_lsw
+        
+    def press_key(self, address: int, hold_ms: int = 100) -> bool:
+        """
+        Simula pressionar uma tecla (pulso ON→OFF)
+        
+        Args:
+            address: Endereço do botão (ex: mm.BTN_K1)
+            hold_ms: Tempo de retenção em ms (padrão 100ms)
+            
+        Returns:
+            True se sucesso
+        """
+        # Ativa coil
+        if not self.write_coil(address, True):
+            return False
+            
+        # Aguarda tempo de retenção
+        time.sleep(hold_ms / 1000.0)
+        
+        # Desativa coil
+        return self.write_coil(address, False)
+        
+    def change_speed_class(self) -> bool:
+        """
+        Alterna classe de velocidade (simula K1+K7)
+        
+        Returns:
+            True se sucesso
+        """
+        # Ativa K1 e K7 simultaneamente
+        ok1 = self.write_coil(mm.BTN_K1, True)
+        ok2 = self.write_coil(mm.BTN_K7, True)
+        
+        if not (ok1 and ok2):
+            return False
+            
+        # Aguarda detecção (100ms)
+        time.sleep(0.1)
+        
+        # Desativa K1 e K7
+        ok1 = self.write_coil(mm.BTN_K1, False)
+        ok2 = self.write_coil(mm.BTN_K7, False)
+
+        return ok1 and ok2
+
+    def simulate_key_press(self, key_name: str) -> bool:
+        """
+        Simula pressão de tecla via ROT9 (método simplificado)
+
+        Em vez de 3 comandos Modbus (ON → wait → OFF), envia apenas 1 comando.
+        O CLP (ROT9) gerencia automaticamente o pulso de 100ms.
+
+        Args:
+            key_name: Nome da tecla ('K1', 'K2', 'K3', 'S1', 'S2',
+                      'ENTER', 'ESC', 'EDIT')
+
+        Returns:
+            True se comando enviado com sucesso
+
+        Exemplo:
+            >>> client.simulate_key_press('K1')  # Simula K1
+            True
+        """
+        if key_name not in mm.CMD_SIMULATE_KEYS:
+            print(f"✗ Tecla '{key_name}' não suportada por ROT9")
+            print(f"  Teclas disponíveis: {list(mm.CMD_SIMULATE_KEYS.keys())}")
+            return False
+
+        cmd_address = mm.CMD_SIMULATE_KEYS[key_name]
+
+        # Escrever 1 no registro de comando
+        # CLP detecta, ativa coil por 100ms, e auto-reseta
+        if self.write_register(cmd_address, 1):
+            print(f"✓ Comando ROT9 enviado: {key_name}")
+            return True
+        else:
+            print(f"✗ Falha ao enviar comando ROT9: {key_name}")
+            return False
+
+    def close(self):
+        """Fecha conexão Modbus"""
+        if self.client and self.connected:
+            self.client.close()
+            self.connected = False
+            print("✓ Conexão Modbus fechada")
+
+
+# Exemplo de uso
+if __name__ == "__main__":
+    # Teste em modo stub
+    print("=== TESTE MODO STUB ===")
+    client = ModbusClientWrapper(stub_mode=True)
+    
+    # Ler encoder
+    angle = client.read_32bit(mm.ENCODER_ANGLE_MSW, mm.ENCODER_ANGLE_LSW)
+    print(f"Encoder: {angle} (stub)")
+    
+    # Ler ângulo dobra 1
+    bend1 = client.read_32bit(mm.BEND_1_LEFT_MSW, mm.BEND_1_LEFT_LSW)
+    print(f"Ângulo Dobra 1: {bend1}° (stub)")
+    
+    # Simular botão K1
+    print("Pressionando K1...")
+    client.press_key(mm.BTN_K1)
+    
+    # Alterar velocidade
+    print("Alterando velocidade (K1+K7)...")
+    client.change_speed_class()
+    
+    client.close()

@@ -1,0 +1,357 @@
+Lines:00012
+[Line00001]
+  [Features]
+    Branchs:01
+    Type:0
+    Label:0
+    Comment:1
+  [CommentText]
+    ROT3: Comunicacao com inversor WEG CFW-08 (via analogico)
+  [Branch01]
+    X1position:00
+    X2position:13
+    Yposition:00
+    Height:01
+    B1:00
+    B2:00
+    BInputnumber:00
+    {0;00;00F7;-1;-1;-1;-1;00}
+    Out:MOVK    T:0029 Size:003 E:0890 E:0000
+    ###
+
+[Line00002]
+  [Features]
+    Branchs:01
+    Type:0
+    Label:0
+    Comment:1
+  [CommentText]
+    Le saida analogica canal 1 (0-10V para inversor) -> 0891
+  [Branch01]
+    X1position:00
+    X2position:13
+    Yposition:00
+    Height:01
+    B1:00
+    B2:00
+    BInputnumber:00
+    {0;00;00F7;-1;-1;-1;-1;00}
+    Out:MOV     T:0028 Size:003 E:06E0 E:0891
+    ###
+
+[Line00003]
+  [Features]
+    Branchs:01
+    Type:0
+    Label:0
+    Comment:1
+  [CommentText]
+    Converte tensao analogica para RPM (5rpm=2000, 10rpm=1583, 15rpm=1055)
+  [Branch01]
+    X1position:00
+    X2position:13
+    Yposition:00
+    Height:01
+    B1:00
+    B2:00
+    BInputnumber:00
+    {0;00;00F7;-1;-1;-1;-1;00}
+    Out:CMP     T:0010 Size:003 E:0891 E:1900
+    ###
+
+[Line00004]
+  [Features]
+    Branchs:02
+    Type:0
+    Label:0
+    Comment:1
+  [CommentText]
+    Se >= 1900 (9.5V): 5 RPM
+  [Branch01]
+    X1position:00
+    X2position:13
+    Yposition:00
+    Height:01
+    B1:00
+    B2:00
+    BInputnumber:00
+    {0;00;02FF;-1;-1;-1;-1;00}
+    Out:MOVK    T:0029 Size:003 E:0892 E:0005
+    Height:02
+  [Branch02]
+    X1position:00
+    X2position:13
+    Yposition:01
+    Height:01
+    B1:00
+    B2:00
+    BInputnumber:00
+    {0;00;02FF;-1;-1;-1;-1;00}
+    Out:MOVK    T:0029 Size:003 E:0890 E:0001
+    ###
+
+[Line00005]
+  [Features]
+    Branchs:02
+    Type:0
+    Label:0
+    Comment:1
+  [CommentText]
+    Se >= 1400 (7V): 10 RPM
+  [Branch01]
+    X1position:00
+    X2position:13
+    Yposition:00
+    Height:01
+    B1:00
+    B2:00
+    BInputnumber:00
+    {0;00;02FE;-1;-1;-1;-1;00}
+    Out:CMP     T:0010 Size:003 E:0891 E:1400
+    Height:03
+  [Branch02]
+    X1position:00
+    X2position:13
+    Yposition:01
+    Height:01
+    B1:00
+    B2:00
+    BInputnumber:00
+    {0;00;02FF;-1;-1;-1;-1;00}
+    Out:MOVK    T:0029 Size:003 E:0892 E:0010
+  [Branch03]
+    X1position:00
+    X2position:13
+    Yposition:02
+    Height:01
+    B1:00
+    B2:00
+    BInputnumber:00
+    {0;00;02FF;-1;-1;-1;-1;00}
+    Out:MOVK    T:0029 Size:003 E:0890 E:0002
+    ###
+
+[Line00006]
+  [Features]
+    Branchs:02
+    Type:0
+    Label:0
+    Comment:1
+  [CommentText]
+    Se >= 900 (4.5V): 15 RPM
+  [Branch01]
+    X1position:00
+    X2position:13
+    Yposition:00
+    Height:01
+    B1:00
+    B2:00
+    BInputnumber:00
+    {0;00;02FE;-1;-1;-1;-1;00}
+    Out:CMP     T:0010 Size:003 E:0891 E:0900
+    Height:03
+  [Branch02]
+    X1position:00
+    X2position:13
+    Yposition:01
+    Height:01
+    B1:00
+    B2:00
+    BInputnumber:00
+    {0;00;02FF;-1;-1;-1;-1;00}
+    Out:MOVK    T:0029 Size:003 E:0892 E:0015
+  [Branch03]
+    X1position:00
+    X2position:13
+    Yposition:02
+    Height:01
+    B1:00
+    B2:00
+    BInputnumber:00
+    {0;00;02FF;-1;-1;-1;-1;00}
+    Out:MOVK    T:0029 Size:003 E:0890 E:0003
+    ###
+
+[Line00007]
+  [Features]
+    Branchs:01
+    Type:0
+    Label:0
+    Comment:1
+  [CommentText]
+    Le entrada analogica 1 (sensor corrente) -> 0893
+  [Branch01]
+    X1position:00
+    X2position:13
+    Yposition:00
+    Height:01
+    B1:00
+    B2:00
+    BInputnumber:00
+    {0;00;00F7;-1;-1;-1;-1;00}
+    Out:MOV     T:0028 Size:003 E:05F0 E:0893
+    ###
+
+[Line00008]
+  [Features]
+    Branchs:01
+    Type:0
+    Label:0
+    Comment:1
+  [CommentText]
+    Le entrada analogica 2 (sensor tensao) -> 0894
+  [Branch01]
+    X1position:00
+    X2position:13
+    Yposition:00
+    Height:01
+    B1:00
+    B2:00
+    BInputnumber:00
+    {0;00;00F7;-1;-1;-1;-1;00}
+    Out:MOV     T:0028 Size:003 E:05F1 E:0894
+    ###
+
+[Line00009]
+  [Features]
+    Branchs:01
+    Type:0
+    Label:0
+    Comment:1
+  [CommentText]
+    Calcula potencia estimada (V * A / 100) -> 0895
+  [Branch01]
+    X1position:00
+    X2position:13
+    Yposition:00
+    Height:01
+    B1:00
+    B2:00
+    BInputnumber:00
+    {0;00;00F7;-1;-1;-1;-1;00}
+    Out:MUL     T:0044 Size:004 E:0893 E:0894 E:0895
+    ###
+
+[Line00010]
+  [Features]
+    Branchs:01
+    Type:0
+    Label:0
+    Comment:1
+  [CommentText]
+    Status inversor: bit 0=Run, bit 1=Alarme, bit 2=Sobrecarga
+  [Branch01]
+    X1position:00
+    X2position:13
+    Yposition:00
+    Height:01
+    B1:00
+    B2:00
+    BInputnumber:00
+    {0;00;00F7;-1;-1;-1;-1;00}
+    Out:MOVK    T:0029 Size:003 E:0896 E:0000
+    Height:04
+  [Branch02]
+    X1position:00
+    X2position:13
+    Yposition:01
+    Height:01
+    B1:00
+    B2:00
+    BInputnumber:00
+    {0;00;0300;-1;-1;-1;-1;00}
+    Out:ADD     T:0040 Size:003 E:0896 E:0001
+  [Branch03]
+    X1position:00
+    X2position:13
+    Yposition:02
+    Height:01
+    B1:00
+    B2:00
+    BInputnumber:00
+    {0;00;0107;-1;-1;-1;-1;00}
+    Out:ADD     T:0040 Size:003 E:0896 E:0002
+  [Branch04]
+    X1position:00
+    X2position:13
+    Yposition:03
+    Height:01
+    B1:00
+    B2:00
+    BInputnumber:00
+    {0;00;0106;-1;-1;-1;-1;00}
+    Out:ADD     T:0040 Size:003 E:0896 E:0004
+    ###
+
+[Line00011]
+  [Features]
+    Branchs:01
+    Type:0
+    Label:0
+    Comment:1
+  [CommentText]
+    Tempo de operacao em minutos (contador) -> 0897/0898 (32-bit)
+  [Branch01]
+    X1position:00
+    X2position:13
+    Yposition:00
+    Height:01
+    B1:00
+    B2:00
+    BInputnumber:00
+    {0;00;0300;-1;-1;-1;-1;00}
+    Out:ADD     T:0040 Size:003 E:0898 E:0001
+    Height:02
+  [Branch02]
+    X1position:00
+    X2position:13
+    Yposition:01
+    Height:01
+    B1:00
+    B2:00
+    BInputnumber:00
+    {0;00;02FE;-1;-1;-1;-1;00}
+    Out:ADD     T:0040 Size:003 E:0897 E:0001
+    ###
+
+[Line00012]
+  [Features]
+    Branchs:01
+    Type:0
+    Label:0
+    Comment:1
+  [CommentText]
+    Comando: Reset tempo operacao (08C0 = 1)
+  [Branch01]
+    X1position:00
+    X2position:13
+    Yposition:00
+    Height:01
+    B1:00
+    B2:00
+    BInputnumber:00
+    {0;00;08C0;-1;-1;-1;-1;00}
+    Out:MOVK    T:0029 Size:003 E:0897 E:0000
+    Height:04
+  [Branch02]
+    X1position:00
+    X2position:13
+    Yposition:01
+    Height:01
+    B1:00
+    B2:00
+    BInputnumber:00
+    {0;00;08C0;-1;-1;-1;-1;00}
+    Out:MOVK    T:0029 Size:003 E:0898 E:0000
+  [Branch03]
+    X1position:00
+    X2position:13
+    Yposition:02
+    Height:01
+    B1:00
+    B2:00
+    BInputnumber:00
+    {0;00;08C0;-1;-1;-1;-1;00}
+    Out:MOVK    T:0029 Size:003 E:08C0 E:0000
+    ###
+

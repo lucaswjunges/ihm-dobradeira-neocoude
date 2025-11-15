@@ -1,0 +1,213 @@
+================================================================================
+ESTRUTURA COMPLETA DO PROJETO IHM WEB - DOBRADEIRA NEOCOUDE-HD-15
+================================================================================
+
+ihm/
+│
+├── 📄 DOCUMENTAÇÃO
+│   ├── README.md              - Instruções completas de uso e troubleshooting
+│   ├── CLAUDE.md              - Documentação técnica para Claude Code
+│   ├── QUICKSTART.md          - Início rápido (1 minuto)
+│   ├── CHECKLIST.md           - Checklist de validação passo-a-passo
+│   ├── ESTRUTURA_PROJETO.txt  - Este arquivo (visão geral)
+│   └── .gitignore             - Arquivos a ignorar no versionamento
+│
+├── 🐍 BACKEND PYTHON
+│   ├── modbus_map.py          - 95 registros/coils mapeados + helpers 32-bit
+│   ├── modbus_client.py       - Cliente Modbus (stub mode + live mode)
+│   ├── state_manager.py       - Polling asyncio 250ms + machine_state
+│   ├── main_server.py         - Servidor WebSocket + HTTP (ponto de entrada)
+│   └── requirements.txt       - Dependências Python (pymodbus, websockets, etc.)
+│
+├── 🌐 FRONTEND WEB
+│   └── static/
+│       └── index.html         - Interface web completa (HTML+CSS+JS vanilla)
+│                                • Display LCD virtual
+│                                • Teclado numérico K0-K9
+│                                • Teclas função S1/S2/ENTER/ESC
+│                                • 3 campos ângulos editáveis
+│                                • 5 LEDs indicadores
+│                                • WebSocket client
+│                                • Overlays erro (DESLIGADO/FALHA CLP)
+│
+└── 🧪 TESTES
+    └── tests/
+        ├── test_modbus.py     - Teste comunicação completa (encoder, ângulos, I/O)
+        ├── test_angles.py     - Teste leitura/escrita ângulos + conversões
+        └── test_speed.py      - Teste mudança velocidade (K1+K7)
+
+================================================================================
+ARQUITETURA DO SISTEMA
+================================================================================
+
+┌─────────────────────────────────────────────────────────────────────────┐
+│                          TABLET (Cliente)                               │
+│  ┌────────────────────────────────────────────────────────────────────┐ │
+│  │ index.html (Navegador)                                             │ │
+│  │  • Display encoder 45.7° (atualização 500ms)                       │ │
+│  │  • Ângulos: [90.0°] [120.0°] [56.0°]                               │ │
+│  │  • Teclado: [1][2][3][S1] [4][5][6][S2] ...                        │ │
+│  │  • LEDs: ●●○○○ (dobra 1/2 ativas)                                  │ │
+│  └─────────────────────────▲───────────────────────────────────────────┘ │
+└────────────────────────────┼────────────────────────────────────────────┘
+                             │
+                             │ WebSocket (JSON)
+                             │ ws://192.168.x.x:8765
+                             │
+┌────────────────────────────▼────────────────────────────────────────────┐
+│               SERVIDOR (Ubuntu Notebook - Python 3)                     │
+│  ┌────────────────────────────────────────────────────────────────────┐ │
+│  │ main_server.py (asyncio event loop)                                │ │
+│  │  • WebSocket server (8765) - comunica com tablet                   │ │
+│  │  • HTTP server (8080) - serve index.html                           │ │
+│  │  • Broadcast loop (500ms) - envia deltas para clientes             │ │
+│  └────┬──────────────────────────────────────────────┬────────────────┘ │
+│       │                                              │                  │
+│  ┌────▼────────────────────┐           ┌─────────────▼──────────────┐  │
+│  │ state_manager.py        │           │ modbus_client.py           │  │
+│  │  • poll_loop (250ms)    │◄──────────┤  • read_coil()             │  │
+│  │  • machine_state {}     │           │  • read_register()         │  │
+│  │    - encoder_angle      │           │  • read_32bit()            │  │
+│  │    - bend_1/2/3_left    │           │  • write_coil()            │  │
+│  │    - inputs/outputs     │           │  • press_key()             │  │
+│  │    - leds, buttons      │           │  • change_speed_class()    │  │
+│  │  • get_changes() deltas │           │  • stub_mode / live_mode   │  │
+│  └─────────────────────────┘           └────────────┬───────────────┘  │
+└───────────────────────────────────────────────────────┼──────────────────┘
+                                                        │
+                                                        │ Modbus RTU
+                                                        │ RS485-B
+                                                        │ 57600 bps
+                                                        │
+┌───────────────────────────────────────────────────────▼──────────────────┐
+│                      CLP ATOS MPC4004 (Slave ID 1)                       │
+│  ┌──────────────────────────────────────────────────────────────────┐   │
+│  │ REGISTROS MAPEADOS (95 total)                                    │   │
+│  │                                                                   │   │
+│  │ [ENCODER 32-bit]                                                 │   │
+│  │  0x04D6/0x04D7 (1238/1239) → Posição angular 0-360°              │   │
+│  │                                                                   │   │
+│  │ [ÂNGULOS 32-bit]                                                 │   │
+│  │  Dobra 1: 0x0840/0x0842 (2112/2114)                              │   │
+│  │  Dobra 2: 0x0848/0x084A (2120/2122)                              │   │
+│  │  Dobra 3: 0x0850/0x0852 (2128/2130)                              │   │
+│  │                                                                   │   │
+│  │ [BOTÕES Coils]                                                   │   │
+│  │  K0-K9: 0x00A9-0x00A0 (169-160)                                  │   │
+│  │  S1/S2: 0x00DC/0x00DD (220/221)                                  │   │
+│  │  ENTER/ESC/EDIT: 0x0025/0x00BC/0x0026                            │   │
+│  │                                                                   │   │
+│  │ [I/O DIGITAL Registers]                                          │   │
+│  │  E0-E7: 0x0100-0x0107 (256-263) - Entradas                       │   │
+│  │  S0-S7: 0x0180-0x0187 (384-391) - Saídas                         │   │
+│  │                                                                   │   │
+│  │ [LEDs Coils]                                                     │   │
+│  │  LED1-5: 0x00C0-0x00C4 (192-196)                                 │   │
+│  │                                                                   │   │
+│  │ [ESTADO CRÍTICO]                                                 │   │
+│  │  0x00BE (190) = Modbus slave enable (DEVE estar ON!)             │   │
+│  └──────────────────────────────────────────────────────────────────┘   │
+└──────────────────────────────────────────────────────────────────────────┘
+
+================================================================================
+FLUXO DE DADOS
+================================================================================
+
+1. LEITURA (CLP → Tablet)
+   ────────────────────────
+   CLP → Modbus RTU → modbus_client.read_32bit(0x04D6, 0x04D7)
+                   → state_manager.poll_once() [250ms]
+                   → machine_state['encoder_angle'] = 45.7
+                   → main_server.broadcast_loop() [500ms]
+                   → WebSocket JSON: {"type": "state_update", "data": {...}}
+                   → index.html: encoderDisplay.textContent = "45.7°"
+
+2. ESCRITA (Tablet → CLP)
+   ───────────────────────
+   index.html: button.click('K1')
+            → WebSocket: {"action": "press_key", "key": "K1"}
+            → main_server.handle_client_message()
+            → modbus_client.press_key(0x00A0, hold_ms=100)
+            → Modbus RTU: write_coil(0x00A0, True) → wait 100ms → write_coil(False)
+            → CLP detecta botão K1 pressionado
+
+3. MODO STUB (Desenvolvimento SEM CLP)
+   ───────────────────────────────────
+   modbus_client = ModbusClientWrapper(stub_mode=True)
+                → stub_registers = {0x04D6: 0x0000, 0x04D7: 0x01C9, ...}
+                → Simula encoder, ângulos, I/O
+                → Interface funciona identicamente
+                → Desenvolve/testa sem hardware
+
+================================================================================
+COMANDOS RÁPIDOS
+================================================================================
+
+# Instalar
+pip3 install -r requirements.txt
+
+# Testar SEM CLP (modo stub)
+python3 main_server.py --stub
+# → Abrir: http://localhost:8080
+
+# Testar COM CLP (modo live)
+python3 main_server.py --port /dev/ttyUSB0
+# → Abrir: http://localhost:8080
+
+# Validar comunicação Modbus
+python3 tests/test_modbus.py
+
+# Testar ângulos
+python3 tests/test_angles.py
+
+# Testar velocidade
+python3 tests/test_speed.py
+
+================================================================================
+MAPEAMENTO MODBUS RESUMIDO
+================================================================================
+
+FUNÇÃO       | ENDEREÇO (Hex) | DECIMAL | DESCRIÇÃO
+-------------|----------------|---------|----------------------------------
+ENCODER MSW  | 0x04D6         | 1238    | Posição angular (bits 31-16)
+ENCODER LSW  | 0x04D7         | 1239    | Posição angular (bits 15-0)
+BEND 1 MSW   | 0x0842         | 2114    | Ângulo dobra 1 (bits 31-16)
+BEND 1 LSW   | 0x0840         | 2112    | Ângulo dobra 1 (bits 15-0)
+BEND 2 MSW   | 0x084A         | 2122    | Ângulo dobra 2 (bits 31-16)
+BEND 2 LSW   | 0x0848         | 2120    | Ângulo dobra 2 (bits 15-0)
+BEND 3 MSW   | 0x0852         | 2130    | Ângulo dobra 3 (bits 31-16)
+BEND 3 LSW   | 0x0850         | 2128    | Ângulo dobra 3 (bits 15-0)
+BTN K1       | 0x00A0         | 160     | Botão 1 (coil)
+BTN S1       | 0x00DC         | 220     | Função 1 (coil)
+BTN ENTER    | 0x0025         | 37      | Confirmar (coil)
+INPUT E0     | 0x0100         | 256     | Entrada digital 0 (register bit 0)
+OUTPUT S0    | 0x0180         | 384     | Saída digital 0 (register bit 0)
+LED 1        | 0x00C0         | 192     | LED 1 (coil)
+MODBUS EN    | 0x00BE         | 190     | Modbus slave enable (CRÍTICO!)
+
+Conversão 32-bit: value = (MSW << 16) | LSW
+Conversão graus:  graus = value / 10.0
+
+================================================================================
+PRÓXIMOS PASSOS
+================================================================================
+
+1. Ler QUICKSTART.md
+2. Instalar dependências: pip3 install -r requirements.txt
+3. Testar modo stub: python3 main_server.py --stub
+4. Testar comunicação: python3 tests/test_modbus.py
+5. Rodar servidor live: python3 main_server.py --port /dev/ttyUSB0
+6. Abrir no tablet: http://<IP_NOTEBOOK>:8080
+7. Validar com CHECKLIST.md
+
+================================================================================
+SUPORTE
+================================================================================
+
+Documentação Técnica: CLAUDE.md
+Instruções Usuário:   README.md
+Início Rápido:        QUICKSTART.md
+Validação:            CHECKLIST.md
+
+Desenvolvido com Claude Code (Anthropic) - Novembro 2025
+================================================================================

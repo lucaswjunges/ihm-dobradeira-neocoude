@@ -1,0 +1,419 @@
+Lines:00020
+[Line00001]
+  [CommentText]
+    ROT9: Emulacao teclas - K0 via Modbus (08C0 -> 00A9)
+  [Features]
+    Branchs:01
+    Type:0
+    Label:0
+    Comment:1
+    Out:SETR    T:0043 Size:003 E:00A9
+    Height:01
+  [Branch01]
+    X1position:00
+    X2position:13
+    Yposition:00
+    Height:01
+    B1:00
+    B2:00
+    BInputnumber:01
+    {0;00;08C0;-1;-1;-1;-1;00}
+    ###
+
+[Line00002]
+  [CommentText]
+    K1 via Modbus (08C1 -> 00A0)
+  [Features]
+    Branchs:01
+    Type:0
+    Label:0
+    Comment:1
+    Out:SETR    T:0043 Size:003 E:00A0
+    Height:01
+  [Branch01]
+    X1position:00
+    X2position:13
+    Yposition:00
+    Height:01
+    B1:00
+    B2:00
+    BInputnumber:01
+    {0;00;08C1;-1;-1;-1;-1;00}
+    ###
+
+[Line00003]
+  [CommentText]
+    K2 via Modbus (08C2 -> 00A1)
+  [Features]
+    Branchs:01
+    Type:0
+    Label:0
+    Comment:1
+    Out:SETR    T:0043 Size:003 E:00A1
+    Height:01
+  [Branch01]
+    X1position:00
+    X2position:13
+    Yposition:00
+    Height:01
+    B1:00
+    B2:00
+    BInputnumber:01
+    {0;00;08C2;-1;-1;-1;-1;00}
+    ###
+
+[Line00004]
+  [CommentText]
+    K3 via Modbus (08C3 -> 00A2)
+  [Features]
+    Branchs:01
+    Type:0
+    Label:0
+    Comment:1
+    Out:SETR    T:0043 Size:003 E:00A2
+    Height:01
+  [Branch01]
+    X1position:00
+    X2position:13
+    Yposition:00
+    Height:01
+    B1:00
+    B2:00
+    BInputnumber:01
+    {0;00;08C3;-1;-1;-1;-1;00}
+    ###
+
+[Line00005]
+  [CommentText]
+    K4 via Modbus (08C4 -> 00A3)
+  [Features]
+    Branchs:01
+    Type:0
+    Label:0
+    Comment:1
+    Out:SETR    T:0043 Size:003 E:00A3
+    Height:01
+  [Branch01]
+    X1position:00
+    X2position:13
+    Yposition:00
+    Height:01
+    B1:00
+    B2:00
+    BInputnumber:01
+    {0;00;08C4;-1;-1;-1;-1;00}
+    ###
+
+[Line00006]
+  [CommentText]
+    K5 via Modbus (08C5 -> 00A4)
+  [Features]
+    Branchs:01
+    Type:0
+    Label:0
+    Comment:1
+    Out:SETR    T:0043 Size:003 E:00A4
+    Height:01
+  [Branch01]
+    X1position:00
+    X2position:13
+    Yposition:00
+    Height:01
+    B1:00
+    B2:00
+    BInputnumber:01
+    {0;00;08C5;-1;-1;-1;-1;00}
+    ###
+
+[Line00007]
+  [CommentText]
+    K6 via Modbus (08C6 -> 00A5)
+  [Features]
+    Branchs:01
+    Type:0
+    Label:0
+    Comment:1
+    Out:SETR    T:0043 Size:003 E:00A5
+    Height:01
+  [Branch01]
+    X1position:00
+    X2position:13
+    Yposition:00
+    Height:01
+    B1:00
+    B2:00
+    BInputnumber:01
+    {0;00;08C6;-1;-1;-1;-1;00}
+    ###
+
+[Line00008]
+  [CommentText]
+    K7 via Modbus (08C7 -> 00A6)
+  [Features]
+    Branchs:01
+    Type:0
+    Label:0
+    Comment:1
+    Out:SETR    T:0043 Size:003 E:00A6
+    Height:01
+  [Branch01]
+    X1position:00
+    X2position:13
+    Yposition:00
+    Height:01
+    B1:00
+    B2:00
+    BInputnumber:01
+    {0;00;08C7;-1;-1;-1;-1;00}
+    ###
+
+[Line00009]
+  [CommentText]
+    K8 via Modbus (08C8 -> 00A7)
+  [Features]
+    Branchs:01
+    Type:0
+    Label:0
+    Comment:1
+    Out:SETR    T:0043 Size:003 E:00A7
+    Height:01
+  [Branch01]
+    X1position:00
+    X2position:13
+    Yposition:00
+    Height:01
+    B1:00
+    B2:00
+    BInputnumber:01
+    {0;00;08C8;-1;-1;-1;-1;00}
+    ###
+
+[Line00010]
+  [CommentText]
+    K9 via Modbus (08C9 -> 00A8)
+  [Features]
+    Branchs:01
+    Type:0
+    Label:0
+    Comment:1
+    Out:SETR    T:0043 Size:003 E:00A8
+    Height:01
+  [Branch01]
+    X1position:00
+    X2position:13
+    Yposition:00
+    Height:01
+    B1:00
+    B2:00
+    BInputnumber:01
+    {0;00;08C9;-1;-1;-1;-1;00}
+    ###
+
+[Line00011]
+  [CommentText]
+    S1 via Modbus (08CA -> 00DC)
+  [Features]
+    Branchs:01
+    Type:0
+    Label:0
+    Comment:1
+    Out:SETR    T:0043 Size:003 E:00DC
+    Height:01
+  [Branch01]
+    X1position:00
+    X2position:13
+    Yposition:00
+    Height:01
+    B1:00
+    B2:00
+    BInputnumber:01
+    {0;00;08CA;-1;-1;-1;-1;00}
+    ###
+
+[Line00012]
+  [CommentText]
+    S2 via Modbus (08CB -> 00DD)
+  [Features]
+    Branchs:01
+    Type:0
+    Label:0
+    Comment:1
+    Out:SETR    T:0043 Size:003 E:00DD
+    Height:01
+  [Branch01]
+    X1position:00
+    X2position:13
+    Yposition:00
+    Height:01
+    B1:00
+    B2:00
+    BInputnumber:01
+    {0;00;08CB;-1;-1;-1;-1;00}
+    ###
+
+[Line00013]
+  [CommentText]
+    ENTER via Modbus (08CC -> 0025)
+  [Features]
+    Branchs:01
+    Type:0
+    Label:0
+    Comment:1
+    Out:SETR    T:0043 Size:003 E:0025
+    Height:01
+  [Branch01]
+    X1position:00
+    X2position:13
+    Yposition:00
+    Height:01
+    B1:00
+    B2:00
+    BInputnumber:01
+    {0;00;08CC;-1;-1;-1;-1;00}
+    ###
+
+[Line00014]
+  [CommentText]
+    ESC via Modbus (08CD -> 00BC)
+  [Features]
+    Branchs:01
+    Type:0
+    Label:0
+    Comment:1
+    Out:SETR    T:0043 Size:003 E:00BC
+    Height:01
+  [Branch01]
+    X1position:00
+    X2position:13
+    Yposition:00
+    Height:01
+    B1:00
+    B2:00
+    BInputnumber:01
+    {0;00;08CD;-1;-1;-1;-1;00}
+    ###
+
+[Line00015]
+  [CommentText]
+    EDIT via Modbus (08CE -> 0026)
+  [Features]
+    Branchs:01
+    Type:0
+    Label:0
+    Comment:1
+    Out:SETR    T:0043 Size:003 E:0026
+    Height:01
+  [Branch01]
+    X1position:00
+    X2position:13
+    Yposition:00
+    Height:01
+    B1:00
+    B2:00
+    BInputnumber:01
+    {0;00;08CE;-1;-1;-1;-1;00}
+    ###
+
+[Line00016]
+  [CommentText]
+    Arrow UP via Modbus (08CF -> 00AC)
+  [Features]
+    Branchs:01
+    Type:0
+    Label:0
+    Comment:1
+    Out:SETR    T:0043 Size:003 E:00AC
+    Height:01
+  [Branch01]
+    X1position:00
+    X2position:13
+    Yposition:00
+    Height:01
+    B1:00
+    B2:00
+    BInputnumber:01
+    {0;00;08CF;-1;-1;-1;-1;00}
+    ###
+
+[Line00017]
+  [CommentText]
+    Arrow DOWN via Modbus (08D0 -> 00AD)
+  [Features]
+    Branchs:01
+    Type:0
+    Label:0
+    Comment:1
+    Out:SETR    T:0043 Size:003 E:00AD
+    Height:01
+  [Branch01]
+    X1position:00
+    X2position:13
+    Yposition:00
+    Height:01
+    B1:00
+    B2:00
+    BInputnumber:01
+    {0;00;08D0;-1;-1;-1;-1;00}
+    ###
+
+[Line00018]
+  [CommentText]
+    Contador total teclas pressionadas (32-bit 08D1/08D2)
+  [Features]
+    Branchs:01
+    Type:0
+    Label:0
+    Comment:1
+    Out:ADD     T:0091 Size:006 E:08D1 E:0001 E:08D1
+    Height:01
+  [Branch01]
+    X1position:00
+    X2position:13
+    Yposition:00
+    Height:01
+    B1:00
+    B2:00
+    BInputnumber:01
+    {0;00;08C0;-1;-1;-1;-1;00}
+    ###
+
+[Line00019]
+  [CommentText]
+    Reset contador via bit 08D3
+  [Features]
+    Branchs:01
+    Type:0
+    Label:0
+    Comment:1
+    Out:MOVK    T:0029 Size:003 E:08D1 E:0000
+    Height:01
+  [Branch01]
+    X1position:00
+    X2position:13
+    Yposition:00
+    Height:01
+    B1:00
+    B2:00
+    BInputnumber:01
+    {0;00;08D3;-1;-1;-1;-1;00}
+    ###
+
+[Line00020]
+  [Features]
+    Branchs:01
+    Type:0
+    Label:0
+    Comment:0
+    Out:RET     T:-002 Size:000
+    Height:01
+  [Branch01]
+    X1position:00
+    X2position:13
+    Yposition:00
+    Height:01
+    B1:00
+    B2:00
+    BInputnumber:00
+    {0;00;00F7;-1;-1;-1;-1;00}
+    ###
+

@@ -1,0 +1,326 @@
+Lines:00015
+[Line00001]
+  [CommentText]
+    ROT8: Timestamp - incrementa a cada minuto (08A0 32-bit)
+  [Features]
+    Branchs:01
+    Type:0
+    Label:0
+    Comment:1
+    Out:ADD     T:0091 Size:006 E:08A0 E:0001 E:08A0
+    Height:01
+  [Branch01]
+    X1position:00
+    X2position:13
+    Yposition:00
+    Height:01
+    B1:00
+    B2:00
+    BInputnumber:01
+    {0;00;0400;-1;-1;-1;-1;00}
+    ###
+
+[Line00002]
+  [CommentText]
+    Ultimo alarme ocorrido (codigo) -> 08A2
+  [Features]
+    Branchs:01
+    Type:0
+    Label:0
+    Comment:1
+    Out:MOVK    T:0029 Size:003 E:08A2 E:0000
+    Height:01
+  [Branch01]
+    X1position:00
+    X2position:13
+    Yposition:00
+    Height:01
+    B1:00
+    B2:00
+    BInputnumber:00
+    {0;00;00F7;-1;-1;-1;-1;00}
+    ###
+
+[Line00003]
+  [CommentText]
+    Detecta emergencia e registra alarme 001
+  [Features]
+    Branchs:01
+    Type:0
+    Label:0
+    Comment:1
+    Out:MOVK    T:0029 Size:003 E:08A2 E:0001
+    Height:01
+  [Branch01]
+    X1position:00
+    X2position:13
+    Yposition:00
+    Height:01
+    B1:00
+    B2:00
+    BInputnumber:01
+    {0;00;0103;-1;-1;-1;-1;00}
+    ###
+
+[Line00004]
+  [CommentText]
+    Detecta alarme inversor e registra 002
+  [Features]
+    Branchs:01
+    Type:0
+    Label:0
+    Comment:1
+    Out:MOVK    T:0029 Size:003 E:08A2 E:0002
+    Height:01
+  [Branch01]
+    X1position:00
+    X2position:13
+    Yposition:00
+    Height:01
+    B1:00
+    B2:00
+    BInputnumber:01
+    {0;00;0107;-1;-1;-1;-1;00}
+    ###
+
+[Line00005]
+  [CommentText]
+    Total pecas produzidas (32-bit 08AD/08AE)
+  [Features]
+    Branchs:01
+    Type:0
+    Label:0
+    Comment:1
+    Out:MOVK    T:0029 Size:003 E:08AD E:0000
+    Height:01
+  [Branch01]
+    X1position:00
+    X2position:13
+    Yposition:00
+    Height:01
+    B1:00
+    B2:00
+    BInputnumber:00
+    {0;00;00F7;-1;-1;-1;-1;00}
+    ###
+
+[Line00006]
+  [CommentText]
+    Incrementa contador pecas na borda ciclo completo
+  [Features]
+    Branchs:01
+    Type:0
+    Label:0
+    Comment:1
+    Out:ADD     T:0091 Size:006 E:08AD E:0001 E:08AD
+    Height:01
+  [Branch01]
+    X1position:00
+    X2position:13
+    Yposition:00
+    Height:01
+    B1:00
+    B2:00
+    BInputnumber:02
+    {0;00;0191;-1;-1;-1;-1;00}
+    {1;01;0191;-1;-1;-1;-1;00}
+    ###
+
+[Line00007]
+  [CommentText]
+    Tempo ciclo atual (segundos) -> 08AF
+  [Features]
+    Branchs:01
+    Type:0
+    Label:0
+    Comment:1
+    Out:MOVK    T:0029 Size:003 E:08AF E:0000
+    Height:01
+  [Branch01]
+    X1position:00
+    X2position:13
+    Yposition:00
+    Height:01
+    B1:00
+    B2:00
+    BInputnumber:00
+    {0;00;00F7;-1;-1;-1;-1;00}
+    ###
+
+[Line00008]
+  [CommentText]
+    Se ciclo ativo, incrementa contador tempo ciclo
+  [Features]
+    Branchs:01
+    Type:0
+    Label:0
+    Comment:1
+    Out:ADD     T:0091 Size:006 E:08AF E:0001 E:08AF
+    Height:01
+  [Branch01]
+    X1position:00
+    X2position:13
+    Yposition:00
+    Height:01
+    B1:00
+    B2:00
+    BInputnumber:01
+    {0;00;0191;-1;-1;-1;-1;00}
+    ###
+
+[Line00009]
+  [CommentText]
+    Reset tempo ciclo quando ciclo finaliza
+  [Features]
+    Branchs:01
+    Type:0
+    Label:0
+    Comment:1
+    Out:MOVK    T:0029 Size:003 E:08AF E:0000
+    Height:01
+  [Branch01]
+    X1position:00
+    X2position:13
+    Yposition:00
+    Height:01
+    B1:00
+    B2:00
+    BInputnumber:02
+    {0;00;0191;-1;-1;-1;-1;00}
+    {1;01;0191;-1;-1;-1;-1;00}
+    ###
+
+[Line00010]
+  [CommentText]
+    Status consolidado: ciclo(bit0) + emergencia(bit1) + modo(bit2)
+  [Features]
+    Branchs:01
+    Type:0
+    Label:0
+    Comment:1
+    Out:MOVK    T:0029 Size:003 E:08B0 E:0000
+    Height:01
+  [Branch01]
+    X1position:00
+    X2position:13
+    Yposition:00
+    Height:01
+    B1:00
+    B2:00
+    BInputnumber:00
+    {0;00;00F7;-1;-1;-1;-1;00}
+    ###
+
+[Line00011]
+  [CommentText]
+    OR bit 0 se ciclo ativo
+  [Features]
+    Branchs:01
+    Type:0
+    Label:0
+    Comment:1
+    Out:OR      T:0090 Size:006 E:08B0 E:0001 E:08B0
+    Height:01
+  [Branch01]
+    X1position:00
+    X2position:13
+    Yposition:00
+    Height:01
+    B1:00
+    B2:00
+    BInputnumber:01
+    {0;00;0191;-1;-1;-1;-1;00}
+    ###
+
+[Line00012]
+  [CommentText]
+    OR bit 1 se emergencia
+  [Features]
+    Branchs:01
+    Type:0
+    Label:0
+    Comment:1
+    Out:OR      T:0090 Size:006 E:08B0 E:0002 E:08B0
+    Height:01
+  [Branch01]
+    X1position:00
+    X2position:13
+    Yposition:00
+    Height:01
+    B1:00
+    B2:00
+    BInputnumber:01
+    {0;00;0103;-1;-1;-1;-1;00}
+    ###
+
+[Line00013]
+  [CommentText]
+    OR bit 2 se modo manual
+  [Features]
+    Branchs:01
+    Type:0
+    Label:0
+    Comment:1
+    Out:OR      T:0090 Size:006 E:08B0 E:0004 E:08B0
+    Height:01
+  [Branch01]
+    X1position:00
+    X2position:13
+    Yposition:00
+    Height:01
+    B1:00
+    B2:00
+    BInputnumber:01
+    {0;00;02FF;-1;-1;-1;-1;00}
+    ###
+
+[Line00014]
+  [CommentText]
+    Reset estatisticas via bit 08B1
+  [Features]
+    Branchs:02
+    Type:0
+    Label:0
+    Comment:1
+    Out:RSTR    T:0043 Size:003 E:08B1
+    Height:02
+  [Branch01]
+    X1position:00
+    X2position:13
+    Yposition:00
+    Height:01
+    B1:00
+    B2:01
+    BInputnumber:01
+    {0;00;08B1;-1;-1;-1;-1;00}
+    ###
+  [Branch02]
+    X1position:00
+    X2position:13
+    Yposition:01
+    Height:01
+    B1:01
+    B2:00
+    BInputnumber:00
+    {0;00;00F7;-1;-1;-1;-1;00}
+    ###
+
+[Line00015]
+  [Features]
+    Branchs:01
+    Type:0
+    Label:0
+    Comment:0
+    Out:RET     T:-002 Size:000
+    Height:01
+  [Branch01]
+    X1position:00
+    X2position:13
+    Yposition:00
+    Height:01
+    B1:00
+    B2:00
+    BInputnumber:00
+    {0;00;00F7;-1;-1;-1;-1;00}
+    ###
+

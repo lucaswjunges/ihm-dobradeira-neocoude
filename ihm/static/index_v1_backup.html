@@ -1,0 +1,858 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>IHM NEOCOUDE-HD-15 - COMPLETA</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Share+Tech+Mono&display=swap');
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Share Tech Mono', 'Courier New', monospace;
+            background: #1a1a1a;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .ihm-panel {
+            background: linear-gradient(145deg, #2a2a2a, #1a1a1a);
+            border: 4px solid #3a3a3a;
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.8);
+            max-width: 600px;
+            width: 100%;
+        }
+
+        .ihm-header {
+            text-align: center;
+            color: #00ff00;
+            font-size: 14px;
+            margin-bottom: 15px;
+            letter-spacing: 2px;
+            font-weight: bold;
+            border-bottom: 2px solid #00ff00;
+            padding-bottom: 10px;
+        }
+
+        /* STATUS */
+        .status-bar {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+            margin-bottom: 15px;
+            padding: 10px;
+            background: #0a0a0a;
+            border-radius: 6px;
+        }
+
+        .status-item {
+            text-align: center;
+            font-size: 11px;
+            color: #666;
+        }
+
+        .status-led {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: #333;
+            display: inline-block;
+            margin-bottom: 4px;
+        }
+
+        .status-led.online {
+            background: #00ff00;
+            box-shadow: 0 0 10px #00ff00;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        /* LCD */
+        .lcd-container {
+            background: #0a0a0a;
+            border: 3px solid #1a1a1a;
+            border-radius: 6px;
+            padding: 15px;
+            margin-bottom: 20px;
+        }
+
+        .lcd-display {
+            background: linear-gradient(180deg, #9FBC2B 0%, #8FAC1F 100%);
+            border: 2px solid #7A9920;
+            border-radius: 3px;
+            padding: 12px 10px;
+            position: relative;
+        }
+
+        .lcd-line {
+            font-size: 20px;
+            font-weight: bold;
+            color: #1a3a0a;
+            letter-spacing: 3px;
+            white-space: pre;
+            line-height: 1.5;
+            text-shadow: 0 1px 1px rgba(255,255,255,0.2);
+        }
+
+        /* CAMPOS EDITÁVEIS */
+        .editable-field {
+            display: inline-block;
+            background: rgba(26, 58, 10, 0.3);
+            padding: 2px 4px;
+            border: 2px dashed transparent;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .editable-field:hover {
+            border-color: #ff8800;
+            background: rgba(255, 136, 0, 0.2);
+        }
+
+        .editable-field.editing {
+            border-color: #00ff00;
+            background: rgba(0, 255, 0, 0.3);
+            animation: blink 0.5s infinite;
+        }
+
+        @keyframes blink {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.6; }
+        }
+
+        /* SCREEN INFO */
+        .screen-info {
+            text-align: center;
+            color: #00ff00;
+            font-size: 12px;
+            margin-bottom: 10px;
+            padding: 8px;
+            background: #0a0a0a;
+            border-radius: 4px;
+        }
+
+        .help-text {
+            text-align: center;
+            color: #666;
+            font-size: 9px;
+            margin-bottom: 15px;
+            line-height: 1.4;
+        }
+
+        /* MODE CONTROL */
+        .mode-control {
+            background: linear-gradient(145deg, #2a2a2a, #1a1a1a);
+            border: 3px solid #444;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+        }
+
+        .mode-display {
+            font-size: 32px;
+            font-weight: bold;
+            text-align: center;
+            padding: 20px;
+            margin: 10px 0;
+            border-radius: 8px;
+            border: 3px solid;
+            box-shadow: inset 0 2px 8px rgba(0,0,0,0.3);
+            transition: all 0.3s;
+        }
+
+        .mode-display[data-mode="AUTO"] {
+            background: linear-gradient(145deg, #4CAF50, #45a049);
+            color: white;
+            border-color: #2e7d32;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .mode-display[data-mode="MANUAL"] {
+            background: linear-gradient(145deg, #FF9800, #f57c00);
+            color: white;
+            border-color: #e65100;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .mode-display[data-mode="UNKNOWN"] {
+            background: linear-gradient(145deg, #757575, #616161);
+            color: #ddd;
+            border-color: #424242;
+        }
+
+        .btn-mode-toggle {
+            width: 100%;
+            padding: 18px;
+            font-size: 20px;
+            font-weight: bold;
+            background: linear-gradient(145deg, #2196F3, #1976D2);
+            color: white;
+            border: 3px solid #0D47A1;
+            border-radius: 8px;
+            cursor: pointer;
+            margin: 10px 0;
+            box-shadow: 0 4px 10px rgba(33, 150, 243, 0.3);
+            transition: all 0.2s;
+        }
+
+        .btn-mode-toggle:hover {
+            background: linear-gradient(145deg, #1976D2, #1565C0);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 14px rgba(33, 150, 243, 0.4);
+        }
+
+        .btn-mode-toggle:active {
+            background: linear-gradient(145deg, #0D47A1, #0a3d91);
+            transform: translateY(0);
+            box-shadow: 0 2px 6px rgba(33, 150, 243, 0.3);
+        }
+
+        .mode-info {
+            font-size: 11px;
+            color: #888;
+            text-align: center;
+            margin-top: 10px;
+            line-height: 1.5;
+        }
+
+        .mode-badge {
+            display: inline-block;
+            padding: 2px 6px;
+            background: #333;
+            border-radius: 3px;
+            font-family: 'Courier New', monospace;
+            color: #0f0;
+        }
+
+        /* BUTTONS */
+        .btn-section {
+            margin-bottom: 12px;
+        }
+
+        .btn-label {
+            color: #00ff00;
+            font-size: 10px;
+            margin-bottom: 6px;
+            text-align: center;
+        }
+
+        .btn-grid {
+            display: grid;
+            gap: 8px;
+        }
+
+        .grid-4 { grid-template-columns: repeat(4, 1fr); }
+        .grid-7 { grid-template-columns: repeat(7, 1fr); }
+
+        .btn {
+            background: linear-gradient(145deg, #4a4a4a, #3a3a3a);
+            border: 2px solid #555;
+            border-radius: 6px;
+            padding: 14px 8px;
+            font-size: 14px;
+            font-weight: bold;
+            color: #ddd;
+            cursor: pointer;
+            transition: all 0.1s;
+            user-select: none;
+            box-shadow: 0 4px 0 #1a1a1a;
+            text-align: center;
+            position: relative;
+        }
+
+        .btn:active {
+            transform: translateY(3px);
+            box-shadow: 0 1px 0 #1a1a1a;
+        }
+
+        .btn.pressed {
+            background: #00ff00 !important;
+            color: #000 !important;
+            border-color: #00cc00;
+            transform: translateY(3px);
+            box-shadow: 0 1px 0 #1a1a1a;
+        }
+
+        .btn-nav {
+            background: linear-gradient(145deg, #4a8acc, #3a7abc);
+            border-color: #2a6aac;
+            color: #fff;
+            font-size: 18px;
+        }
+
+        .btn-num {
+            background: linear-gradient(145deg, #f4a742, #e89732);
+            border-color: #d88722;
+            color: #1a1a1a;
+            font-size: 16px;
+        }
+
+        .btn-func {
+            background: linear-gradient(145deg, #4a8acc, #3a7abc);
+            border-color: #2a6aac;
+            color: #fff;
+        }
+
+        .btn-enter {
+            background: linear-gradient(145deg, #5cb85c, #4ca84c);
+            border-color: #3c983c;
+            color: #fff;
+        }
+
+        .btn-esc {
+            background: linear-gradient(145deg, #d95c5c, #c94c4c);
+            border-color: #b93c3c;
+            color: #fff;
+        }
+
+        .btn-hint {
+            font-size: 8px;
+            color: rgba(255,255,255,0.5);
+            margin-top: 2px;
+            display: block;
+        }
+
+        /* FEEDBACK */
+        .feedback {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: #00ff00;
+            color: #000;
+            padding: 10px 20px;
+            border-radius: 6px;
+            font-weight: bold;
+            display: none;
+            z-index: 9999;
+            box-shadow: 0 4px 10px rgba(0,255,0,0.5);
+        }
+
+        .feedback.show {
+            display: block;
+            animation: slideIn 0.3s;
+        }
+
+        .feedback.error {
+            background: #ff3333;
+            color: #fff;
+        }
+
+        @keyframes slideIn {
+            from { transform: translateX(100%); }
+            to { transform: translateX(0); }
+        }
+    </style>
+</head>
+<body>
+    <div class="feedback" id="feedback"></div>
+
+    <div class="ihm-panel">
+        <div class="ihm-header">
+            🔧 NEOCOUDE-HD-15 - ATOS MPC4004 - COMPLETA
+        </div>
+
+        <div class="status-bar">
+            <div class="status-item">
+                <div class="status-led" id="wsLed"></div>
+                <div id="wsStatus">WebSocket</div>
+            </div>
+            <div class="status-item">
+                <div class="status-led" id="clpLed"></div>
+                <div id="clpStatus">CLP</div>
+            </div>
+            <div class="status-item">
+                <div class="status-led online"></div>
+                <div>Sistema OK</div>
+            </div>
+        </div>
+
+        <div class="lcd-container">
+            <div class="lcd-display">
+                <div class="lcd-line" id="line1">**TRILLOR MAQUINAS**</div>
+                <div class="lcd-line" id="line2">**DOBRADEIRA HD    **</div>
+            </div>
+        </div>
+
+        <div class="screen-info">
+            📺 TELA <span id="screenNum">0</span>/10 - Use ↑↓ para navegar
+        </div>
+
+        <div class="help-text">
+            S1=Modo AUTO/MAN (Tela 2) | S2=Reset Encoder (Tela 3)<br>
+            K1/K2/K3=Vai p/ Tela Ângulo | Clique nos valores para editar
+        </div>
+
+        <!-- CONTROLE DE MODO (compacto - use S1 para alternar) -->
+        <div class="mode-control" style="margin-bottom: 15px;">
+            <div class="mode-display" id="modeDisplay" data-mode="UNKNOWN" style="font-size: 16px; padding: 10px; margin: 5px 0;">
+                <span id="modeText">DESCONHECIDO</span>
+            </div>
+            <div class="mode-info">
+                Pressione <strong>S1</strong> para alternar MANUAL ↔ AUTO
+            </div>
+            <div id="modeWarning" style="display:none; background:linear-gradient(145deg,#ff9800,#f57c00); color:white; padding:8px; margin:5px 0; border-radius:4px; font-size:12px; text-align:center; border:2px solid #e65100;">
+                ⚠️ Mudança de modo bloqueada: Entrada E6 inativa
+            </div>
+        </div>
+
+        <!-- NAVEGAÇÃO -->
+        <div class="btn-section">
+            <div class="btn-label">NAVEGAÇÃO & FUNÇÕES</div>
+            <div class="btn-grid grid-4">
+                <button class="btn btn-nav" onclick="nav(-1)">↑</button>
+                <button class="btn btn-func" onclick="sendKey(220, event)">
+                    S1
+                    <span class="btn-hint">Modo</span>
+                </button>
+                <button class="btn btn-func" onclick="sendKey(221, event)">
+                    S2
+                    <span class="btn-hint">Reset</span>
+                </button>
+                <button class="btn btn-nav" onclick="nav(1)">↓</button>
+            </div>
+        </div>
+
+        <!-- TECLADO NUMÉRICO -->
+        <div class="btn-section">
+            <div class="btn-label">TECLADO NUMÉRICO</div>
+            <div class="btn-grid grid-7">
+                <button class="btn btn-num" onclick="sendKey(160, event)">
+                    K1
+                    <span class="btn-hint">Ang1</span>
+                </button>
+                <button class="btn btn-num" onclick="sendKey(161, event)">
+                    K2
+                    <span class="btn-hint">Ang2</span>
+                </button>
+                <button class="btn btn-num" onclick="sendKey(162, event)">
+                    K3
+                    <span class="btn-hint">Ang3</span>
+                </button>
+                <button class="btn btn-num" onclick="sendKey(163, event)">
+                    K4
+                    <span class="btn-hint">←</span>
+                </button>
+                <button class="btn btn-num" onclick="sendKey(164, event)">
+                    K5
+                    <span class="btn-hint">→</span>
+                </button>
+                <button class="btn btn-num" onclick="sendKey(165, event)">K6</button>
+                <button class="btn btn-num" onclick="sendKey(166, event)">
+                    K7
+                    <span class="btn-hint">Vel</span>
+                </button>
+            </div>
+        </div>
+
+        <div class="btn-section">
+            <div class="btn-grid grid-7">
+                <button class="btn btn-num" onclick="sendKey(167, event)">K8</button>
+                <button class="btn btn-num" onclick="sendKey(168, event)">K9</button>
+                <button class="btn btn-num" onclick="sendKey(169, event)">K0</button>
+                <button class="btn btn-func" onclick="sendKey(241, event)">LOCK</button>
+                <button class="btn btn-esc" onclick="sendKey(188, event)">ESC</button>
+                <button class="btn btn-func" onclick="sendKey(38, event)">EDIT</button>
+                <button class="btn btn-enter" onclick="sendKey(37, event)">ENTER</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const WS_URL = 'ws://localhost:8765';  // CORRIGIDO: porta do main_server.py
+        let ws = null;
+        let screen = 0;
+        let data = {
+            encoder: 0,
+            angle1: 0,
+            angle2: 0,
+            angle3: 0,
+            connected: false
+        };
+
+        console.log('🔧 IHM COMPLETA - Inicializando...');
+
+        // Estado do editor inline
+        let editMode = false;
+        let editBuffer = '';
+        let editField = null;  // 'angle1', 'angle2', ou 'angle3'
+        let editTela = null;   // 4, 5, ou 6
+
+        const screens = [
+            // Tela 0
+            {
+                line1: "**TRILLOR MAQUINAS**",
+                line2: "**DOBRADEIRA HD    **"
+            },
+            // Tela 1
+            {
+                line1: "CAMARGO CORREIA CONS",
+                line2: "AQUISICAO AGOSTO- 06"
+            },
+            // Tela 2
+            {
+                line1: "SELECAO DE AUTO/MAN ",
+                line2: "                    "
+            },
+            // Tela 3 - Encoder
+            {
+                line1: "DESLOCAMENTO ANGULAR",
+                line2: () => `PV=${pad(data.encoder, 4)}° (${pad(data.encoder, 6)})`
+            },
+            // Tela 4 - Ângulo 1 (editável)
+            {
+                line1: "AJUSTE DO ANGULO  01",
+                line2: () => `AJ=<span class="editable-field" onclick="editAngle(4, ${data.angle1})">${pad(data.angle1, 4)}</span>°    PV=${pad(data.encoder, 4)}°`,
+                editable: true,
+                angle_num: 1
+            },
+            // Tela 5 - Ângulo 2 (editável)
+            {
+                line1: "AJUSTE DO ANGULO  02",
+                line2: () => `AJ=<span class="editable-field" onclick="editAngle(5, ${data.angle2})">${pad(data.angle2, 4)}</span>°    PV=${pad(data.encoder, 4)}°`,
+                editable: true,
+                angle_num: 2
+            },
+            // Tela 6 - Ângulo 3 (editável)
+            {
+                line1: "AJUSTE DO ANGULO  03",
+                line2: () => `AJ=<span class="editable-field" onclick="editAngle(6, ${data.angle3})">${pad(data.angle3, 4)}</span>°    PV=${pad(data.encoder, 4)}°`,
+                editable: true,
+                angle_num: 3
+            },
+            // Tela 7
+            {
+                line1: "*SELECAO DA ROTACAO*",
+                line2: "                    "
+            },
+            // Tela 8
+            {
+                line1: "CARENAGEM DOBRADEIRA",
+                line2: "                    "
+            },
+            // Tela 9
+            {
+                line1: "TOTALIZADOR DE TEMPO",
+                line2: "*****     :  h *****"
+            },
+            // Tela 10
+            {
+                line1: "ESTADO DA MAQUINA   ",
+                line2: "                    "
+            }
+        ];
+
+        function pad(num, size) {
+            return String(num).padStart(size, ' ');
+        }
+
+        function nav(dir) {
+            screen = (screen + dir + screens.length) % screens.length;
+            updateScreen();
+            showFeedback(`Tela ${screen}`);
+        }
+
+        function updateScreen() {
+            const s = screens[screen];
+
+            // Linha 1
+            const line1Text = typeof s.line1 === 'function' ? s.line1() : s.line1;
+            document.getElementById('line1').innerHTML = line1Text;
+
+            // Linha 2
+            let line2Text = typeof s.line2 === 'function' ? s.line2() : s.line2;
+
+            // Se em modo de edição e na tela correta, mostrar buffer
+            if (editMode && screen === editTela) {
+                const angleNum = editTela - 3;
+                const bufferDisplay = editBuffer.padEnd(4, '_');
+                line2Text = `AJ=<span class="editable-field editing">${bufferDisplay}</span>°    PV=${pad(data.encoder, 4)}°`;
+            }
+
+            document.getElementById('line2').innerHTML = line2Text;
+
+            document.getElementById('screenNum').textContent = screen;
+        }
+
+        function editAngle(tela, currentValue) {
+            // Ativar modo de edição inline
+            editMode = true;
+            editBuffer = '';
+            editField = `angle${tela-3}`;
+            editTela = tela;
+
+            updateScreen();
+            showFeedback(`EDIT: Digite 0-360 + ENTER`, false);
+        }
+
+        function saveAngle() {
+            const valor = parseInt(editBuffer);
+
+            // Validação
+            if (isNaN(valor) || valor < 0 || valor > 360) {
+                showFeedback('Valor inválido (0-360)!', true);
+                return;
+            }
+
+            // Converter tela (4,5,6) para bend (1,2,3)
+            const bend_num = editTela - 3;  // 4→1, 5→2, 6→3
+
+            // Enviar ao backend (formato main_server.py)
+            if (ws && ws.readyState === WebSocket.OPEN) {
+                console.log(`📤 write_angle: bend=${bend_num}, angle=${valor}°`);
+                ws.send(JSON.stringify({
+                    action: 'write_angle',
+                    bend: bend_num,
+                    angle: valor  // main_server.py faz *10 internamente
+                }));
+
+                showFeedback(`✓ Salvando ${valor}° na dobra ${bend_num}...`);
+            }
+
+            // Sair do modo de edição
+            exitEditMode();
+        }
+
+        function exitEditMode() {
+            editMode = false;
+            editBuffer = '';
+            editField = null;
+            editTela = null;
+            updateScreen();
+        }
+
+        // Mapeamento code → key_name para main_server.py
+        const CODE_TO_KEY = {
+            160: 'K1', 161: 'K2', 162: 'K3', 163: 'K4', 164: 'K5',
+            165: 'K6', 166: 'K7', 167: 'K8', 168: 'K9', 169: 'K0',
+            220: 'S1', 221: 'S2',
+            37: 'ENTER', 188: 'ESC', 38: 'EDIT', 241: 'LOCK'
+        };
+
+        function sendKey(code, event) {
+            const keyName = CODE_TO_KEY[code] || `CODE_${code}`;
+            console.log(`🔘 sendKey: ${keyName} (${code})`);
+
+            // ========== MODO DE EDIÇÃO ==========
+            if (editMode) {
+                // K0-K9: Adicionar dígito ao buffer (máximo 3 dígitos)
+                if (code >= 160 && code <= 169) {
+                    if (editBuffer.length < 3) {
+                        const digit = (code === 169) ? '0' : String(code - 159);
+                        editBuffer += digit;
+                        updateScreen();
+                        showFeedback(`Digitando: ${editBuffer}`);
+                    }
+                    return;  // Não envia ao CLP durante edição
+                }
+
+                // ENTER: Confirmar e salvar
+                if (code === 37) {
+                    if (editBuffer.length > 0) {
+                        saveAngle();
+                    } else {
+                        showFeedback('Digite um valor primeiro!', true);
+                    }
+                    return;
+                }
+
+                // ESC: Cancelar edição
+                if (code === 188) {
+                    showFeedback('Edição cancelada');
+                    exitEditMode();
+                    return;
+                }
+
+                // Outras teclas: não fazem nada em modo de edição
+                showFeedback('Em edição: use K0-K9, ENTER ou ESC');
+                return;
+            }
+
+            // ========== MODO NORMAL ==========
+            if (ws && ws.readyState === WebSocket.OPEN) {
+                // EDIT: Ativar modo de edição se estiver em tela de ângulo
+                if (code === 38) { // EDIT
+                    if (screen >= 4 && screen <= 6) {
+                        const currentAngle = data[`angle${screen-3}`];
+                        editAngle(screen, currentAngle);
+                    } else {
+                        showFeedback('EDIT: Vá para Tela 4/5/6');
+                    }
+                }
+
+                // Enviar tecla ao CLP (formato main_server.py)
+                console.log(`📤 Enviando: press_key ${keyName}`);
+                ws.send(JSON.stringify({ action: 'press_key', key: keyName }));
+
+                // Navegação especial para K1/K2/K3 - vai para tela de ângulo
+                if (code === 160) { // K1
+                    screen = 4; // Tela 4: Ângulo 1
+                    updateScreen();
+                    showFeedback('✓ K1 → Tela 4 (Ângulo 1)');
+                } else if (code === 161) { // K2
+                    screen = 5; // Tela 5: Ângulo 2
+                    updateScreen();
+                    showFeedback('✓ K2 → Tela 5 (Ângulo 2)');
+                } else if (code === 162) { // K3
+                    screen = 6; // Tela 6: Ângulo 3
+                    updateScreen();
+                    showFeedback('✓ K3 → Tela 6 (Ângulo 3)');
+                } else if (code !== 38) {  // Não repetir feedback do EDIT
+                    showFeedback(`✓ Tecla ${code}`);
+                }
+
+                // Feedback visual
+                if (event && event.target) {
+                    const btn = event.target.closest('.btn');
+                    if (btn) {
+                        btn.classList.add('pressed');
+                        setTimeout(() => btn.classList.remove('pressed'), 150);
+                    }
+                }
+            } else {
+                showFeedback('⚠️ WebSocket OFF!', true);
+            }
+        }
+
+        function showFeedback(msg, isError = false) {
+            const fb = document.getElementById('feedback');
+            fb.textContent = msg;
+            fb.classList.toggle('error', isError);
+            fb.classList.add('show');
+            setTimeout(() => fb.classList.remove('show'), 1500);
+        }
+
+        function updateModeDisplay(modeText) {
+            const display = document.getElementById('modeDisplay');
+            const text = document.getElementById('modeText');
+
+            text.textContent = modeText || 'DESCONHECIDO';
+            display.setAttribute('data-mode', modeText || 'UNKNOWN');
+
+            console.log(`🎨 Modo atualizado: ${modeText}`);
+        }
+
+        // Botão de toggle removido - use S1 para alternar modo
+        // S1 envia press_key(220) que o CLP processa normalmente
+
+        function connect() {
+            ws = new WebSocket(WS_URL);
+
+            ws.onopen = () => {
+                document.getElementById('wsLed').classList.add('online');
+                document.getElementById('wsStatus').textContent = 'Online';
+                showFeedback('✓ Conectado');
+            };
+
+            ws.onmessage = (e) => {
+                const msg = JSON.parse(e.data);
+                console.log('📨 Mensagem recebida:', msg.type);
+
+                // Estado completo inicial ou atualização
+                if (msg.type === 'full_state' || msg.type === 'state_update') {
+                    const state = msg.data;
+
+                    // Atualizar encoder (encoder_degrees do state_manager)
+                    if (state.encoder_degrees !== undefined) {
+                        data.encoder = Math.round(state.encoder_degrees);
+                    }
+
+                    // Atualizar ângulos (nested em state.angles)
+                    if (state.angles) {
+                        if (state.angles.bend_1_left !== undefined) {
+                            data.angle1 = Math.round(state.angles.bend_1_left);
+                        }
+                        if (state.angles.bend_2_left !== undefined) {
+                            data.angle2 = Math.round(state.angles.bend_2_left);
+                        }
+                        if (state.angles.bend_3_left !== undefined) {
+                            data.angle3 = Math.round(state.angles.bend_3_left);
+                        }
+                    }
+
+                    // Status CLP (modbus_connected do state_manager)
+                    if (state.modbus_connected !== undefined) {
+                        data.connected = state.modbus_connected;
+
+                        if (state.modbus_connected) {
+                            document.getElementById('clpLed').classList.add('online');
+                            document.getElementById('clpStatus').textContent = 'Online';
+                        } else {
+                            document.getElementById('clpLed').classList.remove('online');
+                            document.getElementById('clpStatus').textContent = 'Offline';
+                        }
+                    }
+
+                    // Atualizar modo (mode_text do state_manager)
+                    if (state.mode_text !== undefined) {
+                        updateModeDisplay(state.mode_text);
+                    }
+
+                    // Mostrar/esconder aviso de E6
+                    const modeWarning = document.getElementById('modeWarning');
+                    if (state.input_e6 !== undefined && modeWarning) {
+                        if (!state.input_e6) {
+                            modeWarning.style.display = 'block';
+                        } else {
+                            modeWarning.style.display = 'none';
+                        }
+                    }
+
+                    updateScreen();
+                }
+
+                // Resposta de escrita de ângulo
+                if (msg.type === 'angle_response') {
+                    if (msg.success) {
+                        showFeedback(`✓ Ângulo ${msg.bend} salvo`);
+                    } else {
+                        showFeedback(`⚠️ Erro ao salvar ângulo ${msg.bend}`, true);
+                    }
+                }
+
+                // Resposta de tecla
+                if (msg.type === 'key_response') {
+                    console.log(`Tecla ${msg.key}: ${msg.success ? 'OK' : 'FALHA'}`);
+                }
+
+                // Modo alterado
+                if (msg.type === 'mode_changed') {
+                    console.log(`✅ Modo alterado: ${msg.mode_antes} → ${msg.mode_depois}`);
+                    updateModeDisplay(msg.mode_depois);
+                    showFeedback(`🔄 Modo: ${msg.mode_depois}`);
+                }
+            };
+
+            ws.onclose = () => {
+                document.getElementById('wsLed').classList.remove('online');
+                document.getElementById('wsStatus').textContent = 'Offline';
+                setTimeout(connect, 2000);
+            };
+        }
+
+        // Suporte teclado
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowUp') { e.preventDefault(); nav(-1); }
+            if (e.key === 'ArrowDown') { e.preventDefault(); nav(1); }
+            if (e.key === 'Enter') { e.preventDefault(); sendKey(37, null); }
+            if (e.key === 'Escape') { e.preventDefault(); sendKey(188, null); }
+            const nums = {'1':160,'2':161,'3':162,'4':163,'5':164,'6':165,'7':166,'8':167,'9':168,'0':169};
+            if (nums[e.key]) { e.preventDefault(); sendKey(nums[e.key], null); }
+        });
+
+        connect();
+        updateScreen();
+        setInterval(updateScreen, 500);  // Atualiza encoder a cada 500ms
+    </script>
+</body>
+</html>

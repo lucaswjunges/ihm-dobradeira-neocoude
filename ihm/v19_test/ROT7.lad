@@ -1,0 +1,251 @@
+Lines:00012
+[Line00001]
+  [CommentText]
+    ROT7: Copia saida analogica 0 (06E0) -> 0880
+  [Features]
+    Branchs:01
+    Type:0
+    Label:0
+    Comment:1
+    Out:MOV     T:0029 Size:003 E:06E0 E:0880
+    Height:01
+  [Branch01]
+    X1position:00
+    X2position:13
+    Yposition:00
+    Height:01
+    B1:00
+    B2:00
+    BInputnumber:00
+    {0;00;00F7;-1;-1;-1;-1;00}
+    ###
+
+[Line00002]
+  [CommentText]
+    Classe velocidade atual (1=5rpm, 2=10rpm, 3=15rpm)
+  [Features]
+    Branchs:01
+    Type:0
+    Label:0
+    Comment:1
+    Out:MOVK    T:0029 Size:003 E:0881 E:0001
+    Height:01
+  [Branch01]
+    X1position:00
+    X2position:13
+    Yposition:00
+    Height:01
+    B1:00
+    B2:00
+    BInputnumber:00
+    {0;00;00F7;-1;-1;-1;-1;00}
+    ###
+
+[Line00003]
+  [CommentText]
+    Corrente motor - entrada analogica 1 (05F1 -> 0882)
+  [Features]
+    Branchs:01
+    Type:0
+    Label:0
+    Comment:1
+    Out:MOV     T:0029 Size:003 E:05F1 E:0882
+    Height:01
+  [Branch01]
+    X1position:00
+    X2position:13
+    Yposition:00
+    Height:01
+    B1:00
+    B2:00
+    BInputnumber:00
+    {0;00;00F7;-1;-1;-1;-1;00}
+    ###
+
+[Line00004]
+  [CommentText]
+    Tensão motor - entrada analogica 2 (05F2 -> 0883)
+  [Features]
+    Branchs:01
+    Type:0
+    Label:0
+    Comment:1
+    Out:MOV     T:0029 Size:003 E:05F2 E:0883
+    Height:01
+  [Branch01]
+    X1position:00
+    X2position:13
+    Yposition:00
+    Height:01
+    B1:00
+    B2:00
+    BInputnumber:00
+    {0;00;00F7;-1;-1;-1;-1;00}
+    ###
+
+[Line00005]
+  [CommentText]
+    Potencia estimada: (corrente * tensao) / 100 -> 0884
+  [Features]
+    Branchs:01
+    Type:0
+    Label:0
+    Comment:1
+    Out:MUL     T:0090 Size:006 E:0882 E:0883 E:0884
+    Height:01
+  [Branch01]
+    X1position:00
+    X2position:13
+    Yposition:00
+    Height:01
+    B1:00
+    B2:00
+    BInputnumber:00
+    {0;00;00F7;-1;-1;-1;-1;00}
+    ###
+
+[Line00006]
+  [CommentText]
+    Divide por 100 para ajustar escala
+  [Features]
+    Branchs:01
+    Type:0
+    Label:0
+    Comment:1
+    Out:DIV     T:0090 Size:006 E:0884 E:0064 E:0884
+    Height:01
+  [Branch01]
+    X1position:00
+    X2position:13
+    Yposition:00
+    Height:01
+    B1:00
+    B2:00
+    BInputnumber:00
+    {0;00;00F7;-1;-1;-1;-1;00}
+    ###
+
+[Line00007]
+  [CommentText]
+    Status inversor Run (S0 -> 0885)
+  [Features]
+    Branchs:01
+    Type:0
+    Label:0
+    Comment:1
+    Out:MOV     T:0029 Size:003 E:0180 E:0885
+    Height:01
+  [Branch01]
+    X1position:00
+    X2position:13
+    Yposition:00
+    Height:01
+    B1:00
+    B2:00
+    BInputnumber:00
+    {0;00;00F7;-1;-1;-1;-1;00}
+    ###
+
+[Line00008]
+  [CommentText]
+    Alarme inverter (E7 -> 0886)
+  [Features]
+    Branchs:01
+    Type:0
+    Label:0
+    Comment:1
+    Out:MOV     T:0029 Size:003 E:0107 E:0886
+    Height:01
+  [Branch01]
+    X1position:00
+    X2position:13
+    Yposition:00
+    Height:01
+    B1:00
+    B2:00
+    BInputnumber:00
+    {0;00;00F7;-1;-1;-1;-1;00}
+    ###
+
+[Line00009]
+  [CommentText]
+    Se Run ativo, incrementa contador tempo (32-bit 0887/0888)
+  [Features]
+    Branchs:01
+    Type:0
+    Label:0
+    Comment:1
+    Out:ADD     T:0091 Size:006 E:0887 E:0001 E:0887
+    Height:01
+  [Branch01]
+    X1position:00
+    X2position:13
+    Yposition:00
+    Height:01
+    B1:00
+    B2:00
+    BInputnumber:01
+    {0;00;0180;-1;-1;-1;-1;00}
+    ###
+
+[Line00010]
+  [CommentText]
+    Reset contador tempo se bit 0889 ativo
+  [Features]
+    Branchs:01
+    Type:0
+    Label:0
+    Comment:1
+    Out:MOVK    T:0029 Size:003 E:0887 E:0000
+    Height:01
+  [Branch01]
+    X1position:00
+    X2position:13
+    Yposition:00
+    Height:01
+    B1:00
+    B2:00
+    BInputnumber:01
+    {0;00;0889;-1;-1;-1;-1;00}
+    ###
+
+[Line00011]
+  [CommentText]
+    Limpa bit reset apos executar
+  [Features]
+    Branchs:01
+    Type:0
+    Label:0
+    Comment:1
+    Out:RSTR    T:0043 Size:003 E:0889
+    Height:01
+  [Branch01]
+    X1position:00
+    X2position:13
+    Yposition:00
+    Height:01
+    B1:00
+    B2:00
+    BInputnumber:01
+    {0;00;0889;-1;-1;-1;-1;00}
+    ###
+
+[Line00012]
+  [Features]
+    Branchs:01
+    Type:0
+    Label:0
+    Comment:0
+    Out:RET     T:-002 Size:000
+    Height:01
+  [Branch01]
+    X1position:00
+    X2position:13
+    Yposition:00
+    Height:01
+    B1:00
+    B2:00
+    BInputnumber:00
+    {0;00;00F7;-1;-1;-1;-1;00}
+    ###
+

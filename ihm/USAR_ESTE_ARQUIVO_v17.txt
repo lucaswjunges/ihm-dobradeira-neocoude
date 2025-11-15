@@ -1,0 +1,45 @@
+═══════════════════════════════════════════════════════════════
+                    USAR ESTE ARQUIVO!
+═══════════════════════════════════════════════════════════════
+
+📦 CLP_10_ROTINAS_v17_TUDO_CORRIGIDO.sup
+
+   MD5: 40998292b0b8c3d8350caa6010874bc8
+   Tamanho: 359 KB
+   Rotinas: 10 (ROT0-ROT9)
+   Status: ✅ PRONTO PARA USO
+
+═══════════════════════════════════════════════════════════════
+
+🔥 PROBLEMAS CORRIGIDOS EM v17:
+
+1. ✅ Project.spr → Lista ROT0-ROT9 completo
+
+2. ✅ Principal.lad → 29 linhas sequenciais (sem duplicatas)
+                  → 10 CALL statements (ROT0-ROT9)
+
+3. ✅ ROT6.lad → Cabeçalho corrigido de Lines:00035 para Lines:00018
+             → Agora abre com conteúdo completo!
+
+4. ✅ Conf.dbf → Metadados para 10 rotinas
+
+5. ✅ Todos os arquivos ROT0-9 com cabeçalhos corretos
+
+═══════════════════════════════════════════════════════════════
+
+📚 DOCUMENTAÇÃO:
+
+README_v17_TUDO_CORRIGIDO.md → Detalhes completos
+STATUS_FINAL_v17.txt         → Status do projeto
+
+═══════════════════════════════════════════════════════════════
+
+🚀 TESTAR NO WINSUP 2:
+
+1. Copiar para Windows
+2. Abrir no WinSUP (como Administrador)
+3. Verificar que TODAS as 10 rotinas aparecem
+4. Verificar que ROT6-9 abrem com conteúdo completo
+5. Compilar sem erros
+
+═══════════════════════════════════════════════════════════════

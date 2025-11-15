@@ -1,0 +1,17 @@
+# IHM Web - Dependências Python
+# ================================
+
+# Comunicação Modbus RTU
+pymodbus>=3.5.0
+
+# Servidor WebSocket
+websockets>=12.0
+
+# Servidor HTTP (para servir index.html)
+aiohttp>=3.9.0
+
+# Porta serial (usado por pymodbus)
+pyserial>=3.5
+
+# Asyncio utilities
+asyncio>=3.4.3

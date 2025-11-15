@@ -1,0 +1,142 @@
+═══════════════════════════════════════════════════════════════
+              ⭐ USAR ESTE ARQUIVO! ⭐
+═══════════════════════════════════════════════════════════════
+
+📦 CLP_10_ROTINAS_v23_CORRETO.sup
+
+   MD5: ccb7fd655fa58bff2bc48c413106c19a
+   Tamanho: 29 KB
+   Status: ✅ REGISTROS CORRETOS - 0942/0944
+
+═══════════════════════════════════════════════════════════════
+
+✅ DESCOBERTA CRÍTICA!
+
+v22 ERRO: "registro Origem fora do range permitido"
+CAUSA: Tentei usar 0800-0966 como DESTINO
+
+SOLUÇÃO v23:
+  ✅ Usa APENAS 0942 e 0944 como destino MOV
+  ✅ Únicos registros válidos descobertos em ROT4 original!
+
+═══════════════════════════════════════════════════════════════
+
+📋 PADRÃO DESCOBERTO EM ROT4:
+
+ROT4 copia ângulos para APENAS 2 registros:
+  0840 → 0944  (ângulo 1 MSW)
+  0842 → 0942  (ângulo 1 LSW)
+  0846 → 0944  (ângulo 2 MSW)
+  0848 → 0942  (ângulo 2 LSW)
+  0850 → 0944  (ângulo 3 MSW)
+  0852 → 0942  (ângulo 3 LSW)
+
+Destinos MOV válidos:
+  ✅ 0942, 0944 (área espelhamento!)
+  ✅ 04D6, 05F0 (auto-refresh)
+  ❌ 0800-0966 (inválidos!)
+
+═══════════════════════════════════════════════════════════════
+
+📋 CONTEÚDO v23:
+
+ROT5 (6 linhas) - Status:
+  MOV 0191 (ciclo) → 0942
+  MOV 02FF (modo) → 0944
+  MOV 00BE (Modbus) → 0942
+  MOV 0400 (timer) → 0944
+  RET × 2
+
+ROT6 (18 linhas) - Espelhamento I/O:
+  MOV E0-E7 (0100-0107) → 0942/0944 (alternando)
+  MOV Encoder MSW (04D6) → 0942
+  MOV Encoder LSW (04D7) → 0944
+  RET × 8
+
+ROT7 (12 linhas) - Inversor WEG:
+  MOV Tensão inv (06E0) → 0942
+  MOV Classe vel (0900) → 0944
+  MOV Corrente (05F1) → 0942
+  MOV Tensão motor (05F2) → 0944
+  RET × 8
+
+ROT8 (15 linhas):
+  RET × 15
+  (ângulos já copiados por ROT4)
+
+ROT9 (20 linhas) - Emulação teclas:
+  SETR K0-K9, S1, S2, ENTER, ESC (condição: 0942)
+  RET × 10
+
+═══════════════════════════════════════════════════════════════
+
+⚠️ LIMITAÇÃO IMPORTANTE:
+
+Apenas 2 registros disponíveis (0942/0944)!
+
+Para acessar dados via Modbus:
+  1. Python lê 0942/0944 em sequência
+  2. Cada scan do CLP atualiza valores diferentes
+  3. Polling deve ser rápido (< 100ms)
+
+Exemplo:
+  Scan 1: 0942=E0, 0944=E1
+  Scan 2: 0942=E2, 0944=E3
+  Scan 3: 0942=E4, 0944=E5
+  Scan 4: 0942=encoder_MSW, 0944=encoder_LSW
+  ...
+
+═══════════════════════════════════════════════════════════════
+
+💻 INTEGRAÇÃO PYTHON:
+
+modbus_map.py:
+```python
+# ÚNICOS registros disponíveis!
+REG_A = 0x0942  # Alternador A
+REG_B = 0x0944  # Alternador B
+```
+
+state_manager.py:
+```python
+def poll_cyclical():
+    # Ler em sequência rápida (scan CLP ~6ms)
+    samples = []
+    for _ in range(20):  # 20 scans
+        a = client.read_register(0x0942)
+        b = client.read_register(0x0944)
+        samples.append((a, b))
+        time.sleep(0.01)  # 10ms entre leituras
+
+    # Analisar padrões nas amostras
+    # Detectar: E0-E7, encoder, status, etc
+    parse_samples(samples)
+```
+
+═══════════════════════════════════════════════════════════════
+
+🚀 TESTAR NO WINSUP:
+
+1. Abrir CLP_10_ROTINAS_v23_CORRETO.sup
+2. Verificar:
+   ✅ Abre sem erros?
+   ✅ ROT5 mostra MOV com destino 0942/0944?
+   ✅ ROT6 mostra MOV com destino 0942/0944?
+   ✅ Compila sem erros?
+
+═══════════════════════════════════════════════════════════════
+
+📈 EVOLUÇÃO:
+
+v21_TEST: ✅ Funcionou (RET puro)
+  ↓
+v22: ❌ Erro "registro fora do range" (0800-0966)
+  ↓
+v23: ✅ APENAS 0942/0944 (descobertos em ROT4!)
+
+═══════════════════════════════════════════════════════════════
+
+Versão atual:
+  ✅ CLP_10_ROTINAS_v23_CORRETO.sup
+
+═══════════════════════════════════════════════════════════════

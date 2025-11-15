@@ -1,0 +1,1106 @@
+Lines:00020
+[Line00001]
+  [Features]
+    Branchs:01
+    Type:0
+    Label:0
+    Comment:1
+  [CommentText]
+    ROT5: Emulacao completa de teclas da IHM fisica
+  [Branch01]
+    X1position:00
+    X2position:13
+    Yposition:00
+    Height:01
+    B1:00
+    B2:00
+    BInputnumber:00
+    {0;00;00F7;-1;-1;-1;-1;00}
+    Out:MOVK    T:0029 Size:003 E:08C1 E:0000
+    ###
+
+[Line00002]
+  [Features]
+    Branchs:01
+    Type:0
+    Label:0
+    Comment:1
+  [CommentText]
+    Mapeia teclas K0-K9 para registros Modbus (08C1-08CA)
+  [Branch01]
+    X1position:00
+    X2position:13
+    Yposition:00
+    Height:01
+    B1:00
+    B2:00
+    BInputnumber:00
+    {0;00;00A9;-1;-1;-1;-1;00}
+    Out:MOVK    T:0029 Size:003 E:08C1 E:0000
+    Height:11
+  [Branch02]
+    X1position:00
+    X2position:13
+    Yposition:01
+    Height:01
+    B1:00
+    B2:00
+    BInputnumber:00
+    {0;00;00A0;-1;-1;-1;-1;00}
+    Out:MOVK    T:0029 Size:003 E:08C2 E:0001
+  [Branch03]
+    X1position:00
+    X2position:13
+    Yposition:02
+    Height:01
+    B1:00
+    B2:00
+    BInputnumber:00
+    {0;00;00A1;-1;-1;-1;-1;00}
+    Out:MOVK    T:0029 Size:003 E:08C3 E:0002
+  [Branch04]
+    X1position:00
+    X2position:13
+    Yposition:03
+    Height:01
+    B1:00
+    B2:00
+    BInputnumber:00
+    {0;00;00A2;-1;-1;-1;-1;00}
+    Out:MOVK    T:0029 Size:003 E:08C4 E:0003
+  [Branch05]
+    X1position:00
+    X2position:13
+    Yposition:04
+    Height:01
+    B1:00
+    B2:00
+    BInputnumber:00
+    {0;00;00A3;-1;-1;-1;-1;00}
+    Out:MOVK    T:0029 Size:003 E:08C5 E:0004
+  [Branch06]
+    X1position:00
+    X2position:13
+    Yposition:05
+    Height:01
+    B1:00
+    B2:00
+    BInputnumber:00
+    {0;00;00A4;-1;-1;-1;-1;00}
+    Out:MOVK    T:0029 Size:003 E:08C6 E:0005
+  [Branch07]
+    X1position:00
+    X2position:13
+    Yposition:06
+    Height:01
+    B1:00
+    B2:00
+    BInputnumber:00
+    {0;00;00A5;-1;-1;-1;-1;00}
+    Out:MOVK    T:0029 Size:003 E:08C7 E:0006
+  [Branch08]
+    X1position:00
+    X2position:13
+    Yposition:07
+    Height:01
+    B1:00
+    B2:00
+    BInputnumber:00
+    {0;00;00A6;-1;-1;-1;-1;00}
+    Out:MOVK    T:0029 Size:003 E:08C8 E:0007
+  [Branch09]
+    X1position:00
+    X2position:13
+    Yposition:08
+    Height:01
+    B1:00
+    B2:00
+    BInputnumber:00
+    {0;00;00A7;-1;-1;-1;-1;00}
+    Out:MOVK    T:0029 Size:003 E:08C9 E:0008
+  [Branch10]
+    X1position:00
+    X2position:13
+    Yposition:09
+    Height:01
+    B1:00
+    B2:00
+    BInputnumber:00
+    {0;00;00A8;-1;-1;-1;-1;00}
+    Out:MOVK    T:0029 Size:003 E:08CA E:0009
+    ###
+
+[Line00003]
+  [Features]
+    Branchs:01
+    Type:0
+    Label:0
+    Comment:1
+  [CommentText]
+    Mapeia teclas especiais S1, S2, ENTER, ESC, EDIT (08CB-08CF)
+  [Branch01]
+    X1position:00
+    X2position:13
+    Yposition:00
+    Height:01
+    B1:00
+    B2:00
+    BInputnumber:00
+    {0;00;00DC;-1;-1;-1;-1;00}
+    Out:MOVK    T:0029 Size:003 E:08CB E:0001
+    Height:06
+  [Branch02]
+    X1position:00
+    X2position:13
+    Yposition:01
+    Height:01
+    B1:00
+    B2:00
+    BInputnumber:00
+    {0;00;00DD;-1;-1;-1;-1;00}
+    Out:MOVK    T:0029 Size:003 E:08CC E:0001
+  [Branch03]
+    X1position:00
+    X2position:13
+    Yposition:02
+    Height:01
+    B1:00
+    B2:00
+    BInputnumber:00
+    {0;00;0025;-1;-1;-1;-1;00}
+    Out:MOVK    T:0029 Size:003 E:08CD E:0001
+  [Branch04]
+    X1position:00
+    X2position:13
+    Yposition:03
+    Height:01
+    B1:00
+    B2:00
+    BInputnumber:00
+    {0;00;00BC;-1;-1;-1;-1;00}
+    Out:MOVK    T:0029 Size:003 E:08CE E:0001
+  [Branch05]
+    X1position:00
+    X2position:13
+    Yposition:04
+    Height:01
+    B1:00
+    B2:00
+    BInputnumber:00
+    {0;00;0026;-1;-1;-1;-1;00}
+    Out:MOVK    T:0029 Size:003 E:08CF E:0001
+  [Branch06]
+    X1position:00
+    X2position:13
+    Yposition:05
+    Height:01
+    B1:00
+    B2:00
+    BInputnumber:00
+    {0;00;00F1;-1;-1;-1;-1;00}
+    Out:MOVK    T:0029 Size:003 E:08D0 E:0001
+    ###
+
+[Line00004]
+  [Features]
+    Branchs:01
+    Type:0
+    Label:0
+    Comment:1
+  [CommentText]
+    Mapeia setas UP/DOWN (08D1, 08D2)
+  [Branch01]
+    X1position:00
+    X2position:13
+    Yposition:00
+    Height:01
+    B1:00
+    B2:00
+    BInputnumber:00
+    {0;00;00AC;-1;-1;-1;-1;00}
+    Out:MOVK    T:0029 Size:003 E:08D1 E:0001
+    Height:03
+  [Branch02]
+    X1position:00
+    X2position:13
+    Yposition:01
+    Height:01
+    B1:00
+    B2:00
+    BInputnumber:00
+    {0;00;00AD;-1;-1;-1;-1;00}
+    Out:MOVK    T:0029 Size:003 E:08D2 E:0001
+    ###
+
+[Line00005]
+  [Features]
+    Branchs:01
+    Type:0
+    Label:0
+    Comment:1
+  [CommentText]
+    Detecta comando composto K1+K7 (mudanca velocidade) -> 08D3
+  [Branch01]
+    X1position:00
+    X2position:13
+    Yposition:00
+    Height:01
+    B1:00
+    B2:00
+    BInputnumber:00
+    {0;00;00A0;-1;-1;-1;-1;00}
+    Out:MOVK    T:0029 Size:003 E:08D3 E:0001
+    Height:02
+  [Branch02]
+    X1position:00
+    X2position:13
+    Yposition:01
+    Height:01
+    B1:00
+    B2:00
+    BInputnumber:00
+    {0;00;00A6;-1;-1;-1;-1;00}
+    ###
+
+[Line00006]
+  [Features]
+    Branchs:01
+    Type:0
+    Label:0
+    Comment:1
+  [CommentText]
+    Detecta comando composto S1+K7/K8/K9 (diagnostico) -> 08D4
+  [Branch01]
+    X1position:00
+    X2position:13
+    Yposition:00
+    Height:01
+    B1:00
+    B2:00
+    BInputnumber:00
+    {0;00;00DC;-1;-1;-1;-1;00}
+    Out:MOVK    T:0029 Size:003 E:08D4 E:0007
+    Height:04
+  [Branch02]
+    X1position:00
+    X2position:13
+    Yposition:01
+    Height:01
+    B1:00
+    B2:00
+    BInputnumber:00
+    {0;00;00A6;-1;-1;-1;-1;00}
+  [Branch03]
+    X1position:00
+    X2position:13
+    Yposition:02
+    Height:01
+    B1:00
+    B2:00
+    BInputnumber:00
+    {0;00;00DC;-1;-1;-1;-1;00}
+    Out:MOVK    T:0029 Size:003 E:08D4 E:0008
+  [Branch04]
+    X1position:00
+    X2position:13
+    Yposition:03
+    Height:01
+    B1:00
+    B2:00
+    BInputnumber:00
+    {0;00;00A7;-1;-1;-1;-1;00}
+    ###
+
+[Line00007]
+  [Features]
+    Branchs:01
+    Type:0
+    Label:0
+    Comment:1
+  [CommentText]
+    Historico de ultimas 5 teclas pressionadas (08D5-08D9)
+  [Branch01]
+    X1position:00
+    X2position:13
+    Yposition:00
+    Height:01
+    B1:00
+    B2:00
+    BInputnumber:00
+    {0;00;00F7;-1;-1;-1;-1;00}
+    Out:MOV     T:0028 Size:003 E:08D6 E:08D5
+    Height:05
+  [Branch02]
+    X1position:00
+    X2position:13
+    Yposition:01
+    Height:01
+    B1:00
+    B2:00
+    BInputnumber:00
+    {0;00;00F7;-1;-1;-1;-1;00}
+    Out:MOV     T:0028 Size:003 E:08D7 E:08D6
+  [Branch03]
+    X1position:00
+    X2position:13
+    Yposition:02
+    Height:01
+    B1:00
+    B2:00
+    BInputnumber:00
+    {0;00;00F7;-1;-1;-1;-1;00}
+    Out:MOV     T:0028 Size:003 E:08D8 E:08D7
+  [Branch04]
+    X1position:00
+    X2position:13
+    Yposition:03
+    Height:01
+    B1:00
+    B2:00
+    BInputnumber:00
+    {0;00;00F7;-1;-1;-1;-1;00}
+    Out:MOV     T:0028 Size:003 E:08D9 E:08D8
+    ###
+
+[Line00008]
+  [Features]
+    Branchs:01
+    Type:0
+    Label:0
+    Comment:1
+  [CommentText]
+    Registra ultima tecla pressionada em 08D9
+  [Branch01]
+    X1position:00
+    X2position:13
+    Yposition:00
+    Height:01
+    B1:00
+    B2:00
+    BInputnumber:00
+    {0;00;00A9;-1;-1;-1;-1;00}
+    Out:MOVK    T:0029 Size:003 E:08D9 E:0000
+    Height:15
+  [Branch02]
+    X1position:00
+    X2position:13
+    Yposition:01
+    Height:01
+    B1:00
+    B2:00
+    BInputnumber:00
+    {0;00;00A0;-1;-1;-1;-1;00}
+    Out:MOVK    T:0029 Size:003 E:08D9 E:0001
+  [Branch03]
+    X1position:00
+    X2position:13
+    Yposition:02
+    Height:01
+    B1:00
+    B2:00
+    BInputnumber:00
+    {0;00;00A1;-1;-1;-1;-1;00}
+    Out:MOVK    T:0029 Size:003 E:08D9 E:0002
+  [Branch04]
+    X1position:00
+    X2position:13
+    Yposition:03
+    Height:01
+    B1:00
+    B2:00
+    BInputnumber:00
+    {0;00;00A2;-1;-1;-1;-1;00}
+    Out:MOVK    T:0029 Size:003 E:08D9 E:0003
+  [Branch05]
+    X1position:00
+    X2position:13
+    Yposition:04
+    Height:01
+    B1:00
+    B2:00
+    BInputnumber:00
+    {0;00;00A3;-1;-1;-1;-1;00}
+    Out:MOVK    T:0029 Size:003 E:08D9 E:0004
+  [Branch06]
+    X1position:00
+    X2position:13
+    Yposition:05
+    Height:01
+    B1:00
+    B2:00
+    BInputnumber:00
+    {0;00;00A4;-1;-1;-1;-1;00}
+    Out:MOVK    T:0029 Size:003 E:08D9 E:0005
+  [Branch07]
+    X1position:00
+    X2position:13
+    Yposition:06
+    Height:01
+    B1:00
+    B2:00
+    BInputnumber:00
+    {0;00;00A5;-1;-1;-1;-1;00}
+    Out:MOVK    T:0029 Size:003 E:08D9 E:0006
+  [Branch08]
+    X1position:00
+    X2position:13
+    Yposition:07
+    Height:01
+    B1:00
+    B2:00
+    BInputnumber:00
+    {0;00;00A6;-1;-1;-1;-1;00}
+    Out:MOVK    T:0029 Size:003 E:08D9 E:0007
+  [Branch09]
+    X1position:00
+    X2position:13
+    Yposition:08
+    Height:01
+    B1:00
+    B2:00
+    BInputnumber:00
+    {0;00;00A7;-1;-1;-1;-1;00}
+    Out:MOVK    T:0029 Size:003 E:08D9 E:0008
+  [Branch10]
+    X1position:00
+    X2position:13
+    Yposition:09
+    Height:01
+    B1:00
+    B2:00
+    BInputnumber:00
+    {0;00;00A8;-1;-1;-1;-1;00}
+    Out:MOVK    T:0029 Size:003 E:08D9 E:0009
+  [Branch11]
+    X1position:00
+    X2position:13
+    Yposition:10
+    Height:01
+    B1:00
+    B2:00
+    BInputnumber:00
+    {0;00;00DC;-1;-1;-1;-1;00}
+    Out:MOVK    T:0029 Size:003 E:08D9 E:0011
+  [Branch12]
+    X1position:00
+    X2position:13
+    Yposition:11
+    Height:01
+    B1:00
+    B2:00
+    BInputnumber:00
+    {0;00;00DD;-1;-1;-1;-1;00}
+    Out:MOVK    T:0029 Size:003 E:08D9 E:0012
+  [Branch13]
+    X1position:00
+    X2position:13
+    Yposition:12
+    Height:01
+    B1:00
+    B2:00
+    BInputnumber:00
+    {0;00;0025;-1;-1;-1;-1;00}
+    Out:MOVK    T:0029 Size:003 E:08D9 E:0013
+  [Branch14]
+    X1position:00
+    X2position:13
+    Yposition:13
+    Height:01
+    B1:00
+    B2:00
+    BInputnumber:00
+    {0;00;00BC;-1;-1;-1;-1;00}
+    Out:MOVK    T:0029 Size:003 E:08D9 E:0014
+  [Branch15]
+    X1position:00
+    X2position:13
+    Yposition:14
+    Height:01
+    B1:00
+    B2:00
+    BInputnumber:00
+    {0;00;0026;-1;-1;-1;-1;00}
+    Out:MOVK    T:0029 Size:003 E:08D9 E:0015
+    ###
+
+[Line00009]
+  [Features]
+    Branchs:01
+    Type:0
+    Label:0
+    Comment:1
+  [CommentText]
+    Contador de teclas pressionadas total (08DA)
+  [Branch01]
+    X1position:00
+    X2position:13
+    Yposition:00
+    Height:01
+    B1:00
+    B2:00
+    BInputnumber:00
+    {0;00;00A9;-1;-1;-1;-1;00}
+    Out:ADD     T:0040 Size:003 E:08DA E:0001
+    Height:16
+  [Branch02]
+    X1position:00
+    X2position:13
+    Yposition:01
+    Height:01
+    B1:00
+    B2:00
+    BInputnumber:00
+    {0;00;00A0;-1;-1;-1;-1;00}
+    Out:ADD     T:0040 Size:003 E:08DA E:0001
+  [Branch03]
+    X1position:00
+    X2position:13
+    Yposition:02
+    Height:01
+    B1:00
+    B2:00
+    BInputnumber:00
+    {0;00;00A1;-1;-1;-1;-1;00}
+    Out:ADD     T:0040 Size:003 E:08DA E:0001
+  [Branch04]
+    X1position:00
+    X2position:13
+    Yposition:03
+    Height:01
+    B1:00
+    B2:00
+    BInputnumber:00
+    {0;00;00A2;-1;-1;-1;-1;00}
+    Out:ADD     T:0040 Size:003 E:08DA E:0001
+  [Branch05]
+    X1position:00
+    X2position:13
+    Yposition:04
+    Height:01
+    B1:00
+    B2:00
+    BInputnumber:00
+    {0;00;00A3;-1;-1;-1;-1;00}
+    Out:ADD     T:0040 Size:003 E:08DA E:0001
+  [Branch06]
+    X1position:00
+    X2position:13
+    Yposition:05
+    Height:01
+    B1:00
+    B2:00
+    BInputnumber:00
+    {0;00;00A4;-1;-1;-1;-1;00}
+    Out:ADD     T:0040 Size:003 E:08DA E:0001
+  [Branch07]
+    X1position:00
+    X2position:13
+    Yposition:06
+    Height:01
+    B1:00
+    B2:00
+    BInputnumber:00
+    {0;00;00A5;-1;-1;-1;-1;00}
+    Out:ADD     T:0040 Size:003 E:08DA E:0001
+  [Branch08]
+    X1position:00
+    X2position:13
+    Yposition:07
+    Height:01
+    B1:00
+    B2:00
+    BInputnumber:00
+    {0;00;00A6;-1;-1;-1;-1;00}
+    Out:ADD     T:0040 Size:003 E:08DA E:0001
+  [Branch09]
+    X1position:00
+    X2position:13
+    Yposition:08
+    Height:01
+    B1:00
+    B2:00
+    BInputnumber:00
+    {0;00;00A7;-1;-1;-1;-1;00}
+    Out:ADD     T:0040 Size:003 E:08DA E:0001
+  [Branch10]
+    X1position:00
+    X2position:13
+    Yposition:09
+    Height:01
+    B1:00
+    B2:00
+    BInputnumber:00
+    {0;00;00A8;-1;-1;-1;-1;00}
+    Out:ADD     T:0040 Size:003 E:08DA E:0001
+  [Branch11]
+    X1position:00
+    X2position:13
+    Yposition:10
+    Height:01
+    B1:00
+    B2:00
+    BInputnumber:00
+    {0;00;00DC;-1;-1;-1;-1;00}
+    Out:ADD     T:0040 Size:003 E:08DA E:0001
+  [Branch12]
+    X1position:00
+    X2position:13
+    Yposition:11
+    Height:01
+    B1:00
+    B2:00
+    BInputnumber:00
+    {0;00;00DD;-1;-1;-1;-1;00}
+    Out:ADD     T:0040 Size:003 E:08DA E:0001
+  [Branch13]
+    X1position:00
+    X2position:13
+    Yposition:12
+    Height:01
+    B1:00
+    B2:00
+    BInputnumber:00
+    {0;00;0025;-1;-1;-1;-1;00}
+    Out:ADD     T:0040 Size:003 E:08DA E:0001
+  [Branch14]
+    X1position:00
+    X2position:13
+    Yposition:13
+    Height:01
+    B1:00
+    B2:00
+    BInputnumber:00
+    {0;00;00BC;-1;-1;-1;-1;00}
+    Out:ADD     T:0040 Size:003 E:08DA E:0001
+  [Branch15]
+    X1position:00
+    X2position:13
+    Yposition:14
+    Height:01
+    B1:00
+    B2:00
+    BInputnumber:00
+    {0;00;0026;-1;-1;-1;-1;00}
+    Out:ADD     T:0040 Size:003 E:08DA E:0001
+  [Branch16]
+    X1position:00
+    X2position:13
+    Yposition:15
+    Height:01
+    B1:00
+    B2:00
+    BInputnumber:00
+    {0;00;00F1;-1;-1;-1;-1;00}
+    Out:ADD     T:0040 Size:003 E:08DA E:0001
+    ###
+
+[Line00010]
+  [Features]
+    Branchs:01
+    Type:0
+    Label:0
+    Comment:1
+  [CommentText]
+    Debounce: Timer para evitar multiplas leituras (08DB)
+  [Branch01]
+    X1position:00
+    X2position:13
+    Yposition:00
+    Height:01
+    B1:00
+    B2:00
+    BInputnumber:00
+    {0;00;00F7;-1;-1;-1;-1;00}
+    Out:TMR     T:0056 Size:003 E:0008
+    ###
+
+[Line00011]
+  [Features]
+    Branchs:01
+    Type:0
+    Label:0
+    Comment:1
+  [CommentText]
+    Estado de bloqueio do teclado (08DC: 0=Desbloqueado, 1=Bloqueado)
+  [Branch01]
+    X1position:00
+    X2position:13
+    Yposition:00
+    Height:01
+    B1:00
+    B2:00
+    BInputnumber:00
+    {0;00;00F1;-1;-1;-1;-1;00}
+    Out:MOVK    T:0029 Size:003 E:08DC E:0001
+    Height:02
+  [Branch02]
+    X1position:00
+    X2position:13
+    Yposition:01
+    Height:01
+    B1:00
+    B2:00
+    BInputnumber:00
+    {1;00;00F1;-1;-1;-1;-1;00}
+    Out:MOVK    T:0029 Size:003 E:08DC E:0000
+    ###
+
+[Line00012]
+  [Features]
+    Branchs:01
+    Type:0
+    Label:0
+    Comment:1
+  [CommentText]
+    Comando via Modbus: Simular K1 (08DD = 1)
+  [Branch01]
+    X1position:00
+    X2position:13
+    Yposition:00
+    Height:01
+    B1:00
+    B2:00
+    BInputnumber:00
+    {0;00;08DD;-1;-1;-1;-1;00}
+    Out:SETR    T:0043 Size:003 E:00A0
+    Height:03
+  [Branch02]
+    X1position:00
+    X2position:13
+    Yposition:01
+    Height:01
+    B1:00
+    B2:00
+    BInputnumber:00
+    {0;00;08DD;-1;-1;-1;-1;00}
+    Out:TMR     T:0056 Size:003 E:0009
+  [Branch03]
+    X1position:00
+    X2position:13
+    Yposition:02
+    Height:01
+    B1:00
+    B2:00
+    BInputnumber:00
+    {0;00;0009;-1;-1;-1;-1;00}
+    Out:MONOA   T:-006 Size:001 E:00A0
+    ###
+
+[Line00013]
+  [Features]
+    Branchs:01
+    Type:0
+    Label:0
+    Comment:1
+  [CommentText]
+    Comando via Modbus: Simular K2 (08DE = 1)
+  [Branch01]
+    X1position:00
+    X2position:13
+    Yposition:00
+    Height:01
+    B1:00
+    B2:00
+    BInputnumber:00
+    {0;00;08DE;-1;-1;-1;-1;00}
+    Out:SETR    T:0043 Size:003 E:00A1
+    Height:03
+  [Branch02]
+    X1position:00
+    X2position:13
+    Yposition:01
+    Height:01
+    B1:00
+    B2:00
+    BInputnumber:00
+    {0;00;08DE;-1;-1;-1;-1;00}
+    Out:TMR     T:0056 Size:003 E:000A
+  [Branch03]
+    X1position:00
+    X2position:13
+    Yposition:02
+    Height:01
+    B1:00
+    B2:00
+    BInputnumber:00
+    {0;00;000A;-1;-1;-1;-1;00}
+    Out:MONOA   T:-006 Size:001 E:00A1
+    ###
+
+[Line00014]
+  [Features]
+    Branchs:01
+    Type:0
+    Label:0
+    Comment:1
+  [CommentText]
+    Comando via Modbus: Simular K3 (08DF = 1)
+  [Branch01]
+    X1position:00
+    X2position:13
+    Yposition:00
+    Height:01
+    B1:00
+    B2:00
+    BInputnumber:00
+    {0;00;08DF;-1;-1;-1;-1;00}
+    Out:SETR    T:0043 Size:003 E:00A2
+    Height:03
+  [Branch02]
+    X1position:00
+    X2position:13
+    Yposition:01
+    Height:01
+    B1:00
+    B2:00
+    BInputnumber:00
+    {0;00;08DF;-1;-1;-1;-1;00}
+    Out:TMR     T:0056 Size:003 E:000B
+  [Branch03]
+    X1position:00
+    X2position:13
+    Yposition:02
+    Height:01
+    B1:00
+    B2:00
+    BInputnumber:00
+    {0;00;000B;-1;-1;-1;-1;00}
+    Out:MONOA   T:-006 Size:001 E:00A2
+    ###
+
+[Line00015]
+  [Features]
+    Branchs:01
+    Type:0
+    Label:0
+    Comment:1
+  [CommentText]
+    Comando via Modbus: Simular S1 (08E0 = 1)
+  [Branch01]
+    X1position:00
+    X2position:13
+    Yposition:00
+    Height:01
+    B1:00
+    B2:00
+    BInputnumber:00
+    {0;00;08E0;-1;-1;-1;-1;00}
+    Out:SETR    T:0043 Size:003 E:00DC
+    Height:03
+  [Branch02]
+    X1position:00
+    X2position:13
+    Yposition:01
+    Height:01
+    B1:00
+    B2:00
+    BInputnumber:00
+    {0;00;08E0;-1;-1;-1;-1;00}
+    Out:TMR     T:0056 Size:003 E:000C
+  [Branch03]
+    X1position:00
+    X2position:13
+    Yposition:02
+    Height:01
+    B1:00
+    B2:00
+    BInputnumber:00
+    {0;00;000C;-1;-1;-1;-1;00}
+    Out:MONOA   T:-006 Size:001 E:00DC
+    ###
+
+[Line00016]
+  [Features]
+    Branchs:01
+    Type:0
+    Label:0
+    Comment:1
+  [CommentText]
+    Comando via Modbus: Simular S2 (08E1 = 1)
+  [Branch01]
+    X1position:00
+    X2position:13
+    Yposition:00
+    Height:01
+    B1:00
+    B2:00
+    BInputnumber:00
+    {0;00;08E1;-1;-1;-1;-1;00}
+    Out:SETR    T:0043 Size:003 E:00DD
+    Height:03
+  [Branch02]
+    X1position:00
+    X2position:13
+    Yposition:01
+    Height:01
+    B1:00
+    B2:00
+    BInputnumber:00
+    {0;00;08E1;-1;-1;-1;-1;00}
+    Out:TMR     T:0056 Size:003 E:000D
+  [Branch03]
+    X1position:00
+    X2position:13
+    Yposition:02
+    Height:01
+    B1:00
+    B2:00
+    BInputnumber:00
+    {0;00;000D;-1;-1;-1;-1;00}
+    Out:MONOA   T:-006 Size:001 E:00DD
+    ###
+
+[Line00017]
+  [Features]
+    Branchs:01
+    Type:0
+    Label:0
+    Comment:1
+  [CommentText]
+    Comando via Modbus: Simular ENTER (08E2 = 1)
+  [Branch01]
+    X1position:00
+    X2position:13
+    Yposition:00
+    Height:01
+    B1:00
+    B2:00
+    BInputnumber:00
+    {0;00;08E2;-1;-1;-1;-1;00}
+    Out:SETR    T:0043 Size:003 E:0025
+    Height:03
+  [Branch02]
+    X1position:00
+    X2position:13
+    Yposition:01
+    Height:01
+    B1:00
+    B2:00
+    BInputnumber:00
+    {0;00;08E2;-1;-1;-1;-1;00}
+    Out:TMR     T:0056 Size:003 E:000E
+  [Branch03]
+    X1position:00
+    X2position:13
+    Yposition:02
+    Height:01
+    B1:00
+    B2:00
+    BInputnumber:00
+    {0;00;000E;-1;-1;-1;-1;00}
+    Out:MONOA   T:-006 Size:001 E:0025
+    ###
+
+[Line00018]
+  [Features]
+    Branchs:01
+    Type:0
+    Label:0
+    Comment:1
+  [CommentText]
+    Comando via Modbus: Simular ESC (08E3 = 1)
+  [Branch01]
+    X1position:00
+    X2position:13
+    Yposition:00
+    Height:01
+    B1:00
+    B2:00
+    BInputnumber:00
+    {0;00;08E3;-1;-1;-1;-1;00}
+    Out:SETR    T:0043 Size:003 E:00BC
+    Height:03
+  [Branch02]
+    X1position:00
+    X2position:13
+    Yposition:01
+    Height:01
+    B1:00
+    B2:00
+    BInputnumber:00
+    {0;00;08E3;-1;-1;-1;-1;00}
+    Out:TMR     T:0056 Size:003 E:000F
+  [Branch03]
+    X1position:00
+    X2position:13
+    Yposition:02
+    Height:01
+    B1:00
+    B2:00
+    BInputnumber:00
+    {0;00;000F;-1;-1;-1;-1;00}
+    Out:MONOA   T:-006 Size:001 E:00BC
+    ###
+
+[Line00019]
+  [Features]
+    Branchs:01
+    Type:0
+    Label:0
+    Comment:1
+  [CommentText]
+    Comando via Modbus: Simular EDIT (08E4 = 1)
+  [Branch01]
+    X1position:00
+    X2position:13
+    Yposition:00
+    Height:01
+    B1:00
+    B2:00
+    BInputnumber:00
+    {0;00;08E4;-1;-1;-1;-1;00}
+    Out:SETR    T:0043 Size:003 E:0026
+    Height:03
+  [Branch02]
+    X1position:00
+    X2position:13
+    Yposition:01
+    Height:01
+    B1:00
+    B2:00
+    BInputnumber:00
+    {0;00;08E4;-1;-1;-1;-1;00}
+    Out:TMR     T:0056 Size:003 E:0010
+  [Branch03]
+    X1position:00
+    X2position:13
+    Yposition:02
+    Height:01
+    B1:00
+    B2:00
+    BInputnumber:00
+    {0;00;0010;-1;-1;-1;-1;00}
+    Out:MONOA   T:-006 Size:001 E:0026
+    ###
+
+[Line00020]
+  [Features]
+    Branchs:01
+    Type:0
+    Label:0
+    Comment:1
+  [CommentText]
+    Comando via Modbus: Reset contador de teclas (08E5 = 1)
+  [Branch01]
+    X1position:00
+    X2position:13
+    Yposition:00
+    Height:01
+    B1:00
+    B2:00
+    BInputnumber:00
+    {0;00;08E5;-1;-1;-1;-1;00}
+    Out:MOVK    T:0029 Size:003 E:08DA E:0000
+    Height:03
+  [Branch02]
+    X1position:00
+    X2position:13
+    Yposition:01
+    Height:01
+    B1:00
+    B2:00
+    BInputnumber:00
+    {0;00;08E5;-1;-1;-1;-1;00}
+    Out:MOVK    T:0029 Size:003 E:08E5 E:0000
+    ###
+

@@ -1,0 +1,355 @@
+"""
+Main Server - Servidor WebSocket IHM Web
+=========================================
+
+Servidor principal que coordena:
+- Modbus client (comunicação com CLP)
+- State manager (estado da máquina)
+- WebSocket server (comunicação com tablet)
+- HTTP server (serve index.html)
+"""
+
+import asyncio
+import websockets
+import json
+import argparse
+import time
+from pathlib import Path
+from typing import Set
+from aiohttp import web
+
+from modbus_client import ModbusClientWrapper
+from state_manager import MachineStateManager
+import modbus_map as mm
+
+
+class IHMServer:
+    """
+    Servidor principal da IHM Web
+    """
+    
+    def __init__(self, stub_mode: bool = False, port: str = '/dev/ttyUSB0'):
+        """
+        Inicializa servidor
+        
+        Args:
+            stub_mode: True para modo simulado
+            port: Porta serial para modo live
+        """
+        self.stub_mode = stub_mode
+        self.port = port
+        
+        # Clientes WebSocket conectados
+        self.clients: Set[websockets.WebSocketServerProtocol] = set()
+        
+        # Componentes principais
+        self.modbus_client = None
+        self.state_manager = None
+        
+        # Tasks asyncio
+        self.tasks = []
+        
+    async def start(self):
+        """Inicializa todos os componentes"""
+        print("=" * 60)
+        print("IHM WEB - DOBRADEIRA NEOCOUDE-HD-15")
+        print("=" * 60)
+        
+        # 1. Inicializa Modbus client
+        print(f"\nModo: {'STUB (simulação)' if self.stub_mode else 'LIVE (CLP real)'}")
+        self.modbus_client = ModbusClientWrapper(
+            stub_mode=self.stub_mode,
+            port=self.port
+        )
+        
+        if not self.modbus_client.connected:
+            print("✗ AVISO: Modbus não conectado!")
+            if not self.stub_mode:
+                print("  Verifique:")
+                print(f"  - Cabo RS485 conectado em {self.port}")
+                print("  - CLP ligado e em RUN")
+                print("  - Estado 00BE (190) ativo no ladder")
+                return False
+        
+        # 2. Inicializa State Manager
+        self.state_manager = MachineStateManager(self.modbus_client)
+        
+        # 3. Inicia loop de polling
+        poll_task = asyncio.create_task(self.state_manager.start_polling())
+        self.tasks.append(poll_task)
+        
+        # 4. Inicia loop de broadcast
+        broadcast_task = asyncio.create_task(self.broadcast_loop())
+        self.tasks.append(broadcast_task)
+        
+        print("\n✓ Servidor iniciado com sucesso")
+        print(f"  WebSocket: ws://localhost:8765")
+        print(f"  HTTP: http://localhost:8080")
+        print("\nAbra http://localhost:8080 no navegador do tablet")
+        print("Pressione Ctrl+C para encerrar\n")
+        
+        return True
+        
+    async def handle_websocket(self, websocket):
+        """
+        Gerencia conexão WebSocket de um cliente
+
+        Args:
+            websocket: Conexão WebSocket
+        """
+        # Registra cliente
+        self.clients.add(websocket)
+        client_addr = websocket.remote_address
+        print(f"✓ Cliente conectado: {client_addr}")
+        
+        try:
+            # Envia estado completo inicial
+            initial_state = self.state_manager.get_state()
+            print(f"🔍 [DEBUG] Estado completo antes de enviar: {len(initial_state)} chaves")
+            print(f"🔍 [DEBUG] mode_bit_02ff no estado: {initial_state.get('mode_bit_02ff')}")
+            print(f"🔍 [DEBUG] mode_text no estado: {initial_state.get('mode_text')}")
+            print(f"🔍 [DEBUG] leds no estado: {initial_state.get('leds')}")
+
+            await websocket.send(json.dumps({
+                'type': 'full_state',
+                'data': initial_state
+            }))
+            print("✅ [DEBUG] Estado completo enviado com sucesso!")
+            
+            # Loop de recebimento de comandos
+            async for message in websocket:
+                await self.handle_client_message(websocket, message)
+                
+        except websockets.exceptions.ConnectionClosed:
+            print(f"✗ Cliente desconectado: {client_addr}")
+        finally:
+            # Remove cliente
+            self.clients.discard(websocket)
+            
+    async def handle_client_message(self, websocket, message: str):
+        """
+        Processa mensagem recebida do cliente
+
+        Args:
+            websocket: Conexão WebSocket
+            message: Mensagem JSON
+        """
+        try:
+            data = json.loads(message)
+            action = data.get('action')
+            print(f"📨 Comando recebido: {action} - {data}")  # LOG ADICIONAL
+
+            if action == 'press_key':
+                # Pressionar botão
+                key_name = data.get('key')  # Ex: 'K1', 'S1', 'ENTER'
+                
+                # Mapeia nome para endereço
+                addr = None
+                if key_name in mm.KEYBOARD_NUMERIC:
+                    addr = mm.KEYBOARD_NUMERIC[key_name]
+                elif key_name in mm.KEYBOARD_FUNCTION:
+                    addr = mm.KEYBOARD_FUNCTION[key_name]
+                    
+                if addr:
+                    success = self.modbus_client.press_key(addr)
+                    await websocket.send(json.dumps({
+                        'type': 'key_response',
+                        'key': key_name,
+                        'success': success
+                    }))
+                    
+            elif action == 'change_speed':
+                # Alterar velocidade (K1+K7)
+                success = self.modbus_client.change_speed_class()
+                await websocket.send(json.dumps({
+                    'type': 'speed_response',
+                    'success': success
+                }))
+                
+            elif action == 'toggle_mode':
+                # Toggle direto do modo (bypass S1+E6)
+                await self.handle_toggle_mode(websocket, data)
+
+            elif action == 'write_angle':
+                # Escrever ângulo de dobra
+                bend_num = data.get('bend')  # 1, 2 ou 3
+                angle_value = int(data.get('angle') * 10)  # Converte graus para unidades CLP
+
+                # Usa novo formato de dicionário do modbus_map
+                addr_map = {
+                    1: (mm.BEND_ANGLES['BEND_1_LEFT_MSW'], mm.BEND_ANGLES['BEND_1_LEFT_LSW']),
+                    2: (mm.BEND_ANGLES['BEND_2_LEFT_MSW'], mm.BEND_ANGLES['BEND_2_LEFT_LSW']),
+                    3: (mm.BEND_ANGLES['BEND_3_LEFT_MSW'], mm.BEND_ANGLES['BEND_3_LEFT_LSW'])
+                }
+
+                if bend_num in addr_map:
+                    msw_addr, lsw_addr = addr_map[bend_num]
+                    success = self.modbus_client.write_32bit(msw_addr, lsw_addr, angle_value)
+                    await websocket.send(json.dumps({
+                        'type': 'angle_response',
+                        'bend': bend_num,
+                        'success': success
+                    }))
+                    
+        except json.JSONDecodeError:
+            print(f"✗ JSON inválido recebido: {message}")
+        except Exception as e:
+            print(f"✗ Erro processando mensagem: {e}")
+            
+    async def broadcast_loop(self):
+        """
+        Loop que envia atualizações para todos os clientes conectados
+        """
+        previous_state = {}
+
+        while True:
+            await asyncio.sleep(0.5)  # Broadcast a cada 500ms
+
+            if not self.clients:
+                # Atualiza previous_state mesmo sem clientes
+                previous_state = self.state_manager.get_state()
+                continue
+
+            # Pega apenas mudanças (deltas)
+            changes = self.state_manager.get_changes(previous_state)
+
+            if changes:
+                message = json.dumps({
+                    'type': 'state_update',
+                    'data': changes
+                })
+
+                # Envia para todos os clientes
+                disconnected = set()
+                for client in self.clients:
+                    try:
+                        await client.send(message)
+                    except:
+                        disconnected.add(client)
+
+                # Remove clientes desconectados
+                self.clients -= disconnected
+
+            # Atualiza estado anterior
+            previous_state = self.state_manager.get_state()
+                
+    async def handle_toggle_mode(self, websocket, data):
+        """
+        Handler para toggle de modo (direto em 02FF - bypass S1+E6)
+        """
+        print("🔄 Toggle de modo (direto em 02FF)...")
+
+        # Ler modo atual
+        mode_antes_bit = self.modbus_client.read_real_mode()
+        mode_antes = "AUTO" if mode_antes_bit else "MANUAL" if mode_antes_bit is not None else "UNKNOWN"
+
+        # Toggle usando método direto (NÃO simula S1 que está bloqueado)
+        new_mode_bit = not mode_antes_bit if mode_antes_bit is not None else None
+        if new_mode_bit is not None:
+            success = self.modbus_client.change_mode_direct(to_auto=new_mode_bit)
+            if not success:
+                new_mode_bit = None
+
+        if new_mode_bit is not None:
+            mode_depois = "AUTO" if new_mode_bit else "MANUAL"
+
+            # Aguardar sincronização
+            await asyncio.sleep(0.3)
+
+            # Broadcast para TODOS os clientes (formato compatível com state_update)
+            update = {
+                'type': 'state_update',
+                'data': {
+                    'mode_bit_02ff': new_mode_bit,
+                    'mode_text': mode_depois,
+                    'mode_manual': not new_mode_bit
+                }
+            }
+
+            for client in self.clients:
+                try:
+                    await client.send(json.dumps(update))
+                except:
+                    pass
+
+            print(f"✅ Modo alterado: {mode_antes} → {mode_depois}")
+        else:
+            await websocket.send(json.dumps({
+                'type': 'error',
+                'message': 'Falha ao alternar modo - verifique conexão Modbus'
+            }))
+            print("❌ Falha ao alternar modo")
+
+    async def http_handler(self, request):
+        """
+        Serve arquivo index.html
+        
+        Args:
+            request: Request HTTP
+            
+        Returns:
+            Response com HTML
+        """
+        html_path = Path(__file__).parent / 'static' / 'index.html'
+        
+        if html_path.exists():
+            return web.FileResponse(html_path)
+        else:
+            return web.Response(text="index.html não encontrado", status=404)
+            
+    async def run(self):
+        """Executa servidor (WebSocket + HTTP)"""
+        # Inicializa componentes
+        if not await self.start():
+            return
+            
+        # Servidor HTTP (para servir index.html)
+        app = web.Application()
+        app.router.add_get('/', self.http_handler)
+        app.router.add_static('/static', Path(__file__).parent / 'static')
+        runner = web.AppRunner(app)
+        await runner.setup()
+        site = web.TCPSite(runner, 'localhost', 8080)
+        await site.start()
+        
+        # Servidor WebSocket
+        async with websockets.serve(self.handle_websocket, 'localhost', 8765):
+            # Mantém rodando até Ctrl+C
+            await asyncio.Future()  # Run forever
+            
+    def stop(self):
+        """Encerra servidor"""
+        print("\nEncerrando servidor...")
+        
+        if self.state_manager:
+            self.state_manager.stop_polling()
+            
+        if self.modbus_client:
+            self.modbus_client.close()
+            
+        for task in self.tasks:
+            task.cancel()
+            
+        print("✓ Servidor encerrado")
+
+
+async def main():
+    """Função principal"""
+    parser = argparse.ArgumentParser(description='IHM Web - Dobradeira NEOCOUDE-HD-15')
+    parser.add_argument('--stub', action='store_true', help='Modo stub (simulação sem CLP)')
+    parser.add_argument('--port', default='/dev/ttyUSB0', help='Porta serial (padrão: /dev/ttyUSB0)')
+    
+    args = parser.parse_args()
+    
+    server = IHMServer(stub_mode=args.stub, port=args.port)
+    
+    try:
+        await server.run()
+    except KeyboardInterrupt:
+        print("\n\n✓ Interrompido pelo usuário")
+    finally:
+        server.stop()
+
+
+if __name__ == "__main__":
+    asyncio.run(main())

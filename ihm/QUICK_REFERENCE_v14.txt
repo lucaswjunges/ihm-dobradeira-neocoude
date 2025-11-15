@@ -1,0 +1,73 @@
+════════════════════════════════════════════════════════════════
+QUICK REFERENCE - CLP_10_ROTINAS_v14_DEFINITIVO.sup
+════════════════════════════════════════════════════════════════
+
+📦 ARQUIVO PARA USAR:
+
+   CLP_10_ROTINAS_v14_DEFINITIVO.sup
+   ├─ Tamanho: 360 KB
+   ├─ MD5: 4c78bc1cb3b018e1c81135fd232261ee
+   └─ Status: ✅ DEFINITIVO
+
+════════════════════════════════════════════════════════════════
+
+✅ 10 ROTINAS COMPLETAS:
+
+   ROT0: Lógica principal (7.8 KB)
+   ROT1: Auxiliar (3.2 KB)
+   ROT2: Controle de dobras (8.5 KB)
+   ROT3: Sequência (5.5 KB)
+   ROT4: Ângulos (8.4 KB)
+   ROT5: Comunicação básica (2.4 KB)
+   ROT6: ⭐ Integração Modbus completa (17.3 KB, 18 linhas)
+   ROT7: 🔥 Comunicação inversor WEG (6.8 KB, 12 linhas)
+   ROT8: 📊 Estatísticas Grafana/SCADA (10.1 KB, 15 linhas)
+   ROT9: ⚡ Emulação teclas IHM (21.7 KB, 20 linhas)
+
+════════════════════════════════════════════════════════════════
+
+🔧 O QUE FOI CORRIGIDO:
+
+   v12 → v13: Metadados (Conf.dbf) para 10 rotinas
+   v13 → v14: Adicionados 5 CALL statements (ROT5-ROT9)
+
+════════════════════════════════════════════════════════════════
+
+📋 REGISTROS MODBUS (~70 registros):
+
+   ROT6: 0FEC, 0860, 0870/71, 0875-087D, 086B, 0882,
+         0884-0886, 0887-0888, 088B, 08B6, 08BD, 08BF
+
+   ROT7: 06E0, 0890-0894, 0896, 0897/98, 08C0
+
+   ROT8: 08A0-08BB, 08BE
+
+   ROT9: 08C1-08DA, 08DC-08E5
+
+════════════════════════════════════════════════════════════════
+
+🚀 USAR NO WINSUP 2:
+
+   1. Copiar para Windows:
+      cp CLP_10_ROTINAS_v14_DEFINITIVO.sup /mnt/c/...
+
+   2. Abrir no WinSUP (como Administrador)
+
+   3. Verificar 10 rotinas visíveis
+
+   4. Confirmar Principal.lad tem 10 CALL statements
+
+════════════════════════════════════════════════════════════════
+
+📚 DOCUMENTAÇÃO:
+
+   README_v14_DEFINITIVO.md    → Documentação completa
+   COMPARACAO_v12_v13_v14.md   → Comparação de versões
+   STATUS_ATUAL_v14.txt        → Status do projeto
+   QUICK_REFERENCE_v14.txt     → Este arquivo
+
+════════════════════════════════════════════════════════════════
+
+✅ ARQUIVO PRONTO PARA PRODUÇÃO!
+
+════════════════════════════════════════════════════════════════

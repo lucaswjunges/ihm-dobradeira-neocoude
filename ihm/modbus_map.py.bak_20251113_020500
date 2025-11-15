@@ -1,0 +1,555 @@
+"""
+MODBUS MAP - IHM Web para Dobradeira NEOCOUDE-HD-15
+====================================================
+
+Mapeamento completo EXPANDIDO para comunicação com:
+- IHM Física (95 registros originais)
+- Supervisão Modbus (ROT6)
+- Inversor WEG CFW-08 (ROT7)
+- Sistema SCADA/Grafana (ROT8)
+- Emulação completa de teclado (ROT9)
+
+Total: 165+ registros
+
+Protocolo: Modbus RTU
+Baudrate: 57600 bps
+Parity: None
+Stop bits: 2
+Slave ID: 1
+
+Data: 12 de novembro de 2025
+"""
+
+# ============================================================================
+# BOTÕES/TECLADO (Coils - Function 0x05)
+# ============================================================================
+
+# Teclado Numérico (K0-K9)
+BTN_K1 = 0x00A0  # 160 - Número 1 / Vai p/ Tela 4 (Dobra 1)
+BTN_K2 = 0x00A1  # 161 - Número 2 / Vai p/ Tela 5 (Dobra 2)
+BTN_K3 = 0x00A2  # 162 - Número 3 / Vai p/ Tela 6 (Dobra 3)
+BTN_K4 = 0x00A3  # 163 - Número 4 / Sentido Esquerda (modo AUTO)
+BTN_K5 = 0x00A4  # 164 - Número 5 / Sentido Direita (modo AUTO)
+BTN_K6 = 0x00A5  # 165 - Número 6
+BTN_K7 = 0x00A6  # 166 - Número 7 / Velocidade (K1+K7 simultâneo)
+BTN_K8 = 0x00A7  # 167 - Número 8
+BTN_K9 = 0x00A8  # 168 - Número 9
+BTN_K0 = 0x00A9  # 169 - Número 0
+
+# Teclas de Função
+BTN_S1 = 0x00DC  # 220 - Alterna AUTO/MANUAL
+BTN_S2 = 0x00DD  # 221 - Reset/Contexto
+
+# Navegação
+BTN_ARROW_UP = 0x00AC    # 172 - Seta CIMA
+BTN_ARROW_DOWN = 0x00AD  # 173 - Seta BAIXO
+BTN_ESC = 0x00BC         # 188 - Escape/Cancelar
+
+# Sistema
+BTN_ENTER = 0x0025  # 37 - Confirmar
+BTN_EDIT = 0x0026   # 38 - Modo Edição
+BTN_LOCK = 0x00F1   # 241 - Trava Teclado
+
+# ============================================================================
+# ENCODER / POSIÇÃO ANGULAR (Registers 32-bit - Function 0x03)
+# ============================================================================
+
+# Posição Angular Atual (MSW + LSW)
+ENCODER_ANGLE_MSW = 0x04D6  # 1238 - Encoder posição (bits 31-16)
+ENCODER_ANGLE_LSW = 0x04D7  # 1239 - Encoder posição (bits 15-0)
+
+# ============================================================================
+# ÂNGULOS SETPOINT - 3 DOBRAS (Registers 32-bit - Function 0x03/0x06)
+# ============================================================================
+
+# DOBRA 1 (Tela 4 - Acessada por K1)
+BEND_1_LEFT_LSW = 0x0840  # 2112 - Ângulo 1 Esquerda (bits 15-0)
+BEND_1_LEFT_MSW = 0x0842  # 2114 - Ângulo 1 Esquerda (bits 31-16)
+
+# DOBRA 2 (Tela 5 - Acessada por K2)
+BEND_2_LEFT_LSW = 0x0848  # 2120 - Ângulo 2 Esquerda (bits 15-0)
+BEND_2_LEFT_MSW = 0x084A  # 2122 - Ângulo 2 Esquerda (bits 31-16)
+
+# DOBRA 3 (Tela 6 - Acessada por K3)
+BEND_3_LEFT_LSW = 0x0850  # 2128 - Ângulo 3 Esquerda (bits 15-0)
+BEND_3_LEFT_MSW = 0x0852  # 2130 - Ângulo 3 Esquerda (bits 31-16)
+
+# ============================================================================
+# ENTRADAS DIGITAIS E0-E7 (Registers 16-bit - Function 0x03)
+# ============================================================================
+
+INPUT_E0 = 0x0100  # 256 - Sensor referência/zero
+INPUT_E1 = 0x0101  # 257 - Carenagem/proteção
+INPUT_E2 = 0x0102  # 258 - Botão AVANÇAR (painel físico)
+INPUT_E3 = 0x0103  # 259 - Botão PARADA (painel físico)
+INPUT_E4 = 0x0104  # 260 - Botão RECUAR (painel físico)
+INPUT_E5 = 0x0105  # 261 - Sensor carenagem
+INPUT_E6 = 0x0106  # 262 - Não mapeado
+INPUT_E7 = 0x0107  # 263 - Não mapeado
+
+# ============================================================================
+# SAÍDAS DIGITAIS S0-S7 (Registers 16-bit - Function 0x03/0x05/0x06)
+# ============================================================================
+
+OUTPUT_S0 = 0x0180  # 384 - Motor AVANÇAR (CCW)
+OUTPUT_S1 = 0x0181  # 385 - Motor RECUAR (CW)
+OUTPUT_S2 = 0x0182  # 386 - Não mapeado
+OUTPUT_S3 = 0x0183  # 387 - Não mapeado
+OUTPUT_S4 = 0x0184  # 388 - Não mapeado
+OUTPUT_S5 = 0x0185  # 389 - Não mapeado
+OUTPUT_S6 = 0x0186  # 390 - Não mapeado
+OUTPUT_S7 = 0x0187  # 391 - Não mapeado
+
+# ============================================================================
+# LEDs FRONTAIS (Coils - Function 0x01/0x05)
+# ============================================================================
+
+LED_1 = 0x00C0   # 192 - LED 1 (indica dobra 1 ativa?)
+LED_2 = 0x00C1   # 193 - LED 2 (indica dobra 2 ativa?)
+LED_3 = 0x00C2   # 194 - LED 3 (indica dobra 3 ativa?)
+LED_4 = 0x00C3   # 195 - LED 4 (sentido esquerda?)
+LED_5 = 0x00C4   # 196 - LED 5 (sentido direita?)
+
+# ============================================================================
+# CONFIGURAÇÃO DO CLP (Registers - Function 0x03)
+# ============================================================================
+
+STATE_MODBUS_SLAVE_ENABLE = 0x00BE  # 190 - Habilita modo Modbus slave (CRÍTICO!)
+
+# ============================================================================
+# HELPERS - Funções auxiliares para 32-bit
+# ============================================================================
+
+def read_32bit(msw: int, lsw: int) -> int:
+    """Combina MSW e LSW em valor 32-bit"""
+    return (msw << 16) | lsw
+
+def split_32bit(value: int) -> tuple:
+    """Separa valor 32-bit em MSW e LSW"""
+    msw = (value >> 16) & 0xFFFF
+    lsw = value & 0xFFFF
+    return (msw, lsw)
+
+# ============================================================================
+# MAPEAMENTO ESTRUTURADO PARA IHM WEB
+# ============================================================================
+
+KEYBOARD_NUMERIC = {
+    'K0': BTN_K0, 'K1': BTN_K1, 'K2': BTN_K2, 'K3': BTN_K3, 'K4': BTN_K4,
+    'K5': BTN_K5, 'K6': BTN_K6, 'K7': BTN_K7, 'K8': BTN_K8, 'K9': BTN_K9
+}
+
+KEYBOARD_FUNCTION = {
+    'S1': BTN_S1,
+    'S2': BTN_S2,
+    'UP': BTN_ARROW_UP,
+    'DOWN': BTN_ARROW_DOWN,
+    'ESC': BTN_ESC,
+    'ENTER': BTN_ENTER,
+    'EDIT': BTN_EDIT,
+    'LOCK': BTN_LOCK
+}
+
+BEND_ANGLES = {
+    1: {'left_msw': BEND_1_LEFT_MSW, 'left_lsw': BEND_1_LEFT_LSW},
+    2: {'left_msw': BEND_2_LEFT_MSW, 'left_lsw': BEND_2_LEFT_LSW},
+    3: {'left_msw': BEND_3_LEFT_MSW, 'left_lsw': BEND_3_LEFT_LSW}
+}
+
+DIGITAL_INPUTS = {
+    'E0': INPUT_E0, 'E1': INPUT_E1, 'E2': INPUT_E2, 'E3': INPUT_E3,
+    'E4': INPUT_E4, 'E5': INPUT_E5, 'E6': INPUT_E6, 'E7': INPUT_E7
+}
+
+DIGITAL_OUTPUTS = {
+    'S0': OUTPUT_S0, 'S1': OUTPUT_S1, 'S2': OUTPUT_S2, 'S3': OUTPUT_S3,
+    'S4': OUTPUT_S4, 'S5': OUTPUT_S5, 'S6': OUTPUT_S6, 'S7': OUTPUT_S7
+}
+
+LEDS = {
+    'LED1': LED_1, 'LED2': LED_2, 'LED3': LED_3, 'LED4': LED_4, 'LED5': LED_5
+}
+
+# ============================================================================
+# ROT6 - SUPERVISÃO MODBUS (Registros criados para IHM Web)
+# ============================================================================
+
+# Sincronização da tela IHM física
+SCREEN_NUM_IHM = 0x0FEC   # 4076 - Número da tela IHM física (comando)
+SCREEN_NUM_WEB = 0x0860   # 2144 - Número da tela copiado para Modbus
+BEND_NUM_CURRENT = 0x086F  # 2159 - Dobra atual (1, 2 ou 3)
+
+# Encoder copiado para área Modbus (facilita leitura 32-bit contínua)
+ENCODER_WEB_MSW = 0x0870  # 2160 - Encoder MSW (cópia de 04D6)
+ENCODER_WEB_LSW = 0x0871  # 2161 - Encoder LSW (cópia de 04D7)
+
+# Ângulos copiados para área Modbus
+BEND_1_MODBUS_MSW = 0x0875  # 2165 - Dobra 1 MSW (cópia de 0840)
+BEND_1_MODBUS_LSW = 0x0876  # 2166 - Dobra 1 LSW (cópia de 0842)
+BEND_2_MODBUS_MSW = 0x0877  # 2167 - Dobra 2 MSW (cópia de 0846)
+BEND_2_MODBUS_LSW = 0x0879  # 2169 - Dobra 2 LSW (cópia de 0848)
+BEND_3_MODBUS_MSW = 0x087A  # 2170 - Dobra 3 MSW (cópia de 084A)
+BEND_3_MODBUS_LSW = 0x087D  # 2173 - Dobra 3 LSW (cópia de 0850)
+
+# Contadores de peças
+PIECE_COUNTER_MSW = 0x086A   # 2154 - Contador MSW (32-bit)
+PIECE_COUNTER_LSW = 0x086B   # 2155 - Contador LSW
+PIECE_COUNTER_TOTAL = 0x086C # 2156 - Contador total de ciclos
+
+# Estados do sistema (registros de 1 bit expandidos para 16-bit)
+MODE_OPERATION = 0x0882      # 2178 - 0=Manual, 1=Auto
+DIRECTION_ROTATION = 0x0884  # 2180 - 0=Horário, 1=Anti-horário
+CYCLE_ACTIVE = 0x0885        # 2181 - 1=Ciclo em andamento
+EMERGENCY_ACTIVE = 0x0886    # 2182 - 1=Emergência ativa
+
+# Entradas/Saídas empacotadas (8 bits em 1 registro de 16-bit)
+INPUTS_PACKED = 0x0887   # 2183 - E0-E7 empacotados (bit 0 = E0, bit 7 = E7)
+OUTPUTS_PACKED = 0x0888  # 2184 - S0-S7 empacotados
+LEDS_PACKED = 0x088B     # 2187 - LED1-LED5 empacotados
+
+# Heartbeat - incrementa a cada scan do CLP
+HEARTBEAT = 0x08B6  # 2230 - Contador de heartbeat
+
+# Comandos de controle (escrita via Modbus)
+CMD_RESET_COUNTER = 0x08BD  # 2237 - Escrever 1 para resetar contador de peças
+CMD_ZERO_ENCODER = 0x08BF   # 2239 - Escrever 1 para zerar encoder
+
+# ============================================================================
+# ROT5 - CONTROLE DE LEDs E FLAGS (CORRIGIDO 2025-11-12)
+# ============================================================================
+# NOTA: Registros movidos de 0x03E0-0x03FF para 0x0700-0x071F
+# Razão: 0x03E0 está em área de estados internos (bits), não registros
+
+LED_FLAG_1 = 0x0700  # 1792 - Flag LED 1 (dobra 1)
+LED_FLAG_2 = 0x0701  # 1793 - Flag LED 2 (dobra 2)
+LED_FLAG_3 = 0x0702  # 1794 - Flag LED 3 (dobra 3)
+LED_FLAG_4 = 0x0703  # 1795 - Flag LED 4 (sentido esquerda)
+LED_FLAG_5 = 0x0704  # 1796 - Flag LED 5 (sentido direita)
+LED_CONTROL = 0x0705 # 1797 - Controle geral de LEDs
+
+# ============================================================================
+# ROT7 - COMUNICAÇÃO INVERSOR WEG CFW-08 (CORRIGIDO 2025-11-12)
+# ============================================================================
+# NOTA: Registros movidos de 0x0890-0x0898 para 0x0720-0x0728
+# Razão: 0x0890 pode estar em área reservada do firmware
+
+# Status do inversor (via leituras analógicas do CLP)
+INVERTER_CLASS_SPEED = 0x0720  # 1824 - Classe velocidade (0=Parado, 1=5rpm, 2=10rpm, 3=15rpm)
+INVERTER_ANALOG_OUT = 0x0721   # 1825 - Saída analógica 0-10V (valor CLP 0-2000)
+INVERTER_RPM_CURRENT = 0x0722  # 1826 - RPM calculado (5, 10 ou 15)
+
+# Monitoramento de carga (sensores analógicos)
+INVERTER_CURRENT_RAW = 0x0723  # 1827 - Corrente motor (valor bruto ADC)
+INVERTER_VOLTAGE_RAW = 0x0724  # 1828 - Tensão motor (valor bruto ADC)
+INVERTER_POWER_EST = 0x0725    # 1829 - Potência estimada (V*A/100)
+
+# Status consolidado do inversor
+INVERTER_STATUS = 0x0726  # 1830 - bit0=Run, bit1=Alarme, bit2=Sobrecarga
+
+# Tempo de operação (32-bit)
+INVERTER_RUNTIME_MSW = 0x0727  # 1831 - Tempo operação MSW (minutos)
+INVERTER_RUNTIME_LSW = 0x0728  # 1832 - Tempo operação LSW
+
+# Comando de controle
+CMD_RESET_RUNTIME = 0x0729  # 1833 - Escrever 1 para resetar tempo de operação
+
+# ============================================================================
+# ROT8 - CONVERSÃO DE ESCALA (SCL2G) (CORRIGIDO 2025-11-12)
+# ============================================================================
+# NOTA: Registros movidos de 0x08A0-0x08D0 para 0x0730-0x0740
+# Razão: 0x08A0 pode estar em área reservada do firmware
+
+# Conversão de escala (SCL2G) - Encoder para graus
+SCALE_BASE_REG = 0x0730      # 1840 - Registro base para SCL2G
+SCALE_PARAM_REG = 0x0732     # 1842 - Parâmetros de escala
+SCALE_RESULT_1 = 0x073C      # 1852 - Resultado escalado 1
+SCALE_RESULT_2 = 0x073D      # 1853 - Resultado escalado 2
+SCALE_RESULT_3 = 0x073E      # 1854 - Resultado escalado 3
+SCALE_AUX_REG = 0x0740       # 1856 - Registro auxiliar
+
+# ============================================================================
+# ROT8B - PREPARAÇÃO PARA GRAFANA/SCADA (Mantido em área diferente)
+# ============================================================================
+
+# Timestamp (contador de minutos desde power-on)
+TIMESTAMP_MSW = 0x0750  # 1872 - Timestamp MSW (32-bit)
+TIMESTAMP_LSW = 0x0751  # 1873 - Timestamp LSW
+
+# Histórico de alarmes (últimos 10)
+ALARM_LOG_1 = 0x0752   # 1874 - Alarme mais recente (código)
+ALARM_LOG_1_TIME = 0x0753  # 1875 - Timestamp do alarme 1
+ALARM_LOG_COUNT = 0x0754   # 1876 - Total de alarmes registrados
+
+# Estatísticas de produção
+PROD_TOTAL_MSW = 0x0755   # 1877 - Total peças produzidas MSW (32-bit)
+PROD_TOTAL_LSW = 0x0756   # 1878 - Total peças produzidas LSW
+PROD_CYCLE_TIME_AVG = 0x0757  # 1879 - Tempo médio de ciclo (segundos)
+PROD_CYCLE_START_TIME = 0x0758  # 1880 - Timestamp início do ciclo
+PROD_CYCLE_END_TIME = 0x0759    # 1881 - Timestamp fim do ciclo (calculado)
+
+# Status consolidado (multi-bit)
+STATUS_GENERAL = 0x075A  # 1882 - bit0=Ciclo, bit1=Emergência, bit2=Manual, bit3=Anti-horário
+PROD_EFFICIENCY = 0x075B  # 1883 - Peças por hora (calculado)
+PROD_EFFICIENCY_REMAINDER = 0x075C  # 1884 - Resto da divisão
+
+# Contadores de eventos
+EVENT_CYCLES_COMPLETE = 0x075D  # 1885 - Ciclos completos
+EVENT_EMERGENCY_COUNT = 0x075E  # 1886 - Paradas de emergência
+EVENT_MODE_CHANGE = 0x075F      # 1887 - Trocas Manual<->Auto
+EVENT_SPEED_CHANGE = 0x0760     # 1888 - Mudanças de velocidade (K1+K7)
+
+# Informações de contexto
+CURRENT_SPEED_CLASS = 0x0761  # 1889 - Classe de velocidade (1, 2 ou 3)
+CURRENT_BEND_NUM = 0x0762     # 1890 - Dobra atual (1, 2 ou 3)
+
+# Comando de controle
+CMD_RESET_STATISTICS = 0x0763  # 1891 - Escrever 1 para resetar estatísticas
+
+# ============================================================================
+# ROT10 - DATA MIRROR PARA MODBUS RTU (ADICIONADO 2025-11-12)
+# ============================================================================
+# NOTA: Área espelho 0x0900-0x09FF (256 registros) que copia automaticamente
+# dados internos a cada scan do CLP (~6ms) para acesso otimizado via Modbus
+
+# --- Seção 1: Encoder e Posição (0x0900-0x090F) ---
+MIRROR_ENCODER_MSW = 0x0900      # 2304 - Encoder MSW (cópia de 04D6)
+MIRROR_ENCODER_LSW = 0x0901      # 2305 - Encoder LSW (cópia de 04D7)
+MIRROR_ENCODER_DEGREES = 0x0902  # 2306 - Encoder em graus (calculado)
+MIRROR_TARGET_MSW = 0x0903       # 2307 - Posição alvo MSW
+MIRROR_TARGET_LSW = 0x0904       # 2308 - Posição alvo LSW
+MIRROR_TARGET_DEGREES = 0x0905   # 2309 - Alvo em graus (calculado)
+
+# --- Seção 2: Ângulos Setpoint (0x0910-0x091F) ---
+MIRROR_BEND1_LEFT_MSW = 0x0910   # 2320 - Dobra 1 Esq MSW (cópia de 0842)
+MIRROR_BEND1_LEFT_LSW = 0x0911   # 2321 - Dobra 1 Esq LSW (cópia de 0840)
+MIRROR_BEND1_LEFT_DEG = 0x0912   # 2322 - Dobra 1 Esq (graus calculado)
+MIRROR_BEND2_LEFT_MSW = 0x0913   # 2323 - Dobra 2 Esq MSW (cópia de 084A)
+MIRROR_BEND2_LEFT_LSW = 0x0914   # 2324 - Dobra 2 Esq LSW (cópia de 0848)
+MIRROR_BEND2_LEFT_DEG = 0x0915   # 2325 - Dobra 2 Esq (graus calculado)
+MIRROR_BEND3_LEFT_MSW = 0x0916   # 2326 - Dobra 3 Esq MSW (cópia de 0852)
+MIRROR_BEND3_LEFT_LSW = 0x0917   # 2327 - Dobra 3 Esq LSW (cópia de 0850)
+MIRROR_BEND3_LEFT_DEG = 0x0918   # 2328 - Dobra 3 Esq (graus calculado)
+
+# --- Seção 3: Estados e Modos (0x0920-0x092F) ---
+MIRROR_MODE_OPERATION = 0x0920   # 2336 - 0=Manual, 1=Auto (cópia de 0190/0191)
+MIRROR_DIRECTION = 0x0921        # 2337 - 0=Horário, 1=Anti-horário
+MIRROR_CYCLE_ACTIVE = 0x0922     # 2338 - 1=Ciclo ativo (cópia de 00F7)
+MIRROR_EMERGENCY = 0x0923        # 2339 - 1=Emergência (cópia de 02FF)
+MIRROR_BEND_CURRENT = 0x0924     # 2340 - Dobra atual (1/2/3)
+MIRROR_SPEED_CLASS = 0x0925      # 2341 - Classe velocidade (1/2/3)
+MIRROR_CYCLE_STATE = 0x0926      # 2342 - Estado ciclo (0300-0308)
+
+# --- Seção 4: Entradas Digitais (0x0930-0x0938) ---
+MIRROR_INPUT_E0 = 0x0930         # 2352 - E0 (cópia de 0100)
+MIRROR_INPUT_E1 = 0x0931         # 2353 - E1 (cópia de 0101)
+MIRROR_INPUT_E2 = 0x0932         # 2354 - E2 (cópia de 0102)
+MIRROR_INPUT_E3 = 0x0933         # 2355 - E3 (cópia de 0103)
+MIRROR_INPUT_E4 = 0x0934         # 2356 - E4 (cópia de 0104)
+MIRROR_INPUT_E5 = 0x0935         # 2357 - E5 (cópia de 0105)
+MIRROR_INPUT_E6 = 0x0936         # 2358 - E6 (cópia de 0106)
+MIRROR_INPUT_E7 = 0x0937         # 2359 - E7 (cópia de 0107)
+MIRROR_INPUTS_PACKED = 0x0938    # 2360 - E0-E7 empacotados (bit 0-7)
+
+# --- Seção 5: Saídas Digitais (0x0940-0x0948) ---
+MIRROR_OUTPUT_S0 = 0x0940        # 2368 - S0 (cópia de 0180)
+MIRROR_OUTPUT_S1 = 0x0941        # 2369 - S1 (cópia de 0181)
+MIRROR_OUTPUT_S2 = 0x0942        # 2370 - S2 (cópia de 0182)
+MIRROR_OUTPUT_S3 = 0x0943        # 2371 - S3 (cópia de 0183)
+MIRROR_OUTPUT_S4 = 0x0944        # 2372 - S4 (cópia de 0184)
+MIRROR_OUTPUT_S5 = 0x0945        # 2373 - S5 (cópia de 0185)
+MIRROR_OUTPUT_S6 = 0x0946        # 2374 - S6 (cópia de 0186)
+MIRROR_OUTPUT_S7 = 0x0947        # 2375 - S7 (cópia de 0187)
+MIRROR_OUTPUTS_PACKED = 0x0948   # 2376 - S0-S7 empacotados (bit 0-7)
+
+# --- Seção 6: LEDs (0x0950-0x0955) ---
+MIRROR_LED1 = 0x0950             # 2384 - LED 1 (cópia de 00C0)
+MIRROR_LED2 = 0x0951             # 2385 - LED 2 (cópia de 00C1)
+MIRROR_LED3 = 0x0952             # 2386 - LED 3 (cópia de 00C2)
+MIRROR_LED4 = 0x0953             # 2387 - LED 4 (cópia de 00C3)
+MIRROR_LED5 = 0x0954             # 2388 - LED 5 (cópia de 00C4)
+MIRROR_LEDS_PACKED = 0x0955      # 2389 - LED1-5 empacotados (bit 0-4)
+
+# --- Seção 7: Diagnóstico e Sistema (0x0960-0x096F) ---
+MIRROR_HEARTBEAT = 0x0960        # 2400 - Incrementa a cada scan (~6ms)
+MIRROR_SCAN_TIME = 0x0961        # 2401 - Tempo de scan (ms)
+MIRROR_ERROR_CODE = 0x0962       # 2402 - Código erro ativo
+MIRROR_WARNING_CODE = 0x0963     # 2403 - Código warning
+MIRROR_MODBUS_REQUESTS = 0x0964  # 2404 - Contador requisições Modbus
+MIRROR_MODBUS_ERRORS = 0x0965    # 2405 - Contador erros Modbus
+
+# --- Seção 8: Contadores de Produção (0x0970-0x097F) ---
+MIRROR_PIECE_COUNTER_MSW = 0x0970  # 2416 - Peças produzidas MSW (32-bit)
+MIRROR_PIECE_COUNTER_LSW = 0x0971  # 2417 - Peças produzidas LSW
+MIRROR_CYCLE_COUNTER = 0x0972      # 2418 - Ciclos completos
+MIRROR_EMERGENCY_COUNTER = 0x0973  # 2419 - Paradas emergência
+MIRROR_MODE_CHANGES = 0x0974       # 2420 - Trocas Manual/Auto
+MIRROR_SPEED_CHANGES = 0x0975      # 2421 - Mudanças velocidade (K1+K7)
+
+# --- Seção 9: Comandos de Controle (0x0980-0x098F) ---
+CMD_MIRROR_RESET_COUNTERS = 0x0980   # 2432 - Escrever 1 = Reset contadores
+CMD_MIRROR_ZERO_ENCODER = 0x0981     # 2433 - Escrever 1 = Zera encoder
+CMD_MIRROR_RESET_EMERGENCY = 0x0982  # 2434 - Escrever 1 = Reset emergência
+CMD_MIRROR_FORCE_MODE = 0x0983       # 2435 - Escrever 0/1 = Manual/Auto
+
+# ============================================================================
+# ROT9 - EMULAÇÃO COMPLETA DE TECLAS DA IHM FÍSICA
+# ============================================================================
+
+# Estado de teclas K0-K9 (individual)
+KEY_K0_STATE = 0x08C1  # 2241 - Estado K0 (0 ou valor da tecla)
+KEY_K1_STATE = 0x08C2  # 2242 - Estado K1
+KEY_K2_STATE = 0x08C3  # 2243 - Estado K2
+KEY_K3_STATE = 0x08C4  # 2244 - Estado K3
+KEY_K4_STATE = 0x08C5  # 2245 - Estado K4
+KEY_K5_STATE = 0x08C6  # 2246 - Estado K5
+KEY_K6_STATE = 0x08C7  # 2247 - Estado K6
+KEY_K7_STATE = 0x08C8  # 2248 - Estado K7
+KEY_K8_STATE = 0x08C9  # 2249 - Estado K8
+KEY_K9_STATE = 0x08CA  # 2250 - Estado K9
+
+# Estado de teclas especiais
+KEY_S1_STATE = 0x08CB   # 2251 - Estado S1
+KEY_S2_STATE = 0x08CC   # 2252 - Estado S2
+KEY_ENTER_STATE = 0x08CD  # 2253 - Estado ENTER
+KEY_ESC_STATE = 0x08CE    # 2254 - Estado ESC
+KEY_EDIT_STATE = 0x08CF   # 2255 - Estado EDIT
+KEY_LOCK_STATE = 0x08D0   # 2256 - Estado LOCK
+
+# Estado de setas
+KEY_UP_STATE = 0x08D1    # 2257 - Estado Arrow UP
+KEY_DOWN_STATE = 0x08D2  # 2258 - Estado Arrow DOWN
+
+# Detecção de comandos compostos
+KEY_COMBO_K1K7 = 0x08D3  # 2259 - Comando K1+K7 (mudança velocidade)
+KEY_COMBO_S1K7 = 0x08D4  # 2260 - Comando S1+K7/K8/K9 (diagnóstico)
+
+# Histórico de teclas (últimas 5 pressionadas)
+KEY_HISTORY_1 = 0x08D5  # 2261 - Última tecla -5
+KEY_HISTORY_2 = 0x08D6  # 2262 - Última tecla -4
+KEY_HISTORY_3 = 0x08D7  # 2263 - Última tecla -3
+KEY_HISTORY_4 = 0x08D8  # 2264 - Última tecla -2
+KEY_HISTORY_5 = 0x08D9  # 2265 - Última tecla (mais recente)
+
+# Estatísticas de teclado
+KEY_PRESS_COUNTER = 0x08DA  # 2266 - Total de teclas pressionadas
+KEY_DEBOUNCE_TIMER = 0x08DB # 2267 - Timer de debounce
+KEY_LOCK_STATUS = 0x08DC    # 2268 - 0=Desbloqueado, 1=Bloqueado
+
+# COMANDOS VIA MODBUS (IHM Web → CLP) - Escrever 1 para simular tecla
+CMD_PRESS_K1 = 0x08DD    # 2269 - Simular K1
+CMD_PRESS_K2 = 0x08DE    # 2270 - Simular K2
+CMD_PRESS_K3 = 0x08DF    # 2271 - Simular K3
+CMD_PRESS_S1 = 0x08E0    # 2272 - Simular S1
+CMD_PRESS_S2 = 0x08E1    # 2273 - Simular S2
+CMD_PRESS_ENTER = 0x08E2 # 2274 - Simular ENTER
+CMD_PRESS_ESC = 0x08E3   # 2275 - Simular ESC
+CMD_PRESS_EDIT = 0x08E4  # 2276 - Simular EDIT
+CMD_RESET_KEY_COUNTER = 0x08E5  # 2277 - Resetar contador de teclas
+
+# ============================================================================
+# MAPEAMENTO EXPANDIDO PARA IHM WEB
+# ============================================================================
+
+# Comandos de simulação de teclas (para IHM Web)
+CMD_SIMULATE_KEYS = {
+    'K1': CMD_PRESS_K1,
+    'K2': CMD_PRESS_K2,
+    'K3': CMD_PRESS_K3,
+    'S1': CMD_PRESS_S1,
+    'S2': CMD_PRESS_S2,
+    'ENTER': CMD_PRESS_ENTER,
+    'ESC': CMD_PRESS_ESC,
+    'EDIT': CMD_PRESS_EDIT
+}
+
+# Registros do inversor WEG (para dashboard)
+INVERTER_REGS = {
+    'speed_class': INVERTER_CLASS_SPEED,
+    'rpm_current': INVERTER_RPM_CURRENT,
+    'current_raw': INVERTER_CURRENT_RAW,
+    'voltage_raw': INVERTER_VOLTAGE_RAW,
+    'power_est': INVERTER_POWER_EST,
+    'status': INVERTER_STATUS,
+    'runtime_msw': INVERTER_RUNTIME_MSW,
+    'runtime_lsw': INVERTER_RUNTIME_LSW
+}
+
+# Registros ROT8 - Escala (para leitura)
+SCALE_REGS = {
+    'base': SCALE_BASE_REG,
+    'param': SCALE_PARAM_REG,
+    'result_1': SCALE_RESULT_1,
+    'result_2': SCALE_RESULT_2,
+    'result_3': SCALE_RESULT_3,
+    'aux': SCALE_AUX_REG
+}
+
+# Registros SCADA/Grafana (para exportação)
+SCADA_REGS = {
+    'timestamp_msw': TIMESTAMP_MSW,
+    'timestamp_lsw': TIMESTAMP_LSW,
+    'prod_total_msw': PROD_TOTAL_MSW,
+    'prod_total_lsw': PROD_TOTAL_LSW,
+    'cycle_time_avg': PROD_CYCLE_TIME_AVG,
+    'efficiency': PROD_EFFICIENCY,
+    'status_general': STATUS_GENERAL,
+    'event_cycles': EVENT_CYCLES_COMPLETE,
+    'event_emergency': EVENT_EMERGENCY_COUNT,
+    'current_bend': CURRENT_BEND_NUM
+}
+
+# Registros ROT6 (supervisão Modbus)
+SUPERVISION_REGS = {
+    'screen_num': SCREEN_NUM_WEB,
+    'bend_num': BEND_NUM_CURRENT,
+    'encoder_msw': ENCODER_WEB_MSW,
+    'encoder_lsw': ENCODER_WEB_LSW,
+    'mode': MODE_OPERATION,
+    'direction': DIRECTION_ROTATION,
+    'cycle_active': CYCLE_ACTIVE,
+    'emergency': EMERGENCY_ACTIVE,
+    'inputs_packed': INPUTS_PACKED,
+    'outputs_packed': OUTPUTS_PACKED,
+    'leds_packed': LEDS_PACKED,
+    'heartbeat': HEARTBEAT
+}
+
+# Registros ROT10 (Data Mirror - área otimizada)
+MIRROR_REGS = {
+    # Encoder
+    'encoder_msw': MIRROR_ENCODER_MSW,
+    'encoder_lsw': MIRROR_ENCODER_LSW,
+    'encoder_degrees': MIRROR_ENCODER_DEGREES,
+    # Ângulos
+    'bend1_left_msw': MIRROR_BEND1_LEFT_MSW,
+    'bend1_left_lsw': MIRROR_BEND1_LEFT_LSW,
+    'bend1_left_deg': MIRROR_BEND1_LEFT_DEG,
+    'bend2_left_msw': MIRROR_BEND2_LEFT_MSW,
+    'bend2_left_lsw': MIRROR_BEND2_LEFT_LSW,
+    'bend2_left_deg': MIRROR_BEND2_LEFT_DEG,
+    'bend3_left_msw': MIRROR_BEND3_LEFT_MSW,
+    'bend3_left_lsw': MIRROR_BEND3_LEFT_LSW,
+    'bend3_left_deg': MIRROR_BEND3_LEFT_DEG,
+    # Estados
+    'mode': MIRROR_MODE_OPERATION,
+    'direction': MIRROR_DIRECTION,
+    'cycle_active': MIRROR_CYCLE_ACTIVE,
+    'emergency': MIRROR_EMERGENCY,
+    'bend_current': MIRROR_BEND_CURRENT,
+    'speed_class': MIRROR_SPEED_CLASS,
+    # I/O empacotado
+    'inputs_packed': MIRROR_INPUTS_PACKED,
+    'outputs_packed': MIRROR_OUTPUTS_PACKED,
+    'leds_packed': MIRROR_LEDS_PACKED,
+    # Diagnóstico
+    'heartbeat': MIRROR_HEARTBEAT,
+    'scan_time': MIRROR_SCAN_TIME,
+    # Contadores
+    'piece_counter_msw': MIRROR_PIECE_COUNTER_MSW,
+    'piece_counter_lsw': MIRROR_PIECE_COUNTER_LSW,
+    'cycle_counter': MIRROR_CYCLE_COUNTER
+}
+
+# Área base da ROT10 para leitura em bloco
+MIRROR_BASE_ADDRESS = 0x0900  # 2304
+MIRROR_BLOCK_SIZE = 128       # Lê 128 registros de uma vez (2304-2431)

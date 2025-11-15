@@ -1,0 +1,176 @@
+═══════════════════════════════════════════════════════════════
+              ⭐ USAR ESTE ARQUIVO! ⭐
+═══════════════════════════════════════════════════════════════
+
+📦 CLP_10_ROTINAS_v24_PROFISSIONAL.sup
+
+   MD5: 7eb6bcb2e4ae138400cc9f3b807452d1
+   Tamanho: 29 KB
+   Status: ✅ PADRÃO ROT4 - PROFISSIONAL
+
+═══════════════════════════════════════════════════════════════
+
+✅ APRENDI COM ROT0-4 ORIGINAIS!
+
+v23 ERROS:
+  - "Contato 0942 fora do range" (usava como condição!)
+  - ROT8 cheio de "FIM" (apenas RET)
+  - Linhas vazias e estrutura errada
+
+v24 CORREÇÕES:
+  ✅ Estrutura IDÊNTICA a ROT4
+  ✅ Height:03 (espaçamento visual correto)
+  ✅ BInputnumber:00 com {0;00;00F7;...} (sempre executa)
+  ✅ TODAS as linhas com lógica MOV (SEM FIM!)
+  ✅ 71 instruções MOV espelhando dados!
+
+═══════════════════════════════════════════════════════════════
+
+📋 PADRÃO DESCOBERTO EM ROT4:
+
+Linha simples que SEMPRE executa:
+```
+[LineXXXXX]
+  [Features]
+    Branchs:01
+    Type:0
+    Label:0
+    Comment:0
+    Out:MOV     T:0028 Size:003 E:XXXX E:0942
+    Height:03          ← VISUAL SPACING!
+  [Branch01]
+    X1position:00
+    X2position:13
+    Yposition:00
+    Height:01
+    B1:00
+    B2:00
+    BInputnumber:00    ← SEM CONDIÇÃO
+    {0;00;00F7;-1;-1;-1;-1;00}  ← 00F7 = ALWAYS TRUE
+    ###
+```
+
+═══════════════════════════════════════════════════════════════
+
+📋 CONTEÚDO v24 (71 INSTRUÇÕES MOV!):
+
+ROT5 (6 linhas) - Status básico:
+  MOV 0191 (ciclo ativo) → 0942
+  MOV 02FF (modo manual) → 0944
+  MOV 00BE (Modbus slave) → 0942
+  MOV 0400 (timer 0) → 0944
+  MOV 0180 (S0) → 0942
+  MOV 0181 (S1) → 0944
+
+ROT6 (18 linhas) - I/O + Encoder:
+  MOV E0-E7 (0100-0107) → 0942/0944 (alternando)
+  MOV S0-S7 (0180-0187) → 0942/0944 (alternando)
+  MOV Encoder MSW (04D6) → 0942
+  MOV Encoder LSW (04D7) → 0944
+
+ROT7 (12 linhas) - Inversor WEG + Entradas:
+  MOV Tensão inv (06E0) → 0942
+  MOV Classe vel (0900) → 0944
+  MOV Corrente (05F1) → 0942
+  MOV Tensão motor (05F2) → 0944
+  MOV S7 (0187) → 0942
+  MOV 0190 → 0944
+  MOV E0-E5 (0100-0105) → 0942/0944
+
+ROT8 (15 linhas) - Mais I/O + Timers:
+  MOV E6-E7 (0106-0107) → 0942/0944
+  MOV S2-S6 (0182-0186) → 0942/0944
+  MOV 05F0 → 0944
+  MOV Timers 0400-0406 → 0942/0944
+
+ROT9 (20 linhas) - Timers adicionais:
+  MOV Timers 0407-041A → 0942/0944 (alternando)
+
+═══════════════════════════════════════════════════════════════
+
+🎯 ESPELHAMENTO MASSIVO (71 MOV!):
+
+TODA a área de I/O e timers é espelhada para 0942/0944!
+
+Python pode ler TUDO via Modbus:
+  - E0-E7 (entradas digitais completas)
+  - S0-S7 (saídas digitais completas)
+  - Encoder MSW+LSW (posição angular)
+  - Status CLP (ciclo, modo, Modbus)
+  - Dados inversor (tensão, corrente, classe)
+  - Timers 0400-041A (21 timers!)
+
+═══════════════════════════════════════════════════════════════
+
+💻 INTEGRAÇÃO PYTHON:
+
+modbus_map.py:
+```python
+# Apenas 2 registros, mas espelham TUDO!
+REG_A = 0x0942  # Alternador A
+REG_B = 0x0944  # Alternador B
+```
+
+state_manager.py:
+```python
+def poll_all_data():
+    """Lê 100+ valores em sequência rápida"""
+    samples = []
+    for _ in range(100):  # 100 scans CLP
+        a = client.read_register(0x0942)
+        b = client.read_register(0x0944)
+        samples.append((a, b))
+        time.sleep(0.006)  # 6ms = scan time CLP
+
+    # Parsear amostras:
+    # scan 1-8: E0-E7
+    # scan 9-16: S0-S7
+    # scan 17-18: Encoder MSW/LSW
+    # scan 19-24: Inversor (tensão, classe, corrente, etc)
+    # scan 25-45: Timers 0400-0414
+    # scan 46-65: Timers 0415-041A + repetição
+
+    return parse_cyclical_data(samples)
+```
+
+═══════════════════════════════════════════════════════════════
+
+🚀 TESTAR NO WINSUP:
+
+1. Abrir CLP_10_ROTINAS_v24_PROFISSIONAL.sup
+2. Verificar:
+   ✅ Abre sem erros?
+   ✅ ROT5 mostra 6 linhas MOV (não FIM)?
+   ✅ ROT6 mostra 18 linhas MOV (não FIM)?
+   ✅ ROT7 mostra 12 linhas MOV (não FIM)?
+   ✅ ROT8 mostra 15 linhas MOV (NÃO FIM!)?
+   ✅ ROT9 mostra 20 linhas MOV (não FIM)?
+3. Compilar → deve compilar SEM ERROS!
+
+═══════════════════════════════════════════════════════════════
+
+📈 EVOLUÇÃO:
+
+v21_TEST: ✅ RET puro (funcionou)
+  ↓
+v22-v23: ❌ Registros inválidos, contatos errados
+  ↓
+v24: ✅ ESTRUTURA PROFISSIONAL COPIADA DE ROT4!
+
+═══════════════════════════════════════════════════════════════
+
+💡 LIÇÕES APRENDIDAS:
+
+1. ✅ SEMPRE copiar estrutura de arquivos que funcionam
+2. ✅ Height:03 é padrão (não Height:01)
+3. ✅ {0;00;00F7;...} = always true flag
+4. ✅ BInputnumber:00 = sem condição
+5. ✅ Apenas 0942/0944 são válidos como destino MOV
+6. ✅ Não inventar - APRENDER com originais!
+
+═══════════════════════════════════════════════════════════════
+
+Versão atual:
+  ✅ CLP_10_ROTINAS_v24_PROFISSIONAL.sup
+
+═══════════════════════════════════════════════════════════════

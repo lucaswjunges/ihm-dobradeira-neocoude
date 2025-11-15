@@ -1,0 +1,800 @@
+Lines:00030
+[Line00001]
+  [Features]
+    Branchs:01
+    Type:0
+    Label:0
+    Comment:0
+    Out:MONOA   T:-006 Size:001 E:0260
+    Height:01
+  [Branch01]
+    X1position:00
+    X2position:13
+    Yposition:00
+    Height:01
+    B1:00
+    B2:00
+    BInputnumber:00
+    {0;00;00A0;-1;-1;-1;-1;00}
+    {0;01;00A6;-1;-1;-1;-1;00}
+    {1;02;02FF;-1;-1;-1;-1;00}
+    ###
+
+[Line00002]
+  [Features]
+    Branchs:01
+    Type:0
+    Label:0
+    Comment:0
+    Out:CALL    T:-001 Size:001 E:ROT0  
+    Height:01
+  [Branch01]
+    X1position:00
+    X2position:13
+    Yposition:00
+    Height:01
+    B1:00
+    B2:00
+    BInputnumber:00
+    {0;00;00F7;-1;-1;-1;-1;00}
+    ###
+
+[Line00003]
+  [Features]
+    Branchs:01
+    Type:0
+    Label:0
+    Comment:0
+    Out:CALL    T:-001 Size:001 E:ROT1  
+    Height:01
+  [Branch01]
+    X1position:00
+    X2position:13
+    Yposition:00
+    Height:01
+    B1:00
+    B2:00
+    BInputnumber:00
+    {0;00;00F7;-1;-1;-1;-1;00}
+    ###
+
+[Line00004]
+  [Features]
+    Branchs:01
+    Type:0
+    Label:0
+    Comment:0
+    Out:CALL    T:-001 Size:001 E:ROT2  
+    Height:01
+  [Branch01]
+    X1position:00
+    X2position:13
+    Yposition:00
+    Height:01
+    B1:00
+    B2:00
+    BInputnumber:00
+    {0;00;00F7;-1;-1;-1;-1;00}
+    ###
+
+[Line00005]
+  [Features]
+    Branchs:01
+    Type:0
+    Label:0
+    Comment:0
+    Out:CALL    T:-001 Size:001 E:ROT3  
+    Height:01
+  [Branch01]
+    X1position:00
+    X2position:13
+    Yposition:00
+    Height:01
+    B1:00
+    B2:00
+    BInputnumber:00
+    {0;00;00F7;-1;-1;-1;-1;00}
+    ###
+
+[Line00006]
+  [Features]
+    Branchs:01
+    Type:0
+    Label:0
+    Comment:0
+    Out:CALL    T:-001 Size:001 E:ROT4  
+    Height:01
+  [Branch01]
+    X1position:00
+    X2position:13
+    Yposition:00
+    Height:01
+    B1:00
+    B2:00
+    BInputnumber:00
+    {0;00;00F7;-1;-1;-1;-1;00}
+    ###
+
+[Line00007]
+  [Features]
+    Branchs:03
+    Type:0
+    Label:0
+    Comment:0
+    Out:OUT     T:-008 Size:001 E:00C5
+    Height:03
+  [Branch01]
+    X1position:00
+    X2position:13
+    Yposition:00
+    Height:01
+    B1:00
+    B2:00
+    BInputnumber:00
+    {0;00;0300;-1;02;-1;-1;00}
+    {0;01;00F4;-1;-1;01;02;00}
+    ###
+  [Branch02]
+    X1position:00
+    X2position:01
+    Yposition:01
+    Height:01
+    B1:01
+    B2:01
+    BInputnumber:-01
+    {0;00;0302;-1;03;-1;-1;00}
+    {0;01;00F3;-1;-1;01;03;00}
+    ###
+  [Branch03]
+    X1position:00
+    X2position:01
+    Yposition:02
+    Height:01
+    B1:02
+    B2:02
+    BInputnumber:-01
+    {1;00;02FF;-1;-1;-1;-1;00}
+    {1;01;02FF;-1;-1;-1;-1;00}
+    ###
+
+[Line00008]
+  [Features]
+    Branchs:01
+    Type:0
+    Label:0
+    Comment:0
+    Out:SUB     T:0048 Size:004 E:0858 E:0842 E:0840
+    Height:04
+  [Branch01]
+    X1position:00
+    X2position:13
+    Yposition:00
+    Height:01
+    B1:00
+    B2:00
+    BInputnumber:00
+    {0;00;00F7;-1;-1;-1;-1;00}
+    ###
+
+[Line00009]
+  [Features]
+    Branchs:01
+    Type:0
+    Label:0
+    Comment:0
+    Out:SUB     T:0048 Size:004 E:0858 E:0848 E:0846
+    Height:04
+  [Branch01]
+    X1position:00
+    X2position:13
+    Yposition:00
+    Height:01
+    B1:00
+    B2:00
+    BInputnumber:00
+    {0;00;00F7;-1;-1;-1;-1;00}
+    ###
+
+[Line00010]
+  [Features]
+    Branchs:01
+    Type:0
+    Label:0
+    Comment:0
+    Out:SUB     T:0048 Size:004 E:0858 E:0852 E:0850
+    Height:04
+  [Branch01]
+    X1position:00
+    X2position:13
+    Yposition:00
+    Height:01
+    B1:00
+    B2:00
+    BInputnumber:00
+    {0;00;00F7;-1;-1;-1;-1;00}
+    ###
+
+[Line00011]
+  [Features]
+    Branchs:02
+    Type:0
+    Label:0
+    Comment:0
+    Out:MOVK    T:0029 Size:003 E:0858 E:0020
+    Height:03
+  [Branch01]
+    X1position:00
+    X2position:13
+    Yposition:00
+    Height:01
+    B1:00
+    B2:00
+    BInputnumber:00
+    {0;00;0210;-1;02;-1;02;00}
+    ###
+  [Branch02]
+    X1position:00
+    X2position:00
+    Yposition:01
+    Height:01
+    B1:01
+    B2:01
+    BInputnumber:-01
+    {0;00;00F5;-1;-1;-1;-1;00}
+    ###
+
+[Line00012]
+  [Features]
+    Branchs:04
+    Type:0
+    Label:0
+    Comment:0
+    Out:SETR    T:0043 Size:003 E:0300
+    Height:04
+  [Branch01]
+    X1position:00
+    X2position:13
+    Yposition:00
+    Height:01
+    B1:00
+    B2:00
+    BInputnumber:00
+    {0;00;0190;-1;02;-1;-1;00}
+    {0;01;0200;-1;-1;01;02;00}
+    {1;02;0300;-1;-1;-1;-1;00}
+    ###
+  [Branch02]
+    X1position:00
+    X2position:01
+    Yposition:01
+    Height:01
+    B1:01
+    B2:01
+    BInputnumber:-01
+    {0;00;0191;-1;-1;-1;-1;00}
+    {0;01;0201;-1;-1;-1;-1;00}
+    ###
+  [Branch03]
+    X1position:00
+    X2position:13
+    Yposition:02
+    Height:01
+    B1:01
+    B2:00
+    BInputnumber:01
+    {0;00;0301;-1;04;-1;04;00}
+    ###
+  [Branch04]
+    X1position:00
+    X2position:00
+    Yposition:03
+    Height:01
+    B1:03
+    B2:03
+    BInputnumber:-02
+    {1;00;02FF;-1;-1;-1;-1;00}
+    ###
+
+[Line00013]
+  [Features]
+    Branchs:01
+    Type:0
+    Label:0
+    Comment:0
+    Out:CMP     T:0010 Size:003 E:04D6 E:0944
+    Height:03
+  [Branch01]
+    X1position:00
+    X2position:13
+    Yposition:00
+    Height:01
+    B1:00
+    B2:00
+    BInputnumber:00
+    {0;00;0300;-1;-1;-1;-1;00}
+    ###
+
+[Line00014]
+  [Features]
+    Branchs:03
+    Type:0
+    Label:0
+    Comment:0
+    Out:SETR    T:0043 Size:003 E:0301
+    Height:03
+  [Branch01]
+    X1position:00
+    X2position:13
+    Yposition:00
+    Height:01
+    B1:00
+    B2:00
+    BInputnumber:00
+    {0;00;0300;-1;02;-1;-1;00}
+    {0;01;00F9;-1;-1;01;02;00}
+    ###
+  [Branch02]
+    X1position:00
+    X2position:01
+    Yposition:01
+    Height:01
+    B1:01
+    B2:01
+    BInputnumber:-01
+    {0;00;0300;-1;-1;-1;-1;00}
+    {0;01;00F8;-1;-1;-1;-1;00}
+    ###
+  [Branch03]
+    X1position:00
+    X2position:13
+    Yposition:02
+    Height:01
+    B1:01
+    B2:00
+    BInputnumber:01
+    {0;00;0302;-1;-1;-1;-1;00}
+    ###
+
+[Line00015]
+  [Features]
+    Branchs:03
+    Type:0
+    Label:0
+    Comment:0
+    Out:SETR    T:0043 Size:003 E:0302
+    Height:04
+  [Branch01]
+    X1position:00
+    X2position:13
+    Yposition:00
+    Height:01
+    B1:00
+    B2:00
+    BInputnumber:00
+    {0;00;0301;-1;-1;-1;-1;00}
+    ###
+  [Branch02]
+    X1position:00
+    X2position:13
+    Yposition:02
+    Height:01
+    B1:01
+    B2:00
+    BInputnumber:01
+    {0;00;0304;-1;03;-1;03;00}
+    ###
+  [Branch03]
+    X1position:00
+    X2position:00
+    Yposition:03
+    Height:01
+    B1:02
+    B2:02
+    BInputnumber:-02
+    {0;00;0308;-1;-1;-1;-1;00}
+    ###
+
+[Line00016]
+  [Features]
+    Branchs:01
+    Type:0
+    Label:0
+    Comment:0
+    Out:CMP     T:0010 Size:003 E:04D6 E:0942
+    Height:03
+  [Branch01]
+    X1position:00
+    X2position:13
+    Yposition:00
+    Height:01
+    B1:00
+    B2:00
+    BInputnumber:00
+    {0;00;0302;-1;-1;-1;-1;00}
+    ###
+
+[Line00017]
+  [Features]
+    Branchs:05
+    Type:0
+    Label:0
+    Comment:0
+    Out:SETR    T:0043 Size:004 E:0303
+    Height:05
+  [Branch01]
+    X1position:00
+    X2position:13
+    Yposition:00
+    Height:01
+    B1:00
+    B2:00
+    BInputnumber:00
+    {0;00;0302;-1;02;-1;-1;00}
+    {0;01;00F9;-1;-1;02;02;00}
+    ###
+  [Branch02]
+    X1position:00
+    X2position:02
+    Yposition:01
+    Height:01
+    B1:01
+    B2:01
+    BInputnumber:-01
+    {0;00;0302;-1;03;-1;-1;00}
+    {0;01;00F8;-1;-1;-1;-1;00}
+    {0;02;00F8;-1;-1;02;03;00}
+    ###
+  [Branch03]
+    X1position:00
+    X2position:02
+    Yposition:02
+    Height:01
+    B1:02
+    B2:02
+    BInputnumber:-01
+    {0;00;0302;-1;-1;-1;-1;00}
+    {0;01;0105;-1;-1;-1;-1;00}
+    {0;02;00FA;-1;-1;-1;-1;00}
+    ###
+  [Branch04]
+    X1position:00
+    X2position:13
+    Yposition:03
+    Height:01
+    B1:01
+    B2:00
+    BInputnumber:01
+    {0;00;0304;-1;05;-1;05;00}
+    ###
+  [Branch05]
+    X1position:00
+    X2position:00
+    Yposition:04
+    Height:01
+    B1:04
+    B2:04
+    BInputnumber:-02
+    {0;00;0308;-1;-1;-1;-1;00}
+    ###
+
+[Line00018]
+  [Features]
+    Branchs:02
+    Type:0
+    Label:0
+    Comment:0
+    Out:SETR    T:0043 Size:003 E:0304
+    Height:03
+  [Branch01]
+    X1position:00
+    X2position:13
+    Yposition:00
+    Height:01
+    B1:00
+    B2:00
+    BInputnumber:00
+    {0;00;0303;-1;-1;-1;-1;00}
+    {0;01;0190;-1;-1;-1;-1;00}
+    ###
+  [Branch02]
+    X1position:00
+    X2position:13
+    Yposition:02
+    Height:01
+    B1:01
+    B2:00
+    BInputnumber:01
+    {0;00;0210;-1;-1;-1;-1;00}
+    ###
+
+[Line00019]
+  [Features]
+    Branchs:02
+    Type:0
+    Label:0
+    Comment:0
+    Out:SETR    T:0043 Size:003 E:0308
+    Height:03
+  [Branch01]
+    X1position:00
+    X2position:13
+    Yposition:00
+    Height:01
+    B1:00
+    B2:00
+    BInputnumber:00
+    {0;00;0303;-1;-1;-1;-1;00}
+    {0;01;0191;-1;-1;-1;-1;00}
+    ###
+  [Branch02]
+    X1position:00
+    X2position:13
+    Yposition:02
+    Height:01
+    B1:01
+    B2:00
+    BInputnumber:01
+    {0;00;0210;-1;-1;-1;-1;00}
+    ###
+
+[Line00020]
+  [Features]
+    Branchs:04
+    Type:0
+    Label:0
+    Comment:0
+    Out:TMR     T:0056 Size:003 E:0005
+    Height:04
+  [Branch01]
+    X1position:00
+    X2position:13
+    Yposition:00
+    Height:01
+    B1:00
+    B2:00
+    BInputnumber:00
+    {0;00;0304;-1;02;-1;02;00}
+    ###
+  [Branch02]
+    X1position:00
+    X2position:00
+    Yposition:01
+    Height:01
+    B1:01
+    B2:01
+    BInputnumber:-01
+    {0;00;0308;-1;-1;-1;-1;00}
+    ###
+  [Branch03]
+    X1position:00
+    X2position:13
+    Yposition:02
+    Height:01
+    B1:01
+    B2:00
+    BInputnumber:01
+    {0;00;0304;-1;04;-1;04;00}
+    ###
+  [Branch04]
+    X1position:00
+    X2position:00
+    Yposition:03
+    Height:01
+    B1:03
+    B2:03
+    BInputnumber:-02
+    {0;00;0308;-1;-1;-1;-1;00}
+    ###
+
+[Line00021]
+  [Features]
+    Branchs:01
+    Type:0
+    Label:0
+    Comment:0
+    Out:MONOA   T:-006 Size:001 E:0210
+    Height:01
+  [Branch01]
+    X1position:00
+    X2position:13
+    Yposition:00
+    Height:01
+    B1:00
+    B2:00
+    BInputnumber:00
+    {0;00;0005;-1;-1;-1;-1;00}
+    ###
+
+[Line00022]
+  [Features]
+    Branchs:01
+    Type:0
+    Label:0
+    Comment:0
+    Out:MOVK    T:0029 Size:003 E:04D6 E:0000
+    Height:03
+  [Branch01]
+    X1position:00
+    X2position:13
+    Yposition:00
+    Height:01
+    B1:00
+    B2:00
+    BInputnumber:00
+    {0;00;0210;-1;-1;-1;-1;00}
+    ###
+
+[Line00023]
+  [Features]
+    Branchs:03
+    Type:0
+    Label:0
+    Comment:0
+    Out:SETR    T:0043 Size:003 E:0305
+    Height:04
+  [Branch01]
+    X1position:00
+    X2position:13
+    Yposition:00
+    Height:01
+    B1:00
+    B2:00
+    BInputnumber:00
+    {0;00;0210;-1;-1;-1;-1;00}
+    ###
+  [Branch02]
+    X1position:00
+    X2position:13
+    Yposition:02
+    Height:01
+    B1:01
+    B2:00
+    BInputnumber:01
+    {0;00;0200;-1;03;-1;03;00}
+    {0;01;0105;-1;-1;-1;-1;00}
+    ###
+  [Branch03]
+    X1position:00
+    X2position:00
+    Yposition:03
+    Height:01
+    B1:02
+    B2:02
+    BInputnumber:-02
+    {0;00;0201;-1;-1;-1;-1;00}
+    ###
+
+[Line00024]
+  [Features]
+    Branchs:01
+    Type:0
+    Label:0
+    Comment:0
+    Out:MONOA   T:-006 Size:001 E:0215
+    Height:01
+  [Branch01]
+    X1position:00
+    X2position:13
+    Yposition:00
+    Height:01
+    B1:00
+    B2:00
+    BInputnumber:00
+    {0;00;0305;-1;-1;-1;-1;00}
+    {0;01;0105;-1;-1;-1;-1;00}
+    ###
+
+[Line00025]
+  [Features]
+    Branchs:01
+    Type:0
+    Label:0
+    Comment:0
+    Out:OUT     T:-008 Size:001 E:00BE
+    Height:01
+  [Branch01]
+    X1position:00
+    X2position:13
+    Yposition:00
+    Height:01
+    B1:00
+    B2:00
+    BInputnumber:00
+    {0;00;00F7;-1;-1;-1;-1;00}
+    ###
+
+[Line00026]
+  [Features]
+    Branchs:01
+    Type:0
+    Label:0
+    Comment:0
+    Out:CALL    T:-001 Size:001 E:ROT6  
+    Height:01
+  [Branch01]
+    X1position:00
+    X2position:13
+    Yposition:00
+    Height:01
+    B1:00
+    B2:00
+    BInputnumber:00
+    {0;00;00F7;-1;-1;-1;-1;00}
+    ###
+
+[Line00027]
+  [Features]
+    Branchs:01
+    Type:0
+    Label:0
+    Comment:0
+    Out:CALL    T:-001 Size:001 E:ROT7  
+    Height:01
+  [Branch01]
+    X1position:00
+    X2position:13
+    Yposition:00
+    Height:01
+    B1:00
+    B2:00
+    BInputnumber:00
+    {0;00;00F7;-1;-1;-1;-1;00}
+    ###
+
+[Line00028]
+  [Features]
+    Branchs:01
+    Type:0
+    Label:0
+    Comment:0
+    Out:CALL    T:-001 Size:001 E:ROT8  
+    Height:01
+  [Branch01]
+    X1position:00
+    X2position:13
+    Yposition:00
+    Height:01
+    B1:00
+    B2:00
+    BInputnumber:00
+    {0;00;00F7;-1;-1;-1;-1;00}
+    ###
+
+[Line00029]
+  [Features]
+    Branchs:01
+    Type:0
+    Label:0
+    Comment:0
+    Out:CALL    T:-001 Size:001 E:ROT9
+    Height:01
+  [Branch01]
+    X1position:00
+    X2position:13
+    Yposition:00
+    Height:01
+    B1:00
+    B2:00
+    BInputnumber:00
+    {0;00;00F7;-1;-1;-1;-1;00}
+    ###
+
+[Line00030]
+  [Features]
+    Branchs:01
+    Type:0
+    Label:0
+    Comment:0
+    Out:CALL    T:-001 Size:001 E:ROT10
+    Height:01
+  [Branch01]
+    X1position:00
+    X2position:13
+    Yposition:00
+    Height:01
+    B1:00
+    B2:00
+    BInputnumber:00
+    {0;00;00F7;-1;-1;-1;-1;00}
+    ###
+

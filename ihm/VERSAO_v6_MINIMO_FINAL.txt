@@ -1,0 +1,110 @@
+═══════════════════════════════════════════════════════════════
+  CLP_FINAL_11_ROTINAS_v6_MINIMO.sup
+  Data: 12/11/2025 17:14
+  Status: VERSÃO MÍNIMA - ÚLTIMA TENTATIVA
+═══════════════════════════════════════════════════════════════
+
+## EVOLUÇÃO DOS ERROS
+
+v1-v4: 22 erros (SUB/SFR/ADSUB registros fora do range)
+v5:     5 erros (redução significativa!)
+v6:     ? erros (teste pendente)
+
+═══════════════════════════════════════════════════════════════
+
+## ROT10 - VERSÃO ABSOLUTAMENTE MÍNIMA
+
+Agora com apenas 4 linhas:
+
+Linha 1: MOVK E:0450 = 0        (zera registro)
+Linha 2: MOVK E:0451 = 1        (flag 1)
+Linha 3: MOVK E:0452 = 1        (flag 2)
+Linha 4: END
+
+ZERO funcionalidade, ZERO complexidade.
+Apenas inicializa 3 registros na área Timer/Counter.
+
+═══════════════════════════════════════════════════════════════
+
+## ROT5 - ENDEREÇO MAIS BAIXO
+
+- Antes: E:03E8 (contato 1000)
+- Agora: E:0300 (contato 768)
+
+SDAT2 continua na linha 7.
+
+═══════════════════════════════════════════════════════════════
+
+## DIAGNÓSTICO
+
+Se v6 AINDA tiver erros:
+
+❌ Problema NÃO é nos endereços de memória
+❌ Problema NÃO é na lógica das rotinas
+✅ Problema É na estrutura do arquivo .sup
+
+POSSÍVEIS CAUSAS:
+1. Corrupção do ZIP ao reempacotar
+2. Metadados do WinSUP incorretos (Conf.dbf, Screen.dbf)
+3. Versão do WinSUP incompatível com formato
+4. Checksum interno do .sup inválido
+
+═══════════════════════════════════════════════════════════════
+
+## SOLUÇÃO ALTERNATIVA
+
+Se v6 falhar, recomendo:
+
+1. CRIAR NOVO PROJETO no WinSUP 2 do ZERO
+2. Copiar MANUALMENTE as rotinas ROT0-ROT9 do arquivo original
+3. NÃO copiar ROT10 (deixar vazio ou com 1 linha END)
+4. NÃO copiar ROT5 (deixar vazio)
+5. Salvar como novo .sup
+
+Isso garante que:
+- Metadados são gerados corretamente pelo WinSUP
+- Não há corrupção de reempacotamento
+- Estrutura interna está válida
+
+═══════════════════════════════════════════════════════════════
+
+## TESTE v6
+
+Abra no WinSUP 2: CLP_FINAL_11_ROTINAS_v6_MINIMO.sup
+
+Resultado esperado:
+- 0-2 erros: SUCESSO! Adicione funcionalidade gradualmente
+- 3-5 erros: Problema estrutural, criar do zero
+- 6+ erros: Arquivo corrompido, descartar
+
+═══════════════════════════════════════════════════════════════
+
+## REGISTROS USADOS (v6)
+
+ROT10:
+- E:0450 (1104): Work register
+- E:0451 (1105): Flag 1
+- E:0452 (1106): Flag 2
+
+ROT5:
+- E:0300 (768): SDAT2 destination
+
+ROT8:
+- E:0400 (1024): Constante 0
+- E:0401 (1025): Constante 1
+- E:0420-0x043E: Variáveis de escala
+
+TOTAL: ~25 registros na área Timer/Counter (0x0400-0x047F)
+
+═══════════════════════════════════════════════════════════════
+
+## PRÓXIMOS PASSOS (SE v6 FUNCIONAR)
+
+1. Teste básico no CLP
+2. Adicione lógica no Principal.lad (não em ROT10!)
+3. Use apenas:
+   - Registros 0x0400-0x047F (Timer/Counter)
+   - Estados 0x0000-0x03FF
+   - Instruções MOVK, SETR, RSTR (evite MOV)
+
+═══════════════════════════════════════════════════════════════

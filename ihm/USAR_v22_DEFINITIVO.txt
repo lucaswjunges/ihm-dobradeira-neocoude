@@ -1,0 +1,188 @@
+═══════════════════════════════════════════════════════════════
+              ⭐ USAR ESTE ARQUIVO! ⭐
+═══════════════════════════════════════════════════════════════
+
+📦 CLP_10_ROTINAS_v22_MINIMAL.sup
+
+   MD5: c6e1be7ba570860f518b2c5f4b57ad05
+   Tamanho: 29 KB
+   Status: ✅ APENAS MOV - ULTRA-CONSERVADOR
+
+═══════════════════════════════════════════════════════════════
+
+✅ v21_TEST FUNCIONOU! (confirmado pelo usuário)
+
+Agora v22 adiciona lógica MINIMALISTA:
+  - Apenas instrução MOV
+  - Apenas registros que EXISTEM nos originais (0800-0966)
+  - Sem CNT, SETR, OUT (para evitar problemas)
+
+═══════════════════════════════════════════════════════════════
+
+📋 CONTEÚDO v22:
+
+ROT0-4: Lógica original (100% preservada)
+
+ROT5 (6 linhas):
+  ✅ MOV S0 (0180) → 0960
+  ✅ MOV S1 (0181) → 0962
+  ✅ MOV S7 (0187) → 0964
+  ✅ MOV 0190 → 0966
+  ✅ MOV ciclo (0191) → 0942
+  ✅ RET
+
+ROT6 (18 linhas):
+  ✅ MOV E0-E7 (0100-0107) → 0944-094B
+  ✅ MOV S0-S7 (0180-0187) → 094C-0953
+  ✅ MOV encoder MSW (04D6) → 0954
+  ✅ RET
+
+ROT7 (12 linhas):
+  ✅ MOV tensão inv (06E0) → 0800
+  ✅ MOV classe vel (0900) → 0802
+  ✅ MOV corrente (05F1) → 0804
+  ✅ 9× RET
+
+ROT8 (15 linhas):
+  ✅ MOV ângulo 1 (0840) → 0806
+  ✅ MOV ângulo 1 LSW (0842) → 0808
+  ✅ MOV ângulo 2 (0848) → 080A
+  ✅ 12× RET
+
+ROT9 (20 linhas):
+  ✅ 20× RET (sem lógica ainda)
+
+═══════════════════════════════════════════════════════════════
+
+📊 ÁREA MODBUS (Registros que podem ser lidos via Modbus):
+
+ESPELHAMENTO I/O (ROT6):
+  0944-094B  - Entradas E0-E7
+  094C-0953  - Saídas S0-S7
+  0954       - Encoder MSW
+
+INVERSOR (ROT7):
+  0800 - Tensão inversor (06E0)
+  0802 - Classe velocidade (0900)
+  0804 - Corrente motor (05F1)
+
+ÂNGULOS (ROT8):
+  0806 - Ângulo dobra 1 MSW (0840)
+  0808 - Ângulo dobra 1 LSW (0842)
+  080A - Ângulo dobra 2 MSW (0848)
+
+STATUS (ROT5):
+  0960 - S0 (Run)
+  0962 - S1
+  0964 - S7 (alarme?)
+  0966 - Registro 0190
+  0942 - Ciclo ativo (0191)
+
+═══════════════════════════════════════════════════════════════
+
+💻 INTEGRAÇÃO PYTHON:
+
+modbus_map.py:
+```python
+# Área espelhamento I/O
+INPUT_E0_BASE = 0x0944
+OUTPUT_S0_BASE = 0x094C
+ENCODER_MSW = 0x0954
+
+# Inversor
+INVERTER_VOLTAGE = 0x0800
+SPEED_CLASS = 0x0802
+MOTOR_CURRENT = 0x0804
+
+# Ângulos
+ANGLE_1_MSW = 0x0806
+ANGLE_1_LSW = 0x0808
+ANGLE_2_MSW = 0x080A
+
+# Status
+STATUS_S0_RUN = 0x0960
+STATUS_CYCLE = 0x0942
+```
+
+state_manager.py:
+```python
+# Ler I/O espelhado
+inputs = [client.read_register(0x0944 + i) for i in range(8)]
+outputs = [client.read_register(0x094C + i) for i in range(8)]
+
+# Ler encoder
+encoder_msw = client.read_register(0x0954)
+encoder_lsw = client.read_register(0x04D7)  # Ler original também
+encoder = (encoder_msw << 16) | encoder_lsw
+
+# Ler ângulo 1
+angle1_msw = client.read_register(0x0806)
+angle1_lsw = client.read_register(0x0808)
+angle1 = ((angle1_msw << 16) | angle1_lsw) / 10.0
+```
+
+═══════════════════════════════════════════════════════════════
+
+🚀 TESTAR NO WINSUP:
+
+1. Abrir CLP_10_ROTINAS_v22_MINIMAL.sup
+2. Verificar:
+   ✅ Abre sem erros?
+   ✅ ROT5-9 aparecem na árvore?
+   ✅ ROT5 mostra 5 instruções MOV + 1 RET?
+   ✅ ROT6 mostra 17 instruções MOV + 1 RET?
+   ✅ ROT7 mostra 3 MOV + 9 RET?
+3. Compilar → deve compilar SEM ERROS
+
+═══════════════════════════════════════════════════════════════
+
+📈 EVOLUÇÃO:
+
+v18: ✅ Estrutura válida (apenas RET)
+  ↓
+v19: ❌ Instruções inválidas (NOT, ADD, MUL...)
+  ↓
+v20: ❌ Instruções CNT, SETR com registros 08xx
+  ↓
+v21_TEST: ✅ Funcionou (1 MOV + 5 RET em ROT5)
+  ↓
+v22: ✅ APENAS MOV para registros 0800-0966
+
+═══════════════════════════════════════════════════════════════
+
+⚠️ LIMITAÇÕES v22:
+
+- Sem contadores (CNT não funciona?)
+- Sem emulação de teclas (SETR não testado ainda)
+- Sem cálculos (ADD, MUL não existem)
+- ROT9 vazia (apenas RET)
+
+FUNCIONALIDADE BÁSICA:
+  ✅ Espelhamento I/O (E0-E7, S0-S7)
+  ✅ Leitura encoder
+  ✅ Leitura dados inversor
+  ✅ Leitura ângulos
+
+═══════════════════════════════════════════════════════════════
+
+🎯 PRÓXIMO PASSO:
+
+SE v22 funcionar:
+  → Adicionar instruções gradualmente:
+     1. Testar SETR (setar bits)
+     2. Testar CNT (contadores)
+     3. Testar OUT (saídas)
+     4. Adicionar lógica ROT9 (teclas)
+
+SE v22 NÃO funcionar:
+  → Problema é mais profundo (estrutura? zip?)
+  → Comparar binário v21 vs v22
+
+═══════════════════════════════════════════════════════════════
+
+Versões:
+  ❌ v19-v20 (não funcionam)
+  ✅ v21_TEST (funciona - apenas RET)
+  ✅ v22_MINIMAL (testar - MOV mínimo)
+
+═══════════════════════════════════════════════════════════════

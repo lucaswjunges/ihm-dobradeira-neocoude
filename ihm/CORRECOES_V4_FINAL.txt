@@ -1,0 +1,42 @@
+# Correções v4 - CLP_FINAL_11_ROTINAS_FIXED_v4.sup
+
+Data: 12/11/2025 17:00
+Arquivo: CLP_FINAL_11_ROTINAS_FIXED_v4.sup (33KB)
+
+## Correções Aplicadas
+
+### ROT5 (2 erros corrigidos)
+- Antes: E:0600 (registro 1536 - fora do range de contatos)
+- Depois: E:03E0 (contato 992 - válido ✓)
+- SDAT2 aceita apenas CONTATOS (0x0000-0x03FF), não registros!
+
+### ROT8 (mantido)
+- SCL2G usa E:0400/E:0401 (registros Timer/Counter ✓)
+
+### ROT10 (20 erros corrigidos)
+TODOS os registros movidos para área Timer/Counter (0x0450-0x046B):
+
+Mapeamento:
+- E:0450-0x0451: Cópia encoder (MSW/LSW)
+- E:0452-0x0457: Ângulos de trabalho
+- E:0458-0x0459: Registros auxiliares
+- E:045A-0x045F: Shadow entradas E0-E5
+- E:0460-0x0461: Shadow saídas S0-S1
+- E:0462: Contador
+- E:0464-0x0469: Shadow leitura E0-E5
+- E:046A-0x046B: Shadow leitura S0-S1
+
+TOTAL: 28 registros na área 0x0450-0x046B (Timer/Counter safe zone)
+
+## Teste no WinSUP 2
+
+Abra: CLP_FINAL_11_ROTINAS_FIXED_v4.sup
+
+Esperado: 0 erros na lista de checagem ✓
+
+## Notas
+
+- Área Timer/Counter (0x0400-0x047F) é a mais segura do MPC4004
+- Todos os endereços estão em áreas documentadas no manual
+- ROT5 agora usa CONTATO válido ao invés de registro
+- ROT10 usa apenas registros baixos (1104-1131 decimal)

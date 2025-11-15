@@ -1,0 +1,387 @@
+Lines:00018
+[Line00001]
+  [CommentText]
+    ROT6: Espelhamento Modbus - E0 -> 0860
+  [Features]
+    Branchs:01
+    Type:0
+    Label:0
+    Comment:1
+    Out:MOV     T:0029 Size:003 E:0100 E:0860
+    Height:01
+  [Branch01]
+    X1position:00
+    X2position:13
+    Yposition:00
+    Height:01
+    B1:00
+    B2:00
+    BInputnumber:00
+    {0;00;00F7;-1;-1;-1;-1;00}
+    ###
+
+[Line00002]
+  [CommentText]
+    E1 -> 0861
+  [Features]
+    Branchs:01
+    Type:0
+    Label:0
+    Comment:1
+    Out:MOV     T:0029 Size:003 E:0101 E:0861
+    Height:01
+  [Branch01]
+    X1position:00
+    X2position:13
+    Yposition:00
+    Height:01
+    B1:00
+    B2:00
+    BInputnumber:00
+    {0;00;00F7;-1;-1;-1;-1;00}
+    ###
+
+[Line00003]
+  [CommentText]
+    E2 -> 0862
+  [Features]
+    Branchs:01
+    Type:0
+    Label:0
+    Comment:1
+    Out:MOV     T:0029 Size:003 E:0102 E:0862
+    Height:01
+  [Branch01]
+    X1position:00
+    X2position:13
+    Yposition:00
+    Height:01
+    B1:00
+    B2:00
+    BInputnumber:00
+    {0;00;00F7;-1;-1;-1;-1;00}
+    ###
+
+[Line00004]
+  [CommentText]
+    E3 -> 0863
+  [Features]
+    Branchs:01
+    Type:0
+    Label:0
+    Comment:1
+    Out:MOV     T:0029 Size:003 E:0103 E:0863
+    Height:01
+  [Branch01]
+    X1position:00
+    X2position:13
+    Yposition:00
+    Height:01
+    B1:00
+    B2:00
+    BInputnumber:00
+    {0;00;00F7;-1;-1;-1;-1;00}
+    ###
+
+[Line00005]
+  [CommentText]
+    E4 -> 0864
+  [Features]
+    Branchs:01
+    Type:0
+    Label:0
+    Comment:1
+    Out:MOV     T:0029 Size:003 E:0104 E:0864
+    Height:01
+  [Branch01]
+    X1position:00
+    X2position:13
+    Yposition:00
+    Height:01
+    B1:00
+    B2:00
+    BInputnumber:00
+    {0;00;00F7;-1;-1;-1;-1;00}
+    ###
+
+[Line00006]
+  [CommentText]
+    E5 -> 0865
+  [Features]
+    Branchs:01
+    Type:0
+    Label:0
+    Comment:1
+    Out:MOV     T:0029 Size:003 E:0105 E:0865
+    Height:01
+  [Branch01]
+    X1position:00
+    X2position:13
+    Yposition:00
+    Height:01
+    B1:00
+    B2:00
+    BInputnumber:00
+    {0;00;00F7;-1;-1;-1;-1;00}
+    ###
+
+[Line00007]
+  [CommentText]
+    E6 -> 0866
+  [Features]
+    Branchs:01
+    Type:0
+    Label:0
+    Comment:1
+    Out:MOV     T:0029 Size:003 E:0106 E:0866
+    Height:01
+  [Branch01]
+    X1position:00
+    X2position:13
+    Yposition:00
+    Height:01
+    B1:00
+    B2:00
+    BInputnumber:00
+    {0;00;00F7;-1;-1;-1;-1;00}
+    ###
+
+[Line00008]
+  [CommentText]
+    E7 -> 0867
+  [Features]
+    Branchs:01
+    Type:0
+    Label:0
+    Comment:1
+    Out:MOV     T:0029 Size:003 E:0107 E:0867
+    Height:01
+  [Branch01]
+    X1position:00
+    X2position:13
+    Yposition:00
+    Height:01
+    B1:00
+    B2:00
+    BInputnumber:00
+    {0;00;00F7;-1;-1;-1;-1;00}
+    ###
+
+[Line00009]
+  [CommentText]
+    S0 -> 0868
+  [Features]
+    Branchs:01
+    Type:0
+    Label:0
+    Comment:1
+    Out:MOV     T:0029 Size:003 E:0180 E:0868
+    Height:01
+  [Branch01]
+    X1position:00
+    X2position:13
+    Yposition:00
+    Height:01
+    B1:00
+    B2:00
+    BInputnumber:00
+    {0;00;00F7;-1;-1;-1;-1;00}
+    ###
+
+[Line00010]
+  [CommentText]
+    S1 -> 0869
+  [Features]
+    Branchs:01
+    Type:0
+    Label:0
+    Comment:1
+    Out:MOV     T:0029 Size:003 E:0181 E:0869
+    Height:01
+  [Branch01]
+    X1position:00
+    X2position:13
+    Yposition:00
+    Height:01
+    B1:00
+    B2:00
+    BInputnumber:00
+    {0;00;00F7;-1;-1;-1;-1;00}
+    ###
+
+[Line00011]
+  [CommentText]
+    S2 -> 08610
+  [Features]
+    Branchs:01
+    Type:0
+    Label:0
+    Comment:1
+    Out:MOV     T:0029 Size:003 E:0182 E:086A
+    Height:01
+  [Branch01]
+    X1position:00
+    X2position:13
+    Yposition:00
+    Height:01
+    B1:00
+    B2:00
+    BInputnumber:00
+    {0;00;00F7;-1;-1;-1;-1;00}
+    ###
+
+[Line00012]
+  [CommentText]
+    S3 -> 08611
+  [Features]
+    Branchs:01
+    Type:0
+    Label:0
+    Comment:1
+    Out:MOV     T:0029 Size:003 E:0183 E:086B
+    Height:01
+  [Branch01]
+    X1position:00
+    X2position:13
+    Yposition:00
+    Height:01
+    B1:00
+    B2:00
+    BInputnumber:00
+    {0;00;00F7;-1;-1;-1;-1;00}
+    ###
+
+[Line00013]
+  [CommentText]
+    S4 -> 08612
+  [Features]
+    Branchs:01
+    Type:0
+    Label:0
+    Comment:1
+    Out:MOV     T:0029 Size:003 E:0184 E:086C
+    Height:01
+  [Branch01]
+    X1position:00
+    X2position:13
+    Yposition:00
+    Height:01
+    B1:00
+    B2:00
+    BInputnumber:00
+    {0;00;00F7;-1;-1;-1;-1;00}
+    ###
+
+[Line00014]
+  [CommentText]
+    S5 -> 08613
+  [Features]
+    Branchs:01
+    Type:0
+    Label:0
+    Comment:1
+    Out:MOV     T:0029 Size:003 E:0185 E:086D
+    Height:01
+  [Branch01]
+    X1position:00
+    X2position:13
+    Yposition:00
+    Height:01
+    B1:00
+    B2:00
+    BInputnumber:00
+    {0;00;00F7;-1;-1;-1;-1;00}
+    ###
+
+[Line00015]
+  [CommentText]
+    S6 -> 08614
+  [Features]
+    Branchs:01
+    Type:0
+    Label:0
+    Comment:1
+    Out:MOV     T:0029 Size:003 E:0186 E:086E
+    Height:01
+  [Branch01]
+    X1position:00
+    X2position:13
+    Yposition:00
+    Height:01
+    B1:00
+    B2:00
+    BInputnumber:00
+    {0;00;00F7;-1;-1;-1;-1;00}
+    ###
+
+[Line00016]
+  [CommentText]
+    S7 -> 08615
+  [Features]
+    Branchs:01
+    Type:0
+    Label:0
+    Comment:1
+    Out:MOV     T:0029 Size:003 E:0187 E:086F
+    Height:01
+  [Branch01]
+    X1position:00
+    X2position:13
+    Yposition:00
+    Height:01
+    B1:00
+    B2:00
+    BInputnumber:00
+    {0;00;00F7;-1;-1;-1;-1;00}
+    ###
+
+[Line00017]
+  [CommentText]
+    Encoder MSW (04D6 -> 0870) e LSW (04D7 -> 0871)
+  [Features]
+    Branchs:02
+    Type:0
+    Label:0
+    Comment:1
+    Out:MOV     T:0029 Size:003 E:04D7 E:0871
+    Height:02
+  [Branch01]
+    X1position:00
+    X2position:13
+    Yposition:00
+    Height:01
+    B1:00
+    B2:01
+    BInputnumber:00
+    {0;00;00F7;-1;-1;-1;-1;00}
+    ###
+  [Branch02]
+    X1position:00
+    X2position:13
+    Yposition:01
+    Height:01
+    B1:01
+    B2:00
+    BInputnumber:00
+    {0;00;00F7;-1;-1;-1;-1;00}
+    ###
+
+[Line00018]
+  [Features]
+    Branchs:01
+    Type:0
+    Label:0
+    Comment:0
+    Out:RET     T:-002 Size:000
+    Height:01
+  [Branch01]
+    X1position:00
+    X2position:13
+    Yposition:00
+    Height:01
+    B1:00
+    B2:00
+    BInputnumber:00
+    {0;00;00F7;-1;-1;-1;-1;00}
+    ###
+
