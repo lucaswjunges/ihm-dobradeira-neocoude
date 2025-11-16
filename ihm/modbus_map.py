@@ -94,26 +94,27 @@ ENCODER = {
 # Escrita: value_clp = graus * 10
 
 BEND_ANGLES = {
-    # ✅ ENDEREÇOS VALIDADOS EMPIRICAMENTE (15/Nov/2025)
-    # Testado via test_angle_addresses_empirical.py - PERSISTEM NO CLP!
+    # 🚨 ENDEREÇOS OFICIAIS DO LADDER (15/Nov/2025 01:45)
+    # Validados via test_ladder_reads_our_angles.py - AUDITORIA CRÍTICA
     #
-    # NOTA DE ENGENHARIA: Dobra 1 (0x0840/0x0842) não persiste (ladder sobrescreve).
-    # SOLUÇÃO: Mapear IHM web para registros que FUNCIONAM:
-    #   - IHM Dobra 1 → CLP Dobra 2 Esq (0x0848/0x084A)
-    #   - IHM Dobra 2 → CLP Dobra 2 Dir (0x084C/0x084E)
-    #   - IHM Dobra 3 → CLP Dobra 3 Dir (0x0854/0x0856)
+    # IMPORTANTE: Estes são os endereços que o LADDER LÊ (PRINCIPAL.lad):
+    #   - Line00008: SUB 0858 = 0842 - 0840  (Dobra 1)
+    #   - Line00009: SUB 0858 = 0848 - 0846  (Dobra 2)
+    #   - Line00010: SUB 0858 = 0852 - 0850  (Dobra 3)
+    #
+    # ⚠️ QUALQUER OUTRO ENDEREÇO SERÁ IGNORADO!
 
-    # Dobra 1 (IHM) → Dobra 2 Esq (CLP) - TESTADO ✅
-    'BEND_1_LEFT_MSW':  0x0848,  # 2120 - Ângulo Dobra 2 Esquerda (MSW - bits 31-16)
-    'BEND_1_LEFT_LSW':  0x084A,  # 2122 - Ângulo Dobra 2 Esquerda (LSW - bits 15-0)
+    # Dobra 1 - ENDEREÇO OFICIAL DO LADDER ✅
+    'BEND_1_LEFT_MSW':  0x0842,  # 2114 - Ângulo Dobra 1 (MSW - bits 31-16)
+    'BEND_1_LEFT_LSW':  0x0840,  # 2112 - Ângulo Dobra 1 (LSW - bits 15-0)
 
-    # Dobra 2 (IHM) → Dobra 2 Dir (CLP) - TESTADO ✅
-    'BEND_2_LEFT_MSW':  0x084C,  # 2124 - Ângulo Dobra 2 Direita (MSW)
-    'BEND_2_LEFT_LSW':  0x084E,  # 2126 - Ângulo Dobra 2 Direita (LSW)
+    # Dobra 2 - ENDEREÇO OFICIAL DO LADDER ✅
+    'BEND_2_LEFT_MSW':  0x0848,  # 2120 - Ângulo Dobra 2 (MSW)
+    'BEND_2_LEFT_LSW':  0x0846,  # 2118 - Ângulo Dobra 2 (LSW)
 
-    # Dobra 3 (IHM) → Dobra 3 Dir (CLP) - TESTADO ✅
-    'BEND_3_LEFT_MSW':  0x0854,  # 2132 - Ângulo Dobra 3 Direita (MSW)
-    'BEND_3_LEFT_LSW':  0x0856,  # 2134 - Ângulo Dobra 3 Direita (LSW)
+    # Dobra 3 - ENDEREÇO OFICIAL DO LADDER ✅
+    'BEND_3_LEFT_MSW':  0x0852,  # 2130 - Ângulo Dobra 3 (MSW)
+    'BEND_3_LEFT_LSW':  0x0850,  # 2128 - Ângulo Dobra 3 (LSW)
 }
 
 # ==========================================

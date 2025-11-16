@@ -1,12 +1,12 @@
-Lines:00015
+Lines:00021
 [Line00001]
   [Features]
     Branchs:01
     Type:0
     Label:0
-    Comment:1
-  [CommentText]
-    ROT4: Preparacao dados para Grafana/SCADA
+    Comment:0
+    Out:MOV     T:0028 Size:003 E:05F0 E:05F0
+    Height:03
   [Branch01]
     X1position:00
     X2position:13
@@ -16,17 +16,16 @@ Lines:00015
     B2:00
     BInputnumber:00
     {0;00;00F7;-1;-1;-1;-1;00}
-    Out:MOVK    T:0029 Size:003 E:08A0 E:0000
     ###
 
 [Line00002]
   [Features]
-    Branchs:01
+    Branchs:02
     Type:0
     Label:0
-    Comment:1
-  [CommentText]
-    Timestamp: Contador de minutos desde power-on (08A0/08A1 - 32bit)
+    Comment:0
+    Out:CNT     T:0013 Size:003 E:001B
+    Height:03
   [Branch01]
     X1position:00
     X2position:13
@@ -35,19 +34,17 @@ Lines:00015
     B1:00
     B2:00
     BInputnumber:00
-    {0;00;0017;-1;-1;-1;-1;00}
-    Out:ADD     T:0040 Size:003 E:08A1 E:0001
-    Height:02
+    {0;00;00F7;-1;-1;-1;-1;00}
+    ###
   [Branch02]
     X1position:00
     X2position:13
-    Yposition:01
+    Yposition:02
     Height:01
-    B1:00
+    B1:01
     B2:00
-    BInputnumber:00
-    {0;00;02FE;-1;-1;-1;-1;00}
-    Out:ADD     T:0040 Size:003 E:08A0 E:0001
+    BInputnumber:01
+    {0;00;0215;-1;-1;-1;-1;00}
     ###
 
 [Line00003]
@@ -55,9 +52,9 @@ Lines:00015
     Branchs:01
     Type:0
     Label:0
-    Comment:1
-  [CommentText]
-    Registro de alarmes: Ultimos 10 alarmes (08A2-08AB)
+    Comment:0
+    Out:CMP     T:0010 Size:003 E:0476 E:0960
+    Height:03
   [Branch01]
     X1position:00
     X2position:13
@@ -66,39 +63,17 @@ Lines:00015
     B1:00
     B2:00
     BInputnumber:00
-    {0;00;0107;-1;-1;-1;-1;00}
-    Out:MOVK    T:0029 Size:003 E:08A2 E:0001
-    Height:03
-  [Branch02]
-    X1position:00
-    X2position:13
-    Yposition:01
-    Height:01
-    B1:00
-    B2:00
-    BInputnumber:00
-    {0;00;0107;-1;-1;-1;-1;00}
-    Out:MOV     T:0028 Size:003 E:08A0 E:08A3
-  [Branch03]
-    X1position:00
-    X2position:13
-    Yposition:02
-    Height:01
-    B1:00
-    B2:00
-    BInputnumber:00
-    {0;00;0107;-1;-1;-1;-1;00}
-    Out:ADD     T:0040 Size:003 E:08AC E:0001
+    {0;00;00F7;-1;-1;-1;-1;00}
     ###
 
 [Line00004]
   [Features]
-    Branchs:01
+    Branchs:03
     Type:0
     Label:0
-    Comment:1
-  [CommentText]
-    Estatisticas: Total pecas produzidas (08AD/08AE - 32bit)
+    Comment:0
+    Out:SETR    T:0043 Size:003 E:0380
+    Height:04
   [Branch01]
     X1position:00
     X2position:13
@@ -107,19 +82,27 @@ Lines:00015
     B1:00
     B2:00
     BInputnumber:00
-    {0;00;0304;-1;-1;-1;-1;00}
-    Out:ADD     T:0040 Size:003 E:08AE E:0001
-    Height:02
+    {0;00;00F9;-1;-1;-1;-1;00}
+    ###
   [Branch02]
     X1position:00
     X2position:13
-    Yposition:01
+    Yposition:02
     Height:01
-    B1:00
+    B1:01
     B2:00
-    BInputnumber:00
-    {0;00;02FE;-1;-1;-1;-1;00}
-    Out:ADD     T:0040 Size:003 E:08AD E:0001
+    BInputnumber:01
+    {0;00;0381;-1;03;-1;03;00}
+    ###
+  [Branch03]
+    X1position:00
+    X2position:00
+    Yposition:03
+    Height:01
+    B1:02
+    B2:02
+    BInputnumber:-02
+    {0;00;00F5;-1;-1;-1;-1;00}
     ###
 
 [Line00005]
@@ -127,9 +110,9 @@ Lines:00015
     Branchs:01
     Type:0
     Label:0
-    Comment:1
-  [CommentText]
-    Tempo medio de ciclo em segundos (08AF)
+    Comment:0
+    Out:CMP     T:0010 Size:003 E:0476 E:0962
+    Height:03
   [Branch01]
     X1position:00
     X2position:13
@@ -138,39 +121,17 @@ Lines:00015
     B1:00
     B2:00
     BInputnumber:00
-    {0;00;0300;-1;-1;-1;-1;00}
-    Out:MOVK    T:0029 Size:003 E:08B0 E:0000
-    Height:03
-  [Branch02]
-    X1position:00
-    X2position:13
-    Yposition:01
-    Height:01
-    B1:00
-    B2:00
-    BInputnumber:00
-    {0;00;0304;-1;-1;-1;-1;00}
-    Out:SUB     T:0048 Size:004 E:08A1 E:08B1 E:08B2
-  [Branch03]
-    X1position:00
-    X2position:13
-    Yposition:02
-    Height:01
-    B1:00
-    B2:00
-    BInputnumber:00
-    {0;00;0304;-1;-1;-1;-1;00}
-    Out:MOV     T:0028 Size:003 E:08B2 E:08AF
+    {0;00;00F7;-1;-1;-1;-1;00}
     ###
 
 [Line00006]
   [Features]
-    Branchs:01
+    Branchs:03
     Type:0
     Label:0
-    Comment:1
-  [CommentText]
-    Marca inicio de ciclo (salva timestamp)
+    Comment:0
+    Out:SETR    T:0043 Size:003 E:0381
+    Height:04
   [Branch01]
     X1position:00
     X2position:13
@@ -179,8 +140,27 @@ Lines:00015
     B1:00
     B2:00
     BInputnumber:00
-    {0;00;0300;-1;-1;-1;-1;00}
-    Out:MOV     T:0028 Size:003 E:08A1 E:08B1
+    {0;00;00F9;-1;-1;-1;-1;00}
+    ###
+  [Branch02]
+    X1position:00
+    X2position:13
+    Yposition:02
+    Height:01
+    B1:01
+    B2:00
+    BInputnumber:01
+    {0;00;0382;-1;03;-1;03;00}
+    ###
+  [Branch03]
+    X1position:00
+    X2position:00
+    Yposition:03
+    Height:01
+    B1:02
+    B2:02
+    BInputnumber:-02
+    {0;00;00F5;-1;-1;-1;-1;00}
     ###
 
 [Line00007]
@@ -188,9 +168,9 @@ Lines:00015
     Branchs:01
     Type:0
     Label:0
-    Comment:1
-  [CommentText]
-    Status geral consolidado (08B3): bit0=Ciclo, bit1=Emergencia, bit2=Manual, bit3=Antihorario
+    Comment:0
+    Out:CMP     T:0010 Size:003 E:0476 E:0964
+    Height:03
   [Branch01]
     X1position:00
     X2position:13
@@ -200,58 +180,16 @@ Lines:00015
     B2:00
     BInputnumber:00
     {0;00;00F7;-1;-1;-1;-1;00}
-    Out:MOVK    T:0029 Size:003 E:08B3 E:0000
-    Height:05
-  [Branch02]
-    X1position:00
-    X2position:13
-    Yposition:01
-    Height:01
-    B1:00
-    B2:00
-    BInputnumber:00
-    {0;00;0300;-1;-1;-1;-1;00}
-    Out:ADD     T:0040 Size:003 E:08B3 E:0001
-  [Branch03]
-    X1position:00
-    X2position:13
-    Yposition:02
-    Height:01
-    B1:00
-    B2:00
-    BInputnumber:00
-    {0;00;0107;-1;-1;-1;-1;00}
-    Out:ADD     T:0040 Size:003 E:08B3 E:0002
-  [Branch04]
-    X1position:00
-    X2position:13
-    Yposition:03
-    Height:01
-    B1:00
-    B2:00
-    BInputnumber:00
-    {0;00;0210;-1;-1;-1;-1;00}
-    Out:ADD     T:0040 Size:003 E:08B3 E:0004
-  [Branch05]
-    X1position:00
-    X2position:13
-    Yposition:04
-    Height:01
-    B1:00
-    B2:00
-    BInputnumber:00
-    {0;00;0191;-1;-1;-1;-1;00}
-    Out:ADD     T:0040 Size:003 E:08B3 E:0008
     ###
 
 [Line00008]
   [Features]
-    Branchs:01
+    Branchs:03
     Type:0
     Label:0
-    Comment:1
-  [CommentText]
-    Eficiencia: Pecas por hora (08B4)
+    Comment:0
+    Out:SETR    T:0043 Size:003 E:0382
+    Height:04
   [Branch01]
     X1position:00
     X2position:13
@@ -260,8 +198,27 @@ Lines:00015
     B1:00
     B2:00
     BInputnumber:00
-    {0;00;00F7;-1;-1;-1;-1;00}
-    Out:DIV     T:0045 Size:005 E:08AE E:0060 E:08B4 E:08B5
+    {0;00;00F9;-1;-1;-1;-1;00}
+    ###
+  [Branch02]
+    X1position:00
+    X2position:13
+    Yposition:02
+    Height:01
+    B1:01
+    B2:00
+    BInputnumber:01
+    {0;00;0383;-1;03;-1;03;00}
+    ###
+  [Branch03]
+    X1position:00
+    X2position:00
+    Yposition:03
+    Height:01
+    B1:02
+    B2:02
+    BInputnumber:-02
+    {0;00;00F5;-1;-1;-1;-1;00}
     ###
 
 [Line00009]
@@ -269,9 +226,9 @@ Lines:00015
     Branchs:01
     Type:0
     Label:0
-    Comment:1
-  [CommentText]
-    Registro de eventos: Contador de ciclos completos (08B7)
+    Comment:0
+    Out:CMP     T:0010 Size:003 E:0476 E:0966
+    Height:03
   [Branch01]
     X1position:00
     X2position:13
@@ -280,18 +237,17 @@ Lines:00015
     B1:00
     B2:00
     BInputnumber:00
-    {0;00;0304;-1;-1;-1;-1;00}
-    Out:ADD     T:0040 Size:003 E:08B7 E:0001
+    {0;00;00F7;-1;-1;-1;-1;00}
     ###
 
 [Line00010]
   [Features]
-    Branchs:01
+    Branchs:03
     Type:0
     Label:0
-    Comment:1
-  [CommentText]
-    Contador de paradas de emergencia (08B8)
+    Comment:0
+    Out:SETR    T:0043 Size:003 E:0383
+    Height:04
   [Branch01]
     X1position:00
     X2position:13
@@ -300,29 +256,37 @@ Lines:00015
     B1:00
     B2:00
     BInputnumber:00
-    {0;00;0107;-1;-1;-1;-1;00}
-    Out:MONOA   T:-006 Size:001 E:0310
-    Height:02
+    {0;00;00F9;-1;-1;-1;-1;00}
+    ###
   [Branch02]
     X1position:00
     X2position:13
-    Yposition:01
+    Yposition:02
     Height:01
-    B1:00
+    B1:01
     B2:00
-    BInputnumber:00
-    {0;00;0310;-1;-1;-1;-1;00}
-    Out:ADD     T:0040 Size:003 E:08B8 E:0001
+    BInputnumber:01
+    {0;00;0385;-1;03;-1;03;00}
+    ###
+  [Branch03]
+    X1position:00
+    X2position:00
+    Yposition:03
+    Height:01
+    B1:02
+    B2:02
+    BInputnumber:-02
+    {0;00;00F5;-1;-1;-1;-1;00}
     ###
 
 [Line00011]
   [Features]
-    Branchs:01
+    Branchs:02
     Type:0
     Label:0
-    Comment:1
-  [CommentText]
-    Contador de trocas de modo (Manual<->Auto) (08B9)
+    Comment:0
+    Out:MOVK    T:0029 Size:003 E:0476 E:0001
+    Height:03
   [Branch01]
     X1position:00
     X2position:13
@@ -331,19 +295,19 @@ Lines:00015
     B1:00
     B2:00
     BInputnumber:00
-    {0;00;00DC;-1;-1;-1;-1;00}
-    Out:MONOA   T:-006 Size:001 E:0311
-    Height:02
+    {0;00;0383;-1;02;-1;-1;00}
+    {0;01;0105;-1;-1;01;02;00}
+    ###
   [Branch02]
     X1position:00
-    X2position:13
+    X2position:01
     Yposition:01
     Height:01
-    B1:00
-    B2:00
-    BInputnumber:00
-    {0;00;0311;-1;-1;-1;-1;00}
-    Out:ADD     T:0040 Size:003 E:08B9 E:0001
+    B1:01
+    B2:01
+    BInputnumber:-01
+    {0;00;00F5;-1;-1;-1;-1;00}
+    {0;01;00F5;-1;-1;-1;-1;00}
     ###
 
 [Line00012]
@@ -351,9 +315,142 @@ Lines:00015
     Branchs:01
     Type:0
     Label:0
-    Comment:1
-  [CommentText]
-    Contador de mudancas de velocidade (K1+K7) (08BA)
+    Comment:0
+    Out:OUT     T:-008 Size:001 E:0385
+    Height:01
+  [Branch01]
+    X1position:00
+    X2position:13
+    Yposition:00
+    Height:01
+    B1:00
+    B2:00
+    BInputnumber:00
+    {0;00;0383;-1;-1;-1;-1;00}
+    ###
+
+[Line00013]
+  [Features]
+    Branchs:01
+    Type:0
+    Label:0
+    Comment:0
+    Out:MOV     T:0028 Size:003 E:0842 E:0942
+    Height:03
+  [Branch01]
+    X1position:00
+    X2position:13
+    Yposition:00
+    Height:01
+    B1:00
+    B2:00
+    BInputnumber:00
+    {0;00;0380;-1;-1;-1;-1;00}
+    ###
+
+[Line00014]
+  [Features]
+    Branchs:01
+    Type:0
+    Label:0
+    Comment:0
+    Out:MOV     T:0028 Size:003 E:0840 E:0944
+    Height:03
+  [Branch01]
+    X1position:00
+    X2position:13
+    Yposition:00
+    Height:01
+    B1:00
+    B2:00
+    BInputnumber:00
+    {0;00;0380;-1;-1;-1;-1;00}
+    ###
+
+[Line00015]
+  [Features]
+    Branchs:01
+    Type:0
+    Label:0
+    Comment:0
+    Out:MOV     T:0028 Size:003 E:0848 E:0942
+    Height:03
+  [Branch01]
+    X1position:00
+    X2position:13
+    Yposition:00
+    Height:01
+    B1:00
+    B2:00
+    BInputnumber:00
+    {0;00;0381;-1;-1;-1;-1;00}
+    ###
+
+[Line00016]
+  [Features]
+    Branchs:01
+    Type:0
+    Label:0
+    Comment:0
+    Out:MOV     T:0028 Size:003 E:0846 E:0944
+    Height:03
+  [Branch01]
+    X1position:00
+    X2position:13
+    Yposition:00
+    Height:01
+    B1:00
+    B2:00
+    BInputnumber:00
+    {0;00;0381;-1;-1;-1;-1;00}
+    ###
+
+[Line00017]
+  [Features]
+    Branchs:01
+    Type:0
+    Label:0
+    Comment:0
+    Out:MOV     T:0028 Size:003 E:0852 E:0942
+    Height:03
+  [Branch01]
+    X1position:00
+    X2position:13
+    Yposition:00
+    Height:01
+    B1:00
+    B2:00
+    BInputnumber:00
+    {0;00;0382;-1;-1;-1;-1;00}
+    ###
+
+[Line00018]
+  [Features]
+    Branchs:01
+    Type:0
+    Label:0
+    Comment:0
+    Out:MOV     T:0028 Size:003 E:0850 E:0944
+    Height:03
+  [Branch01]
+    X1position:00
+    X2position:13
+    Yposition:00
+    Height:01
+    B1:00
+    B2:00
+    BInputnumber:00
+    {0;00;0382;-1;-1;-1;-1;00}
+    ###
+
+[Line00019]
+  [Features]
+    Branchs:01
+    Type:0
+    Label:0
+    Comment:0
+    Out:OUT     T:-008 Size:001 E:00C0
+    Height:01
   [Branch01]
     X1position:00
     X2position:13
@@ -363,28 +460,18 @@ Lines:00015
     B2:00
     BInputnumber:00
     {0;00;02FF;-1;-1;-1;-1;00}
-    Out:MONOA   T:-006 Size:001 E:0312
-    Height:02
-  [Branch02]
-    X1position:00
-    X2position:13
-    Yposition:01
-    Height:01
-    B1:00
-    B2:00
-    BInputnumber:00
-    {0;00;0312;-1;-1;-1;-1;00}
-    Out:ADD     T:0040 Size:003 E:08BA E:0001
+    {0;01;0380;-1;-1;-1;-1;00}
+    {0;02;00F4;-1;-1;-1;-1;00}
     ###
 
-[Line00013]
+[Line00020]
   [Features]
     Branchs:01
     Type:0
     Label:0
-    Comment:1
-  [CommentText]
-    Classe de velocidade atual (1=5rpm, 2=10rpm, 3=15rpm) (08BB)
+    Comment:0
+    Out:OUT     T:-008 Size:001 E:00C1
+    Height:01
   [Branch01]
     X1position:00
     X2position:13
@@ -393,18 +480,19 @@ Lines:00015
     B1:00
     B2:00
     BInputnumber:00
-    {0;00;00F7;-1;-1;-1;-1;00}
-    Out:MOV     T:0028 Size:003 E:0890 E:08BB
+    {0;00;02FF;-1;-1;-1;-1;00}
+    {0;01;0381;-1;-1;-1;-1;00}
+    {0;02;00F4;-1;-1;-1;-1;00}
     ###
 
-[Line00014]
+[Line00021]
   [Features]
     Branchs:01
     Type:0
     Label:0
-    Comment:1
-  [CommentText]
-    Dobra atual (1, 2 ou 3) baseado em LEDs (08BC)
+    Comment:0
+    Out:OUT     T:-008 Size:001 E:00C2
+    Height:01
   [Branch01]
     X1position:00
     X2position:13
@@ -413,109 +501,8 @@ Lines:00015
     B1:00
     B2:00
     BInputnumber:00
-    {0;00;00C0;-1;-1;-1;-1;00}
-    Out:MOVK    T:0029 Size:003 E:08BC E:0001
-    Height:04
-  [Branch02]
-    X1position:00
-    X2position:13
-    Yposition:01
-    Height:01
-    B1:00
-    B2:00
-    BInputnumber:00
-    {0;00;00C1;-1;-1;-1;-1;00}
-    Out:MOVK    T:0029 Size:003 E:08BC E:0002
-  [Branch03]
-    X1position:00
-    X2position:13
-    Yposition:02
-    Height:01
-    B1:00
-    B2:00
-    BInputnumber:00
-    {0;00;00C2;-1;-1;-1;-1;00}
-    Out:MOVK    T:0029 Size:003 E:08BC E:0003
-    ###
-
-[Line00015]
-  [Features]
-    Branchs:01
-    Type:0
-    Label:0
-    Comment:1
-  [CommentText]
-    Comando: Reset estatisticas (08BE = 1)
-  [Branch01]
-    X1position:00
-    X2position:13
-    Yposition:00
-    Height:01
-    B1:00
-    B2:00
-    BInputnumber:00
-    {0;00;08BE;-1;-1;-1;-1;00}
-    Out:MOVK    T:0029 Size:003 E:08AD E:0000
-    Height:07
-  [Branch02]
-    X1position:00
-    X2position:13
-    Yposition:01
-    Height:01
-    B1:00
-    B2:00
-    BInputnumber:00
-    {0;00;08BE;-1;-1;-1;-1;00}
-    Out:MOVK    T:0029 Size:003 E:08AE E:0000
-  [Branch03]
-    X1position:00
-    X2position:13
-    Yposition:02
-    Height:01
-    B1:00
-    B2:00
-    BInputnumber:00
-    {0;00;08BE;-1;-1;-1;-1;00}
-    Out:MOVK    T:0029 Size:003 E:08B7 E:0000
-  [Branch04]
-    X1position:00
-    X2position:13
-    Yposition:03
-    Height:01
-    B1:00
-    B2:00
-    BInputnumber:00
-    {0;00;08BE;-1;-1;-1;-1;00}
-    Out:MOVK    T:0029 Size:003 E:08B8 E:0000
-  [Branch05]
-    X1position:00
-    X2position:13
-    Yposition:04
-    Height:01
-    B1:00
-    B2:00
-    BInputnumber:00
-    {0;00;08BE;-1;-1;-1;-1;00}
-    Out:MOVK    T:0029 Size:003 E:08B9 E:0000
-  [Branch06]
-    X1position:00
-    X2position:13
-    Yposition:05
-    Height:01
-    B1:00
-    B2:00
-    BInputnumber:00
-    {0;00;08BE;-1;-1;-1;-1;00}
-    Out:MOVK    T:0029 Size:003 E:08BA E:0000
-  [Branch07]
-    X1position:00
-    X2position:13
-    Yposition:06
-    Height:01
-    B1:00
-    B2:00
-    BInputnumber:00
-    {0;00;08BE;-1;-1;-1;-1;00}
-    Out:MOVK    T:0029 Size:003 E:08BE E:0000
+    {0;00;02FF;-1;-1;-1;-1;00}
+    {0;01;0382;-1;-1;-1;-1;00}
+    {0;02;00F4;-1;-1;-1;-1;00}
     ###
 

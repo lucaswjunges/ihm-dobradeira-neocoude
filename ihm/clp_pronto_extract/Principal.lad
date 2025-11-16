@@ -684,23 +684,3 @@ Lines:00024
     {0;01;0105;-1;-1;-1;-1;00}
     ###
 
-[Line00025]
-  [Features]
-    Branchs:01
-    Type:0
-    Label:0
-    Comment:1
-  [CommentText]
-    Chama rotina de supervisao Modbus ROT6
-  [Branch01]
-    X1position:00
-    X2position:13
-    Yposition:00
-    Height:01
-    B1:00
-    B2:00
-    BInputnumber:00
-    {0;00;00F7;-1;-1;-1;-1;00}
-    Out:CALL    T:-001 Size:001 E:ROT6  
-    ###
-
