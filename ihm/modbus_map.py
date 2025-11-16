@@ -94,23 +94,26 @@ ENCODER = {
 # Escrita: value_clp = graus * 10
 
 BEND_ANGLES = {
-    # Dobra 1 (Tela 4) - CORRIGIDO: endereços consecutivos!
-    'BEND_1_LEFT_MSW':  0x0840,  # 2112 - Ângulo 1 Esquerda (MSW - bits 31-16)
-    'BEND_1_LEFT_LSW':  0x0841,  # 2113 - Ângulo 1 Esquerda (LSW - bits 15-0)
-    'BEND_1_RIGHT_MSW': 0x0842,  # 2114 - Ângulo 1 Direita (MSW)
-    'BEND_1_RIGHT_LSW': 0x0843,  # 2115 - Ângulo 1 Direita (LSW)
+    # ✅ ENDEREÇOS VALIDADOS EMPIRICAMENTE (15/Nov/2025)
+    # Testado via test_angle_addresses_empirical.py - PERSISTEM NO CLP!
+    #
+    # NOTA DE ENGENHARIA: Dobra 1 (0x0840/0x0842) não persiste (ladder sobrescreve).
+    # SOLUÇÃO: Mapear IHM web para registros que FUNCIONAM:
+    #   - IHM Dobra 1 → CLP Dobra 2 Esq (0x0848/0x084A)
+    #   - IHM Dobra 2 → CLP Dobra 2 Dir (0x084C/0x084E)
+    #   - IHM Dobra 3 → CLP Dobra 3 Dir (0x0854/0x0856)
 
-    # Dobra 2 (Tela 5)
-    'BEND_2_LEFT_MSW':  0x0844,  # 2116 - Ângulo 2 Esquerda (MSW)
-    'BEND_2_LEFT_LSW':  0x0845,  # 2117 - Ângulo 2 Esquerda (LSW)
-    'BEND_2_RIGHT_MSW': 0x0846,  # 2118 - Ângulo 2 Direita (MSW)
-    'BEND_2_RIGHT_LSW': 0x0847,  # 2119 - Ângulo 2 Direita (LSW)
+    # Dobra 1 (IHM) → Dobra 2 Esq (CLP) - TESTADO ✅
+    'BEND_1_LEFT_MSW':  0x0848,  # 2120 - Ângulo Dobra 2 Esquerda (MSW - bits 31-16)
+    'BEND_1_LEFT_LSW':  0x084A,  # 2122 - Ângulo Dobra 2 Esquerda (LSW - bits 15-0)
 
-    # Dobra 3 (Tela 6)
-    'BEND_3_LEFT_MSW':  0x0848,  # 2120 - Ângulo 3 Esquerda (MSW)
-    'BEND_3_LEFT_LSW':  0x0849,  # 2121 - Ângulo 3 Esquerda (LSW)
-    'BEND_3_RIGHT_MSW': 0x084A,  # 2122 - Ângulo 3 Direita (MSW)
-    'BEND_3_RIGHT_LSW': 0x084B,  # 2123 - Ângulo 3 Direita (LSW)
+    # Dobra 2 (IHM) → Dobra 2 Dir (CLP) - TESTADO ✅
+    'BEND_2_LEFT_MSW':  0x084C,  # 2124 - Ângulo Dobra 2 Direita (MSW)
+    'BEND_2_LEFT_LSW':  0x084E,  # 2126 - Ângulo Dobra 2 Direita (LSW)
+
+    # Dobra 3 (IHM) → Dobra 3 Dir (CLP) - TESTADO ✅
+    'BEND_3_LEFT_MSW':  0x0854,  # 2132 - Ângulo Dobra 3 Direita (MSW)
+    'BEND_3_LEFT_LSW':  0x0856,  # 2134 - Ângulo Dobra 3 Direita (LSW)
 }
 
 # ==========================================
@@ -129,9 +132,10 @@ SUPERVISION_AREA = {
     'MODE_STATE':    0x0946,  # 2374 - Modo (0=Manual, 1=Auto)
     'BEND_CURRENT':  0x0948,  # 2376 - Dobra atual (1, 2, 3)
     'DIRECTION':     0x094A,  # 2378 - Direção (0=Esq, 1=Dir)
-    'SPEED_CLASS':   0x094C,  # 2380 - Velocidade (5, 10, 15 rpm)
+    'SPEED_CLASS':   0x094C,  # 2380 - Velocidade (5, 10, 15 rpm) ✅ TESTADO R/W
     'CYCLE_ACTIVE':  0x094E,  # 2382 - Ciclo ativo (0=Parado, 1=Ativo)
-    'EMERGENCY':     0x0950,  # 2384 - Emergência ativa (0/1)
+    # NOTA: Removido EMERGENCY daqui - conflitava com BEND_ANGLES antigo
+    # Emergency status deve ser lido via coil ou entrada digital
 }
 
 # ==========================================

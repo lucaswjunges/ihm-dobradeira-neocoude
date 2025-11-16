@@ -144,14 +144,19 @@ class MachineStateManager:
     async def read_encoder(self) -> bool:
         """Lê encoder (32-bit) e atualiza estado."""
         try:
+            print(f"🔍 [DEBUG] Tentando ler encoder em 0x{mm.ENCODER['ANGLE_MSW']:04X}/0x{mm.ENCODER['ANGLE_LSW']:04X}")
             raw = self.client.read_32bit(
                 mm.ENCODER['ANGLE_MSW'],
                 mm.ENCODER['ANGLE_LSW']
             )
+            print(f"🔍 [DEBUG] Encoder retornou: {raw}")
             if raw is not None:
                 self.machine_state['encoder_raw'] = raw
                 self.machine_state['encoder_degrees'] = mm.clp_to_degrees(raw)
+                print(f"✓ Encoder lido: {raw} raw, {mm.clp_to_degrees(raw):.1f}°")
                 return True
+            else:
+                print(f"✗ Encoder retornou None!")
             return False
         except Exception as e:
             print(f"✗ Erro lendo encoder: {e}")
@@ -162,13 +167,13 @@ class MachineStateManager:
     async def read_angles(self) -> bool:
         """Lê todos os ângulos programados."""
         try:
+            # NOTA: Mapeamento corrigido após teste empírico (15/Nov/2025)
+            # Apenas 3 registros funcionam! (ver modbus_map.py)
             angles_map = {
-                'bend_1_left': ('BEND_1_LEFT_MSW', 'BEND_1_LEFT_LSW'),
-                'bend_2_left': ('BEND_2_LEFT_MSW', 'BEND_2_LEFT_LSW'),
-                'bend_3_left': ('BEND_3_LEFT_MSW', 'BEND_3_LEFT_LSW'),
-                'bend_1_right': ('BEND_1_RIGHT_MSW', 'BEND_1_RIGHT_LSW'),
-                'bend_2_right': ('BEND_2_RIGHT_MSW', 'BEND_2_RIGHT_LSW'),
-                'bend_3_right': ('BEND_3_RIGHT_MSW', 'BEND_3_RIGHT_LSW'),
+                'bend_1_left': ('BEND_1_LEFT_MSW', 'BEND_1_LEFT_LSW'),  # → 0x0848/0x084A
+                'bend_2_left': ('BEND_2_LEFT_MSW', 'BEND_2_LEFT_LSW'),  # → 0x084C/0x084E
+                'bend_3_left': ('BEND_3_LEFT_MSW', 'BEND_3_LEFT_LSW'),  # → 0x0854/0x0856
+                # Removido bend_X_right (não existem no modbus_map corrigido)
             }
             for key, (msw_name, lsw_name) in angles_map.items():
                 raw = self.client.read_32bit(
@@ -263,8 +268,10 @@ class MachineStateManager:
             if self.client.write_supervision_register('DIRECTION', direction):
                 self.machine_state['direction'] = direction
 
-            speed = self.infer_speed_class()
-            if self.client.write_supervision_register('SPEED_CLASS', speed):
+            # Lê velocidade do CLP (não escreve, para preservar valor configurado)
+            speed_addr = mm.SUPERVISION_AREA['SPEED_CLASS']
+            speed = self.client.read_register(speed_addr)
+            if speed is not None:
                 self.machine_state['speed_class'] = speed
 
             mode = 0 if self.machine_state.get('mode_manual', True) else 1

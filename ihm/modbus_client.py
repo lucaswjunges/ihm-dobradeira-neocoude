@@ -163,35 +163,47 @@ class ModbusClientWrapper:
             return self.stub_registers.get(address, 0)
 
         if not self.connected:
+            print(f"✗ [DEBUG] read_register 0x{address:04X}: NÃO CONECTADO (self.connected=False)")
             return None
 
         try:
+            print(f"🔍 [DEBUG] read_register: Lendo 0x{address:04X} (slave={self.slave_id})")
             result = self.client.read_holding_registers(address=address, count=1)
             if result.isError():
+                print(f"✗ [DEBUG] read_register 0x{address:04X}: result.isError()=True")
                 return None
-            return result.registers[0]
+            value = result.registers[0]
+            print(f"✓ [DEBUG] read_register 0x{address:04X}: {value} (0x{value:04X})")
+            return value
         except Exception as e:
             print(f"✗ Erro lendo registro 0x{address:04X}: {e}")
+            import traceback
+            traceback.print_exc()
             return None
             
     def read_32bit(self, msw_address: int, lsw_address: int) -> Optional[int]:
         """
         Lê valor 32-bit (MSW + LSW)
-        
+
         Args:
             msw_address: Endereço MSW (bits 31-16)
             lsw_address: Endereço LSW (bits 15-0)
-            
+
         Returns:
             Valor 32-bit ou None se erro
         """
+        print(f"🔍 [DEBUG] read_32bit: Lendo MSW=0x{msw_address:04X}, LSW=0x{lsw_address:04X}")
         msw = self.read_register(msw_address)
         lsw = self.read_register(lsw_address)
-        
+        print(f"🔍 [DEBUG] read_32bit: MSW={msw}, LSW={lsw}")
+
         if msw is None or lsw is None:
+            print(f"✗ [DEBUG] read_32bit: Falhou (MSW ou LSW é None)")
             return None
-            
-        return mm.read_32bit(msw, lsw)
+
+        result = mm.read_32bit(msw, lsw)
+        print(f"✓ [DEBUG] read_32bit: Resultado = {result}")
+        return result
         
     def write_coil(self, address: int, value: bool) -> bool:
         """

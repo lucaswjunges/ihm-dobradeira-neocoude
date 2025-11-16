@@ -106,9 +106,10 @@ class IHMServer:
             # Envia estado completo inicial
             initial_state = self.state_manager.get_state()
             print(f"🔍 [DEBUG] Estado completo antes de enviar: {len(initial_state)} chaves")
-            print(f"🔍 [DEBUG] mode_bit_02ff no estado: {initial_state.get('mode_bit_02ff')}")
-            print(f"🔍 [DEBUG] mode_text no estado: {initial_state.get('mode_text')}")
-            print(f"🔍 [DEBUG] leds no estado: {initial_state.get('leds')}")
+            print(f"🔍 [DEBUG] modbus_connected no estado: {initial_state.get('modbus_connected')}")
+            print(f"🔍 [DEBUG] connected no estado: {initial_state.get('connected')}")
+            print(f"🔍 [DEBUG] encoder_raw no estado: {initial_state.get('encoder_raw')}")
+            print(f"🔍 [DEBUG] encoder_degrees no estado: {initial_state.get('encoder_degrees')}")
 
             await websocket.send(json.dumps({
                 'type': 'full_state',
@@ -190,6 +191,77 @@ class IHMServer:
                         'bend': bend_num,
                         'success': success
                     }))
+
+            elif action == 'write_output':
+                # Controlar saída digital (motor)
+                output_name = data.get('output')  # 'S0' ou 'S1'
+                value = data.get('value')  # True/False
+
+                if output_name in mm.DIGITAL_OUTPUTS:
+                    # M-002: INTERTRAVAMENTO S0/S1 (Safety)
+                    if value and output_name in ['S0', 'S1']:
+                        # Verificar se a outra saída está ativa
+                        other_output = 'S1' if output_name == 'S0' else 'S0'
+                        other_addr = mm.DIGITAL_OUTPUTS[other_output]
+                        other_state = self.modbus_client.read_coil(other_addr)
+
+                        if other_state:
+                            # BLOQUEIO DE SEGURANÇA
+                            print(f"⚠️ BLOQUEIO: {output_name} não pode ligar enquanto {other_output} está ativo!")
+                            await websocket.send(json.dumps({
+                                'type': 'error',
+                                'message': f'ERRO DE SEGURANÇA: {other_output} ainda está ativo. Pare o motor antes de inverter direção.'
+                            }))
+                            return
+
+                    addr = mm.DIGITAL_OUTPUTS[output_name]
+                    success = self.modbus_client.write_coil(addr, value)
+                    print(f"{'✓' if success else '✗'} Motor {output_name}: {'ON' if value else 'OFF'}")
+                    await websocket.send(json.dumps({
+                        'type': 'output_response',
+                        'output': output_name,
+                        'value': value,
+                        'success': success
+                    }))
+
+            elif action == 'write_speed':
+                # Alterar velocidade do motor
+                speed = data.get('speed')  # 5, 10 ou 15 RPM
+
+                if speed in [5, 10, 15]:
+                    addr = mm.SUPERVISION_AREA['SPEED_CLASS']
+                    success = self.modbus_client.write_register(addr, speed)
+                    print(f"{'✓' if success else '✗'} Velocidade: {speed} RPM")
+                    await websocket.send(json.dumps({
+                        'type': 'speed_response',
+                        'speed': speed,
+                        'success': success
+                    }))
+                else:
+                    print(f"✗ Velocidade inválida: {speed}")
+                    await websocket.send(json.dumps({
+                        'type': 'error',
+                        'message': f'Velocidade inválida: {speed}. Use 5, 10 ou 15 RPM.'
+                    }))
+
+            elif action == 'emergency_stop':
+                # M-001: PARADA DE EMERGÊNCIA (NR-12)
+                print("🚨 EMERGÊNCIA ACIONADA! Desligando tudo...")
+
+                # Desliga S0 e S1 imediatamente (sem verificação)
+                s0_success = self.modbus_client.write_coil(mm.DIGITAL_OUTPUTS['S0'], False)
+                s1_success = self.modbus_client.write_coil(mm.DIGITAL_OUTPUTS['S1'], False)
+
+                # Opcional: Zera velocidade (ou coloca em classe mais baixa)
+                # speed_success = self.modbus_client.write_register(mm.SUPERVISION_AREA['SPEED_CLASS'], 5)
+
+                print(f"{'✓' if s0_success and s1_success else '✗'} Motor desligado (S0={s0_success}, S1={s1_success})")
+
+                await websocket.send(json.dumps({
+                    'type': 'emergency_response',
+                    'success': s0_success and s1_success,
+                    'message': 'Parada de emergência executada'
+                }))
                     
         except json.JSONDecodeError:
             print(f"✗ JSON inválido recebido: {message}")
