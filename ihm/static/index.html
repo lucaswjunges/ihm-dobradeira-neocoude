@@ -2,233 +2,195 @@
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>IHM Web 2.0 - NEOCOUDE-HD-15</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <title>IHM - NEOCOUDE-HD-15</title>
     <style>
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        html, body {
+            height: 100%;
+            overflow: hidden;
+            font-family: 'Segoe UI', Roboto, Arial, sans-serif;
         }
 
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
             color: #fff;
-            min-height: 100vh;
-            padding: 20px;
-        }
-
-        .container {
-            max-width: 800px;
-            margin: 0 auto;
-        }
-
-        header {
-            text-align: center;
-            margin-bottom: 30px;
-        }
-
-        h1 {
-            font-size: 28px;
-            font-weight: 600;
-            margin-bottom: 5px;
-        }
-
-        .subtitle {
-            font-size: 14px;
-            opacity: 0.8;
-        }
-
-        /* Status Bar */
-        .status-bar {
             display: flex;
-            justify-content: space-around;
-            background: rgba(255,255,255,0.1);
-            border-radius: 10px;
-            padding: 15px;
-            margin-bottom: 20px;
+            flex-direction: column;
         }
 
-        .status-item {
-            text-align: center;
+        /* Header compacto */
+        .header {
+            background: rgba(0,0,0,0.3);
+            padding: 8px 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 2px solid rgba(255,255,255,0.2);
         }
 
-        .status-label {
-            font-size: 11px;
-            opacity: 0.7;
-            margin-bottom: 5px;
-        }
-
-        .status-value {
+        .header-title {
             font-size: 16px;
             font-weight: 600;
         }
 
+        .header-status {
+            display: flex;
+            gap: 15px;
+            font-size: 11px;
+        }
+
+        .status-item {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
         .status-dot {
-            display: inline-block;
-            width: 10px;
-            height: 10px;
+            width: 8px;
+            height: 8px;
             border-radius: 50%;
-            margin-right: 5px;
+            background: #f44336;
+            box-shadow: 0 0 8px currentColor;
         }
 
         .status-dot.connected {
             background: #4caf50;
-            box-shadow: 0 0 10px #4caf50;
         }
 
-        .status-dot.disconnected {
-            background: #f44336;
-            box-shadow: 0 0 10px #f44336;
+        /* Container principal com grid */
+        .main-container {
+            flex: 1;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            grid-template-rows: auto 1fr auto;
+            gap: 10px;
+            padding: 10px;
+            overflow: hidden;
         }
 
-        /* Encoder Display */
-        .encoder-display {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            border-radius: 15px;
-            padding: 30px;
-            text-align: center;
-            margin-bottom: 20px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+        /* Encoder compacto */
+        .encoder-compact {
+            grid-column: 1 / -1;
+            background: rgba(255,255,255,0.1);
+            border-radius: 10px;
+            padding: 10px 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
         }
 
         .encoder-label {
-            font-size: 14px;
-            opacity: 0.9;
-            margin-bottom: 10px;
+            font-size: 12px;
+            opacity: 0.8;
         }
 
         .encoder-value {
-            font-size: 72px;
+            font-size: 28px;
             font-weight: 700;
-            line-height: 1;
-            text-shadow: 0 2px 10px rgba(0,0,0,0.3);
+            color: #4caf50;
+            text-shadow: 0 2px 10px rgba(76,175,80,0.5);
         }
 
-        /* Angles Section */
-        .angles-section {
-            background: rgba(255,255,255,0.1);
-            border-radius: 15px;
-            padding: 20px;
-            margin-bottom: 20px;
-        }
-
-        .section-title {
-            font-size: 16px;
-            font-weight: 600;
-            margin-bottom: 15px;
-            opacity: 0.9;
-        }
-
+        /* Ângulos em grid compacto */
         .angles-grid {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
-            gap: 15px;
+            gap: 8px;
         }
 
         .angle-card {
             background: rgba(255,255,255,0.15);
+            border: 2px solid rgba(255,255,255,0.3);
             border-radius: 10px;
-            padding: 15px;
+            padding: 12px 8px;
             text-align: center;
             cursor: pointer;
             transition: all 0.3s;
         }
 
-        .angle-card:hover {
+        .angle-card:active {
+            transform: scale(0.95);
             background: rgba(255,255,255,0.25);
-            transform: translateY(-2px);
         }
 
         .angle-card-label {
-            font-size: 12px;
+            font-size: 11px;
             opacity: 0.8;
-            margin-bottom: 8px;
+            margin-bottom: 5px;
         }
 
         .angle-card-value {
-            font-size: 32px;
-            font-weight: 600;
+            font-size: 22px;
+            font-weight: 700;
         }
 
         .angle-card-unit {
-            font-size: 18px;
+            font-size: 16px;
             opacity: 0.7;
         }
 
-        /* Motor Control */
-        .motor-section {
-            background: rgba(255,255,255,0.1);
-            border-radius: 15px;
-            padding: 20px;
-            margin-bottom: 20px;
-        }
-
-        .motor-buttons {
+        /* Controles em grid */
+        .controls-section {
+            grid-column: 1 / -1;
             display: grid;
-            grid-template-columns: 1fr 1fr 1fr;
-            gap: 15px;
-            margin-top: 15px;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
         }
 
-        .motor-btn {
+        .control-btn {
             background: rgba(255,255,255,0.2);
             border: 2px solid rgba(255,255,255,0.3);
-            border-radius: 10px;
+            border-radius: 12px;
             color: #fff;
-            font-size: 16px;
+            font-size: 14px;
             font-weight: 600;
-            padding: 20px;
+            padding: 15px;
             cursor: pointer;
-            transition: all 0.3s;
+            transition: all 0.2s;
             display: flex;
             flex-direction: column;
             align-items: center;
-            gap: 8px;
+            gap: 5px;
         }
 
-        .motor-btn:hover {
-            background: rgba(255,255,255,0.3);
-            transform: scale(1.05);
-        }
-
-        .motor-btn:active {
+        .control-btn:active {
             transform: scale(0.95);
         }
 
-        .motor-btn.active {
+        .control-btn.active {
             background: #4caf50;
             border-color: #4caf50;
-            box-shadow: 0 0 20px rgba(76, 175, 80, 0.5);
+            box-shadow: 0 0 15px rgba(76,175,80,0.5);
         }
 
-        .motor-btn.stop {
-            background: rgba(244, 67, 54, 0.3);
-            border-color: rgba(244, 67, 54, 0.5);
+        .control-btn.stop {
+            background: rgba(244,67,54,0.3);
+            border-color: rgba(244,67,54,0.5);
         }
 
-        .motor-btn.stop:hover {
+        .control-btn.stop:active {
             background: #f44336;
         }
 
-        .motor-icon {
-            font-size: 32px;
+        .control-icon {
+            font-size: 24px;
         }
 
-        /* Velocity Selector */
-        .velocity-section {
-            background: rgba(255,255,255,0.1);
-            border-radius: 15px;
-            padding: 20px;
-            margin-bottom: 20px;
-        }
-
-        .velocity-selector {
+        /* Velocidade horizontal */
+        .velocity-row {
+            grid-column: 1 / -1;
             display: grid;
             grid-template-columns: repeat(3, 1fr);
-            gap: 15px;
-            margin-top: 15px;
+            gap: 8px;
         }
 
         .velocity-btn {
@@ -236,134 +198,57 @@
             border: 2px solid rgba(255,255,255,0.3);
             border-radius: 10px;
             color: #fff;
-            font-size: 16px;
             font-weight: 600;
-            padding: 15px;
+            padding: 12px;
             cursor: pointer;
-            transition: all 0.3s;
+            transition: all 0.2s;
             text-align: center;
         }
 
-        .velocity-btn:hover {
-            background: rgba(255,255,255,0.25);
+        .velocity-btn:active {
+            transform: scale(0.95);
         }
 
         .velocity-btn.active {
             background: #2196f3;
             border-color: #2196f3;
-            box-shadow: 0 0 20px rgba(33, 150, 243, 0.5);
+            box-shadow: 0 0 12px rgba(33,150,243,0.5);
         }
 
         .velocity-value {
-            font-size: 24px;
             display: block;
-            margin-bottom: 5px;
+            font-size: 20px;
         }
 
         .velocity-label {
-            font-size: 12px;
-            opacity: 0.8;
-        }
-
-        /* Emergency Button */
-        .emergency-section {
-            background: rgba(244, 67, 54, 0.2);
-            border: 3px solid #f44336;
-            border-radius: 15px;
-            padding: 20px;
-            margin-bottom: 20px;
-        }
-
-        .emergency-btn {
-            width: 100%;
-            background: linear-gradient(135deg, #f44336 0%, #d32f2f 100%);
-            border: 4px solid #fff;
-            border-radius: 50%;
-            color: #fff;
-            font-size: 24px;
-            font-weight: 700;
-            padding: 60px;
-            cursor: pointer;
-            transition: all 0.3s;
-            text-align: center;
-            box-shadow: 0 10px 30px rgba(244, 67, 54, 0.5);
-            animation: pulse-emergency 2s infinite;
-        }
-
-        .emergency-btn:hover {
-            transform: scale(1.05);
-            box-shadow: 0 15px 40px rgba(244, 67, 54, 0.7);
-        }
-
-        .emergency-btn:active {
-            transform: scale(0.95);
-        }
-
-        .emergency-icon {
-            font-size: 64px;
             display: block;
-            margin-bottom: 10px;
+            font-size: 10px;
+            opacity: 0.7;
+            margin-top: 2px;
         }
 
-        .emergency-label {
-            font-size: 20px;
-            letter-spacing: 2px;
-        }
-
-        @keyframes pulse-emergency {
-            0%, 100% {
-                box-shadow: 0 10px 30px rgba(244, 67, 54, 0.5);
-            }
-            50% {
-                box-shadow: 0 10px 30px rgba(244, 67, 54, 0.9), 0 0 50px rgba(244, 67, 54, 0.5);
-            }
-        }
-
-        /* Overlay para erros */
-        .overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0,0,0,0.9);
-            display: none;
-            align-items: center;
-            justify-content: center;
-            z-index: 1000;
-            flex-direction: column;
-            gap: 20px;
-        }
-
-        .overlay.active {
-            display: flex;
-        }
-
-        .overlay-message {
-            font-size: 48px;
-            font-weight: 700;
-            color: #f44336;
+        /* Footer */
+        .footer {
+            background: rgba(0,0,0,0.3);
+            padding: 8px;
             text-align: center;
-            animation: pulse 1s infinite;
+            font-size: 10px;
+            opacity: 0.7;
+            border-top: 1px solid rgba(255,255,255,0.1);
         }
 
-        @keyframes pulse {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0.5; }
-        }
-
-        /* Modal para editar ângulo */
+        /* Modal */
         .modal {
+            display: none;
             position: fixed;
             top: 0;
             left: 0;
-            width: 100%;
-            height: 100%;
+            right: 0;
+            bottom: 0;
             background: rgba(0,0,0,0.8);
-            display: none;
+            z-index: 1000;
             align-items: center;
             justify-content: center;
-            z-index: 999;
         }
 
         .modal.active {
@@ -372,15 +257,16 @@
 
         .modal-content {
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            border-radius: 15px;
-            padding: 30px;
-            max-width: 400px;
+            border-radius: 20px;
+            padding: 25px;
             width: 90%;
+            max-width: 350px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.5);
         }
 
         .modal-title {
-            font-size: 24px;
-            font-weight: 600;
+            font-size: 20px;
+            font-weight: 700;
             margin-bottom: 20px;
             text-align: center;
         }
@@ -389,11 +275,11 @@
             width: 100%;
             background: rgba(255,255,255,0.2);
             border: 2px solid rgba(255,255,255,0.3);
-            border-radius: 10px;
+            border-radius: 12px;
             color: #fff;
-            font-size: 48px;
-            font-weight: 600;
-            padding: 20px;
+            font-size: 32px;
+            font-weight: 700;
+            padding: 15px;
             text-align: center;
             margin-bottom: 20px;
         }
@@ -405,23 +291,23 @@
         .modal-buttons {
             display: grid;
             grid-template-columns: 1fr 1fr;
-            gap: 15px;
+            gap: 12px;
         }
 
         .modal-btn {
             background: rgba(255,255,255,0.2);
             border: 2px solid rgba(255,255,255,0.3);
-            border-radius: 10px;
+            border-radius: 12px;
             color: #fff;
-            font-size: 18px;
+            font-size: 16px;
             font-weight: 600;
             padding: 15px;
             cursor: pointer;
-            transition: all 0.3s;
+            transition: all 0.2s;
         }
 
-        .modal-btn:hover {
-            background: rgba(255,255,255,0.3);
+        .modal-btn:active {
+            transform: scale(0.95);
         }
 
         .modal-btn.confirm {
@@ -429,26 +315,78 @@
             border-color: #4caf50;
         }
 
-        .modal-btn.confirm:hover {
-            background: #45a049;
+        /* Overlay de erro */
+        .overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(244,67,54,0.95);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 999;
         }
 
-        /* Responsivo */
-        @media (max-width: 600px) {
+        .overlay.active {
+            display: flex;
+        }
+
+        .overlay-message {
+            font-size: 48px;
+            font-weight: 900;
+            text-shadow: 0 4px 20px rgba(0,0,0,0.5);
+            animation: pulse 1s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.7; }
+        }
+
+        /* Responsivo Desktop */
+        @media (min-width: 768px) {
+            .main-container {
+                max-width: 1200px;
+                margin: 0 auto;
+                padding: 20px;
+            }
+
+            .header {
+                padding: 12px 20px;
+            }
+
+            .header-title {
+                font-size: 20px;
+            }
+
             .encoder-value {
-                font-size: 56px;
+                font-size: 36px;
+            }
+        }
+
+        /* Landscape mobile */
+        @media (max-height: 500px) and (orientation: landscape) {
+            .header {
+                padding: 5px 10px;
             }
 
-            .angles-grid {
-                grid-template-columns: 1fr;
+            .encoder-compact {
+                padding: 8px 12px;
             }
 
-            .motor-buttons {
-                grid-template-columns: 1fr;
+            .encoder-value {
+                font-size: 24px;
             }
 
-            .velocity-selector {
-                grid-template-columns: 1fr;
+            .control-btn {
+                padding: 10px;
+                font-size: 12px;
+            }
+
+            .control-icon {
+                font-size: 20px;
             }
         }
     </style>
@@ -471,110 +409,93 @@
         </div>
     </div>
 
-    <div class="container">
-        <header>
-            <h1>IHM Web 2.0</h1>
-            <div class="subtitle">NEOCOUDE-HD-15 - Controle Modbus Direto</div>
-        </header>
-
-        <!-- Barra de Status -->
-        <div class="status-bar">
+    <!-- Header -->
+    <div class="header">
+        <div class="header-title">IHM - NEOCOUDE-HD-15</div>
+        <div class="header-status">
             <div class="status-item">
-                <div class="status-label">WebSocket</div>
-                <div class="status-value">
-                    <span class="status-dot disconnected" id="wsStatus"></span>
-                    <span id="wsText">Desconectado</span>
-                </div>
+                <span class="status-dot" id="wsStatus"></span>
+                <span id="wsText">WS</span>
             </div>
             <div class="status-item">
-                <div class="status-label">CLP Modbus</div>
-                <div class="status-value">
-                    <span class="status-dot disconnected" id="clpStatus"></span>
-                    <span id="clpText">Offline</span>
+                <span class="status-dot" id="clpStatus"></span>
+                <span id="clpText">CLP</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Container Principal -->
+    <div class="main-container">
+        <!-- Encoder Compacto -->
+        <div class="encoder-compact">
+            <div>
+                <div class="encoder-label">ENCODER</div>
+                <div class="encoder-value" id="encoderValue">0.0°</div>
+            </div>
+            <div style="text-align: right;">
+                <div class="encoder-label">VELOCIDADE</div>
+                <div style="font-size: 20px; font-weight: 600;" id="speedValue">5 RPM</div>
+            </div>
+        </div>
+
+        <!-- Ângulos -->
+        <div class="angles-grid" style="grid-column: 1 / -1;">
+            <div class="angle-card" onclick="editAngle(1)">
+                <div class="angle-card-label">DOBRA 1</div>
+                <div class="angle-card-value">
+                    <span id="angle1">0.0</span><span class="angle-card-unit">°</span>
                 </div>
             </div>
-            <div class="status-item">
-                <div class="status-label">Motor</div>
-                <div class="status-value" id="motorStatus">Parado</div>
+            <div class="angle-card" onclick="editAngle(2)">
+                <div class="angle-card-label">DOBRA 2</div>
+                <div class="angle-card-value">
+                    <span id="angle2">0.0</span><span class="angle-card-unit">°</span>
+                </div>
             </div>
-        </div>
-
-        <!-- Display do Encoder -->
-        <div class="encoder-display">
-            <div class="encoder-label">POSIÇÃO ATUAL (ENCODER)</div>
-            <div class="encoder-value" id="encoderValue">0.0°</div>
-        </div>
-
-        <!-- Ângulos Programados -->
-        <div class="angles-section">
-            <div class="section-title">ÂNGULOS PROGRAMADOS</div>
-            <div class="angles-grid">
-                <div class="angle-card" onclick="editAngle(1)">
-                    <div class="angle-card-label">DOBRA 1</div>
-                    <div class="angle-card-value">
-                        <span id="angle1">0.0</span><span class="angle-card-unit">°</span>
-                    </div>
-                </div>
-                <div class="angle-card" onclick="editAngle(2)">
-                    <div class="angle-card-label">DOBRA 2</div>
-                    <div class="angle-card-value">
-                        <span id="angle2">0.0</span><span class="angle-card-unit">°</span>
-                    </div>
-                </div>
-                <div class="angle-card" onclick="editAngle(3)">
-                    <div class="angle-card-label">DOBRA 3</div>
-                    <div class="angle-card-value">
-                        <span id="angle3">0.0</span><span class="angle-card-unit">°</span>
-                    </div>
+            <div class="angle-card" onclick="editAngle(3)">
+                <div class="angle-card-label">DOBRA 3</div>
+                <div class="angle-card-value">
+                    <span id="angle3">0.0</span><span class="angle-card-unit">°</span>
                 </div>
             </div>
         </div>
 
-        <!-- Controle do Motor -->
-        <div class="motor-section">
-            <div class="section-title">CONTROLE DO MOTOR</div>
-            <div class="motor-buttons">
-                <button class="motor-btn" id="btnForward" onclick="startMotor('forward')">
-                    <div class="motor-icon">⬆️</div>
-                    <div>AVANÇAR</div>
-                </button>
-                <button class="motor-btn" id="btnReverse" onclick="startMotor('reverse')">
-                    <div class="motor-icon">⬇️</div>
-                    <div>RECUAR</div>
-                </button>
-                <button class="motor-btn stop" onclick="stopMotor()">
-                    <div class="motor-icon">⏹️</div>
-                    <div>PARAR</div>
-                </button>
-            </div>
-        </div>
-
-        <!-- Seletor de Velocidade -->
-        <div class="velocity-section">
-            <div class="section-title">VELOCIDADE (RPM)</div>
-            <div class="velocity-selector">
-                <button class="velocity-btn" onclick="changeSpeed(5)">
-                    <span class="velocity-value">5</span>
-                    <span class="velocity-label">Classe 1</span>
-                </button>
-                <button class="velocity-btn" onclick="changeSpeed(10)">
-                    <span class="velocity-value">10</span>
-                    <span class="velocity-label">Classe 2</span>
-                </button>
-                <button class="velocity-btn" onclick="changeSpeed(15)">
-                    <span class="velocity-value">15</span>
-                    <span class="velocity-label">Classe 3</span>
-                </button>
-            </div>
-        </div>
-
-        <!-- Botão de Emergência (NR-12) -->
-        <div class="emergency-section">
-            <button class="emergency-btn" onclick="emergencyStop()">
-                <span class="emergency-icon">⛔</span>
-                <span class="emergency-label">EMERGÊNCIA</span>
+        <!-- Controles de Motor -->
+        <div class="controls-section">
+            <button class="control-btn" id="btnForward" onclick="startMotor('forward')">
+                <div class="control-icon">⬆️</div>
+                <div>AVANÇAR</div>
+            </button>
+            <button class="control-btn stop" onclick="stopMotor()">
+                <div class="control-icon">⏹️</div>
+                <div>PARAR</div>
+            </button>
+            <button class="control-btn" id="btnReverse" onclick="startMotor('reverse')">
+                <div class="control-icon">⬇️</div>
+                <div>RECUAR</div>
             </button>
         </div>
+
+        <!-- Velocidades -->
+        <div class="velocity-row">
+            <button class="velocity-btn" id="vel5" onclick="changeSpeed(5)">
+                <span class="velocity-value">5 RPM</span>
+                <span class="velocity-label">Classe 1</span>
+            </button>
+            <button class="velocity-btn" id="vel10" onclick="changeSpeed(10)">
+                <span class="velocity-value">10 RPM</span>
+                <span class="velocity-label">Classe 2</span>
+            </button>
+            <button class="velocity-btn" id="vel15" onclick="changeSpeed(15)">
+                <span class="velocity-value">15 RPM</span>
+                <span class="velocity-label">Classe 3</span>
+            </button>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <div class="footer">
+        Desenvolvido pelo Eng. Lucas William Junges
     </div>
 
     <script>
@@ -582,11 +503,11 @@
         let ws = null;
         let currentBend = null;
         let currentSpeed = 5;
-        let motorState = 'stopped'; // 'stopped', 'forward', 'reverse'
 
         // Conectar WebSocket
         function connectWebSocket() {
-            ws = new WebSocket('ws://localhost:8765');
+            const wsHost = window.location.hostname;
+            ws = new WebSocket(`ws://${wsHost}:8765`);
 
             ws.onopen = () => {
                 console.log('WebSocket conectado');
@@ -595,13 +516,10 @@
 
             ws.onmessage = (event) => {
                 const message = JSON.parse(event.data);
-                console.log('📨 Mensagem recebida:', message.type);
 
-                // Extrair dados do wrapper (servidor envia { type: "...", data: {...} })
                 if (message.type === 'full_state' || message.type === 'state_update') {
                     handleServerMessage(message.data);
                 } else {
-                    // Outros tipos de mensagem (error, key_response, etc.)
                     handleServerMessage(message);
                 }
             };
@@ -618,120 +536,73 @@
             };
         }
 
-        // Atualizar status de conexão
+        // Atualizar status
         function updateStatus(type, connected) {
             if (type === 'ws') {
                 const dot = document.getElementById('wsStatus');
                 const text = document.getElementById('wsText');
-                if (connected) {
-                    dot.className = 'status-dot connected';
-                    text.textContent = 'Conectado';
-                    document.getElementById('errorOverlay').classList.remove('active');
-                } else {
-                    dot.className = 'status-dot disconnected';
-                    text.textContent = 'Desconectado';
+                dot.className = 'status-dot ' + (connected ? 'connected' : '');
+                text.textContent = connected ? 'WS' : 'OFF';
+
+                if (!connected) {
                     document.getElementById('errorOverlay').classList.add('active');
                     document.getElementById('errorMessage').textContent = 'DESLIGADO';
+                } else {
+                    document.getElementById('errorOverlay').classList.remove('active');
                 }
             } else if (type === 'clp') {
                 const dot = document.getElementById('clpStatus');
                 const text = document.getElementById('clpText');
-                if (connected) {
-                    dot.className = 'status-dot connected';
-                    text.textContent = 'Online';
-                    document.getElementById('errorOverlay').classList.remove('active');
-                } else {
-                    dot.className = 'status-dot disconnected';
-                    text.textContent = 'Offline';
-                    if (ws && ws.readyState === WebSocket.OPEN) {
-                        document.getElementById('errorOverlay').classList.add('active');
-                        document.getElementById('errorMessage').textContent = 'FALHA CLP';
-                    }
+                dot.className = 'status-dot ' + (connected ? 'connected' : '');
+                text.textContent = connected ? 'CLP' : 'OFF';
+
+                if (!connected && ws && ws.readyState === WebSocket.OPEN) {
+                    document.getElementById('errorOverlay').classList.add('active');
+                    document.getElementById('errorMessage').textContent = 'FALHA CLP';
                 }
             }
         }
 
         // Processar mensagens do servidor
         function handleServerMessage(data) {
-            // Status de conexão CLP
-            if (data.modbus_connected !== undefined) {
-                updateStatus('clp', data.modbus_connected);
-            }
-
-            // Encoder
+            // Atualizar encoder
             if (data.encoder_degrees !== undefined) {
                 document.getElementById('encoderValue').textContent = data.encoder_degrees.toFixed(1) + '°';
             }
 
-            // Ângulos
-            if (data.bend_1_left !== undefined) {
-                document.getElementById('angle1').textContent = data.bend_1_left.toFixed(1);
-            }
-            if (data.bend_2_left !== undefined) {
-                document.getElementById('angle2').textContent = data.bend_2_left.toFixed(1);
-            }
-            if (data.bend_3_left !== undefined) {
-                document.getElementById('angle3').textContent = data.bend_3_left.toFixed(1);
-            }
-
-            // Velocidade atual
+            // Atualizar velocidade
             if (data.speed_class !== undefined) {
                 currentSpeed = data.speed_class;
+                document.getElementById('speedValue').textContent = data.speed_class + ' RPM';
                 updateSpeedButtons();
             }
 
-            // Estado dos outputs (motor)
-            if (data.outputs !== undefined) {
-                updateMotorState(data.outputs);
+            // Atualizar ângulos
+            if (data.angles) {
+                if (data.angles.bend_1_left !== undefined) {
+                    document.getElementById('angle1').textContent = data.angles.bend_1_left.toFixed(1);
+                }
+                if (data.angles.bend_2_left !== undefined) {
+                    document.getElementById('angle2').textContent = data.angles.bend_2_left.toFixed(1);
+                }
+                if (data.angles.bend_3_left !== undefined) {
+                    document.getElementById('angle3').textContent = data.angles.bend_3_left.toFixed(1);
+                }
             }
-        }
 
-        // Atualizar estado do motor baseado nos outputs
-        function updateMotorState(outputs) {
-            const s0 = outputs['S0'] || false;
-            const s1 = outputs['S1'] || false;
-
-            const btnForward = document.getElementById('btnForward');
-            const btnReverse = document.getElementById('btnReverse');
-            const motorStatus = document.getElementById('motorStatus');
-
-            btnForward.classList.remove('active');
-            btnReverse.classList.remove('active');
-
-            if (s0) {
-                motorState = 'forward';
-                btnForward.classList.add('active');
-                motorStatus.textContent = 'Avançando';
-            } else if (s1) {
-                motorState = 'reverse';
-                btnReverse.classList.add('active');
-                motorStatus.textContent = 'Recuando';
-            } else {
-                motorState = 'stopped';
-                motorStatus.textContent = 'Parado';
-            }
-        }
-
-        // Atualizar botões de velocidade
-        function updateSpeedButtons() {
-            document.querySelectorAll('.velocity-btn').forEach(btn => {
-                btn.classList.remove('active');
-            });
-            const speeds = [5, 10, 15];
-            const index = speeds.indexOf(currentSpeed);
-            if (index >= 0) {
-                document.querySelectorAll('.velocity-btn')[index].classList.add('active');
+            // Status CLP
+            if (data.modbus_connected !== undefined) {
+                updateStatus('clp', data.modbus_connected);
             }
         }
 
         // Editar ângulo
         function editAngle(bendNumber) {
             currentBend = bendNumber;
-            const currentValue = document.getElementById(`angle${bendNumber}`).textContent;
             document.getElementById('modalTitle').textContent = `Editar Ângulo - Dobra ${bendNumber}`;
-            document.getElementById('angleInput').value = currentValue;
+            document.getElementById('angleInput').value = '';
             document.getElementById('angleModal').classList.add('active');
-            document.getElementById('angleInput').focus();
+            setTimeout(() => document.getElementById('angleInput').focus(), 100);
         }
 
         // Fechar modal
@@ -752,39 +623,39 @@
                 return;
             }
 
-            // Enviar comando para o servidor
             ws.send(JSON.stringify({
                 action: 'write_angle',
                 bend: currentBend,
                 angle: value
             }));
 
-            // Atualizar display localmente (será confirmado pelo servidor)
             document.getElementById(`angle${currentBend}`).textContent = value.toFixed(1);
-
             closeModal();
         }
 
-        // Iniciar motor
+        // Controle de motor
         function startMotor(direction) {
-            if (!ws || ws.readyState !== WebSocket.OPEN) {
-                return;
-            }
+            if (!ws || ws.readyState !== WebSocket.OPEN) return;
 
             ws.send(JSON.stringify({
                 action: 'write_output',
                 output: direction === 'forward' ? 'S0' : 'S1',
                 value: true
             }));
+
+            // Feedback visual
+            if (direction === 'forward') {
+                document.getElementById('btnForward').classList.add('active');
+                document.getElementById('btnReverse').classList.remove('active');
+            } else {
+                document.getElementById('btnReverse').classList.add('active');
+                document.getElementById('btnForward').classList.remove('active');
+            }
         }
 
-        // Parar motor
         function stopMotor() {
-            if (!ws || ws.readyState !== WebSocket.OPEN) {
-                return;
-            }
+            if (!ws || ws.readyState !== WebSocket.OPEN) return;
 
-            // Desligar ambos S0 e S1
             ws.send(JSON.stringify({
                 action: 'write_output',
                 output: 'S0',
@@ -798,13 +669,15 @@
                     value: false
                 }));
             }, 50);
+
+            // Remove feedback visual
+            document.getElementById('btnForward').classList.remove('active');
+            document.getElementById('btnReverse').classList.remove('active');
         }
 
         // Mudar velocidade
         function changeSpeed(speed) {
-            if (!ws || ws.readyState !== WebSocket.OPEN) {
-                return;
-            }
+            if (!ws || ws.readyState !== WebSocket.OPEN) return;
 
             ws.send(JSON.stringify({
                 action: 'write_speed',
@@ -815,40 +688,23 @@
             updateSpeedButtons();
         }
 
-        // Event listener para Enter no input
+        // Atualizar botões de velocidade
+        function updateSpeedButtons() {
+            document.getElementById('vel5').classList.toggle('active', currentSpeed === 5);
+            document.getElementById('vel10').classList.toggle('active', currentSpeed === 10);
+            document.getElementById('vel15').classList.toggle('active', currentSpeed === 15);
+        }
+
+        // Event listeners
         document.getElementById('angleInput').addEventListener('keypress', (e) => {
             if (e.key === 'Enter') {
                 saveAngle();
-            } else if (e.key === 'Escape') {
-                closeModal();
             }
         });
 
-        // Emergência (NR-12 compliance)
-        function emergencyStop() {
-            if (!ws || ws.readyState !== WebSocket.OPEN) {
-                alert('ERRO: WebSocket desconectado! Impossível acionar emergência.');
-                return;
-            }
-
-            // Confirmação apenas visual (não bloqueia ação)
-            console.log('🚨 EMERGÊNCIA ACIONADA!');
-
-            // Desliga TUDO imediatamente (sem delay)
-            // S0 OFF
-            ws.send(JSON.stringify({
-                action: 'emergency_stop'
-            }));
-
-            // Feedback visual imediato
-            const motorStatus = document.getElementById('motorStatus');
-            motorStatus.textContent = '🚨 PARADA DE EMERGÊNCIA';
-            motorStatus.style.color = '#f44336';
-            motorStatus.style.fontWeight = '700';
-        }
-
-        // Iniciar conexão WebSocket
+        // Iniciar
         connectWebSocket();
+        updateSpeedButtons();
     </script>
 </body>
 </html>

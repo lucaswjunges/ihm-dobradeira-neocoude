@@ -165,24 +165,25 @@ class MachineStateManager:
             return False
 
     async def read_angles(self) -> bool:
-        """Lê todos os ângulos programados."""
+        """
+        Lê todos os ângulos programados.
+
+        ATUALIZADO 16/Nov/2025: Usa novo método read_all_bend_angles()
+        validado com 100% de precisão na área 0x0500-0x0504.
+        """
         try:
-            # NOTA: Mapeamento corrigido após teste empírico (15/Nov/2025)
-            # Apenas 3 registros funcionam! (ver modbus_map.py)
-            angles_map = {
-                'bend_1_left': ('BEND_1_LEFT_MSW', 'BEND_1_LEFT_LSW'),  # → 0x0848/0x084A
-                'bend_2_left': ('BEND_2_LEFT_MSW', 'BEND_2_LEFT_LSW'),  # → 0x084C/0x084E
-                'bend_3_left': ('BEND_3_LEFT_MSW', 'BEND_3_LEFT_LSW'),  # → 0x0854/0x0856
-                # Removido bend_X_right (não existem no modbus_map corrigido)
-            }
-            for key, (msw_name, lsw_name) in angles_map.items():
-                raw = self.client.read_32bit(
-                    mm.BEND_ANGLES[msw_name],
-                    mm.BEND_ANGLES[lsw_name]
-                )
-                if raw is not None:
-                    self.machine_state['angles'][key] = mm.clp_to_degrees(raw)
-            return True
+            # Usa método validado que lê área 0x0500 (setpoints oficiais)
+            angles = self.client.read_all_bend_angles()
+
+            if angles:
+                # Atualiza estado com formato esperado pela interface
+                self.machine_state['angles'] = {
+                    'bend_1_left': angles.get('bend_1', 0.0),
+                    'bend_2_left': angles.get('bend_2', 0.0),
+                    'bend_3_left': angles.get('bend_3', 0.0),
+                }
+                return True
+            return False
         except Exception as e:
             print(f"✗ Erro lendo ângulos: {e}")
             import traceback
@@ -268,9 +269,9 @@ class MachineStateManager:
             if self.client.write_supervision_register('DIRECTION', direction):
                 self.machine_state['direction'] = direction
 
-            # Lê velocidade do CLP (não escreve, para preservar valor configurado)
-            speed_addr = mm.SUPERVISION_AREA['SPEED_CLASS']
-            speed = self.client.read_register(speed_addr)
+            # Lê velocidade do CLP usando método validado (16/Nov/2025)
+            # Usa read_speed_class() que lê registro 0x094C (2380)
+            speed = self.client.read_speed_class()
             if speed is not None:
                 self.machine_state['speed_class'] = speed
 

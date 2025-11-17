@@ -88,33 +88,44 @@ ENCODER = {
 }
 
 # ==========================================
-# ÂNGULOS SETPOINT (32-bit)
+# ÂNGULOS SETPOINT (16-bit ÚNICO)
 # ==========================================
-# Padrão: Registros consecutivos (par=MSW, ímpar=LSW)
-# Escrita: value_clp = graus * 10
+# ✅ VALIDADO 16/Nov/2025 - Área 0x0500 aceita escrita sem proteção!
+# Formato: Valor único de 16 bits (NÃO usa MSW/LSW)
+# Conversão: value_clp = graus * 10
+# Conforme manual MPC4004 página 85 - Área oficial de setpoints
 
 BEND_ANGLES = {
-    # 🚨 ENDEREÇOS OFICIAIS DO LADDER (15/Nov/2025 01:45)
-    # Validados via test_ladder_reads_our_angles.py - AUDITORIA CRÍTICA
-    #
-    # IMPORTANTE: Estes são os endereços que o LADDER LÊ (PRINCIPAL.lad):
-    #   - Line00008: SUB 0858 = 0842 - 0840  (Dobra 1)
-    #   - Line00009: SUB 0858 = 0848 - 0846  (Dobra 2)
-    #   - Line00010: SUB 0858 = 0852 - 0850  (Dobra 3)
-    #
-    # ⚠️ QUALQUER OUTRO ENDEREÇO SERÁ IGNORADO!
+    # Endereços validados empiricamente - 100% precisão
+    'BEND_1_SETPOINT': 0x0500,  # 1280 - Ângulo Dobra 1 ✅ TESTADO
+    'BEND_2_SETPOINT': 0x0502,  # 1282 - Ângulo Dobra 2 ✅ TESTADO
+    'BEND_3_SETPOINT': 0x0504,  # 1284 - Ângulo Dobra 3 ✅ TESTADO
+}
 
-    # Dobra 1 - ENDEREÇO OFICIAL DO LADDER ✅
-    'BEND_1_LEFT_MSW':  0x0842,  # 2114 - Ângulo Dobra 1 (MSW - bits 31-16)
-    'BEND_1_LEFT_LSW':  0x0840,  # 2112 - Ângulo Dobra 1 (LSW - bits 15-0)
+# ==========================================
+# ÂNGULOS SHADOW (32-bit) - ÁREA PROTEGIDA
+# ==========================================
+# ⚠️ NÃO USAR PARA ESCRITA - Somente leitura!
+# Valores sobrescritos por ROT4/ROT5 no ladder a cada scan
+# Byte baixo forçado para 0x99 (153) - Ver ANALISE_BYTE_099_LADDER.md
+#
+# IMPORTANTE: Estes são os endereços que o LADDER LÊ (PRINCIPAL.lad):
+#   - Line00008: SUB 0858 = 0842 - 0840  (Dobra 1)
+#   - Line00009: SUB 0858 = 0848 - 0846  (Dobra 2)
+#   - Line00010: SUB 0858 = 0852 - 0850  (Dobra 3)
 
-    # Dobra 2 - ENDEREÇO OFICIAL DO LADDER ✅
-    'BEND_2_LEFT_MSW':  0x0848,  # 2120 - Ângulo Dobra 2 (MSW)
-    'BEND_2_LEFT_LSW':  0x0846,  # 2118 - Ângulo Dobra 2 (LSW)
+BEND_ANGLES_SHADOW = {
+    # Dobra 1 - READ-ONLY
+    'BEND_1_LEFT_LSW':  0x0840,  # 2112 - Shadow Dobra 1 (LSW - protegido)
+    'BEND_1_LEFT_MSW':  0x0842,  # 2114 - Shadow Dobra 1 (MSW - protegido)
 
-    # Dobra 3 - ENDEREÇO OFICIAL DO LADDER ✅
-    'BEND_3_LEFT_MSW':  0x0852,  # 2130 - Ângulo Dobra 3 (MSW)
-    'BEND_3_LEFT_LSW':  0x0850,  # 2128 - Ângulo Dobra 3 (LSW)
+    # Dobra 2 - READ-ONLY
+    'BEND_2_LEFT_LSW':  0x0846,  # 2118 - Shadow Dobra 2 (LSW - protegido)
+    'BEND_2_LEFT_MSW':  0x0848,  # 2120 - Shadow Dobra 2 (MSW - protegido)
+
+    # Dobra 3 - READ-ONLY
+    'BEND_3_LEFT_LSW':  0x0850,  # 2128 - Shadow Dobra 3 (LSW - protegido)
+    'BEND_3_LEFT_MSW':  0x0852,  # 2130 - Shadow Dobra 3 (MSW - protegido)
 }
 
 # ==========================================

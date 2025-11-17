@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Debug IHM</title>
+    <style>
+        body { font-family: monospace; padding: 20px; background: #000; color: #0f0; }
+        #log { white-space: pre; }
+        .error { color: #f00; }
+        .success { color: #0f0; }
+    </style>
+</head>
+<body>
+    <h1>Debug WebSocket IHM</h1>
+    <div id="log"></div>
+
+    <script>
+        const log = document.getElementById('log');
+
+        function addLog(msg, type = 'info') {
+            const timestamp = new Date().toLocaleTimeString();
+            log.innerHTML += `[${timestamp}] ${msg}\n`;
+            console.log(msg);
+        }
+
+        addLog('Iniciando script...', 'info');
+        addLog(`window.location.hostname = ${window.location.hostname}`, 'info');
+
+        const wsHost = window.location.hostname;
+        const wsUrl = `ws://${wsHost}:8765`;
+
+        addLog(`Tentando conectar em: ${wsUrl}`, 'info');
+
+        try {
+            const ws = new WebSocket(wsUrl);
+
+            ws.onopen = () => {
+                addLog('✅ WebSocket CONECTADO!', 'success');
+            };
+
+            ws.onmessage = (event) => {
+                const data = event.data.substring(0, 100);
+                addLog(`📩 Mensagem: ${data}...`, 'success');
+            };
+
+            ws.onerror = (error) => {
+                addLog(`❌ ERRO WebSocket: ${error}`, 'error');
+                console.error(error);
+            };
+
+            ws.onclose = (event) => {
+                addLog(`⚠️ WebSocket fechou. Code: ${event.code}, Reason: ${event.reason}`, 'error');
+            };
+
+        } catch (e) {
+            addLog(`❌ EXCEPTION: ${e.message}`, 'error');
+            console.error(e);
+        }
+    </script>
+</body>
+</html>

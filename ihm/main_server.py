@@ -63,15 +63,15 @@ class IHMServer:
         )
         
         if not self.modbus_client.connected:
-            print("✗ AVISO: Modbus não conectado!")
+            print("⚠️  AVISO: Modbus não conectado!")
             if not self.stub_mode:
                 print("  Verifique:")
                 print(f"  - Cabo RS485 conectado em {self.port}")
                 print("  - CLP ligado e em RUN")
                 print("  - Estado 00BE (190) ativo no ladder")
-                return False
-        
-        # 2. Inicializa State Manager
+                print("\n  ⚙️  Servidor continuará rodando - CLP pode conectar depois")
+
+        # 2. Inicializa State Manager (funciona mesmo sem CLP)
         self.state_manager = MachineStateManager(self.modbus_client)
         
         # 3. Inicia loop de polling
@@ -160,11 +160,11 @@ class IHMServer:
                     }))
                     
             elif action == 'change_speed':
-                # Alterar velocidade (K1+K7)
-                success = self.modbus_client.change_speed_class()
+                # DEPRECATED 16/Nov/2025: K1+K7 via Modbus não funciona!
+                # Usar action='write_speed' com valor específico (5, 10, 15)
                 await websocket.send(json.dumps({
-                    'type': 'speed_response',
-                    'success': success
+                    'type': 'error',
+                    'message': 'DEPRECATED: Use write_speed com valor específico (5, 10 ou 15 RPM)'
                 }))
                 
             elif action == 'toggle_mode':
@@ -173,22 +173,17 @@ class IHMServer:
 
             elif action == 'write_angle':
                 # Escrever ângulo de dobra
+                # ATUALIZADO 16/Nov/2025: Usa método validado write_bend_angle()
                 bend_num = data.get('bend')  # 1, 2 ou 3
-                angle_value = int(data.get('angle') * 10)  # Converte graus para unidades CLP
+                angle_degrees = float(data.get('angle'))  # Graus (ex: 90.0, 120.5)
 
-                # Usa novo formato de dicionário do modbus_map
-                addr_map = {
-                    1: (mm.BEND_ANGLES['BEND_1_LEFT_MSW'], mm.BEND_ANGLES['BEND_1_LEFT_LSW']),
-                    2: (mm.BEND_ANGLES['BEND_2_LEFT_MSW'], mm.BEND_ANGLES['BEND_2_LEFT_LSW']),
-                    3: (mm.BEND_ANGLES['BEND_3_LEFT_MSW'], mm.BEND_ANGLES['BEND_3_LEFT_LSW'])
-                }
-
-                if bend_num in addr_map:
-                    msw_addr, lsw_addr = addr_map[bend_num]
-                    success = self.modbus_client.write_32bit(msw_addr, lsw_addr, angle_value)
+                if bend_num in [1, 2, 3]:
+                    # Usa método validado que escreve em área 0x0500 (setpoints)
+                    success = self.modbus_client.write_bend_angle(bend_num, angle_degrees)
                     await websocket.send(json.dumps({
                         'type': 'angle_response',
                         'bend': bend_num,
+                        'angle': angle_degrees,
                         'success': success
                     }))
 
@@ -226,11 +221,12 @@ class IHMServer:
 
             elif action == 'write_speed':
                 # Alterar velocidade do motor
+                # ATUALIZADO 16/Nov/2025: Usa método validado write_speed_class()
                 speed = data.get('speed')  # 5, 10 ou 15 RPM
 
                 if speed in [5, 10, 15]:
-                    addr = mm.SUPERVISION_AREA['SPEED_CLASS']
-                    success = self.modbus_client.write_register(addr, speed)
+                    # Usa método validado que escreve direto em 0x094C (2380)
+                    success = self.modbus_client.write_speed_class(speed)
                     print(f"{'✓' if success else '✗'} Velocidade: {speed} RPM")
                     await websocket.send(json.dumps({
                         'type': 'speed_response',
@@ -378,14 +374,15 @@ class IHMServer:
         # Servidor HTTP (para servir index.html)
         app = web.Application()
         app.router.add_get('/', self.http_handler)
+        app.router.add_get('/index.html', self.http_handler)
         app.router.add_static('/static', Path(__file__).parent / 'static')
         runner = web.AppRunner(app)
         await runner.setup()
-        site = web.TCPSite(runner, 'localhost', 8080)
+        site = web.TCPSite(runner, '0.0.0.0', 8080)
         await site.start()
-        
+
         # Servidor WebSocket
-        async with websockets.serve(self.handle_websocket, 'localhost', 8765):
+        async with websockets.serve(self.handle_websocket, '0.0.0.0', 8765):
             # Mantém rodando até Ctrl+C
             await asyncio.Future()  # Run forever
             

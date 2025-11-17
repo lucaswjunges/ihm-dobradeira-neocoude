@@ -51,13 +51,14 @@ class ModbusClientWrapper:
     def _connect_live(self):
         """Conecta ao CLP real via RS485"""
         try:
+            print(f"🔌 Tentando conectar em {self.port}...")
             self.client = ModbusSerialClient(
                 port=self.port,
                 baudrate=self.baudrate,
                 parity='N',
                 stopbits=2,  # Importante: 2 stop bits conforme CLAUDE.md
                 bytesize=8,
-                timeout=1.0
+                timeout=0.5  # Timeout reduzido para inicialização rápida
             )
             # Configura slave_id no objeto client
             self.client.slave_id = self.slave_id
@@ -66,7 +67,7 @@ class ModbusClientWrapper:
             if self.connected:
                 print(f"✓ Modbus conectado: {self.port} @ {self.baudrate} bps (slave {self.slave_id})")
             else:
-                print(f"✗ Falha ao conectar em {self.port}")
+                print(f"✗ Falha ao conectar em {self.port} - CLP desligado ou cabo desconectado")
         except Exception as e:
             print(f"✗ Erro ao conectar Modbus: {e}")
             self.connected = False
@@ -79,13 +80,10 @@ class ModbusClientWrapper:
         self.stub_registers[mm.ENCODER['ANGLE_MSW']] = 0x0000
         self.stub_registers[mm.ENCODER['ANGLE_LSW']] = 0x01C9  # 457 = 45.7°
 
-        # Ângulos setpoint iniciais
-        self.stub_registers[mm.BEND_ANGLES['BEND_1_LEFT_MSW']] = 0x0000
-        self.stub_registers[mm.BEND_ANGLES['BEND_1_LEFT_LSW']] = 0x0384  # 900 = 90°
-        self.stub_registers[mm.BEND_ANGLES['BEND_2_LEFT_MSW']] = 0x0000
-        self.stub_registers[mm.BEND_ANGLES['BEND_2_LEFT_LSW']] = 0x04B0  # 1200 = 120°
-        self.stub_registers[mm.BEND_ANGLES['BEND_3_LEFT_MSW']] = 0x0000
-        self.stub_registers[mm.BEND_ANGLES['BEND_3_LEFT_LSW']] = 0x0230  # 560 = 56°
+        # Ângulos setpoint iniciais (área 0x0500 - validada 16/Nov/2025)
+        self.stub_registers[mm.BEND_ANGLES['BEND_1_SETPOINT']] = 900   # 90.0°
+        self.stub_registers[mm.BEND_ANGLES['BEND_2_SETPOINT']] = 1200  # 120.0°
+        self.stub_registers[mm.BEND_ANGLES['BEND_3_SETPOINT']] = 560   # 56.0°
 
         # Entradas digitais (todos OFF)
         for addr in mm.DIGITAL_INPUTS.values():
@@ -132,12 +130,15 @@ class ModbusClientWrapper:
             return None
 
         try:
+            # pymodbus usa endereçamento base-0, subtrai 1
+            pdu_address = address - 1
+
             # BUGFIX: pymodbus 3.11.3 não funciona com count=1
             # Lemos 8 coils começando do endereço base (múltiplo de 8)
-            base_address = (address // 8) * 8
-            bit_offset = address - base_address
+            base_address = (pdu_address // 8) * 8
+            bit_offset = pdu_address - base_address
 
-            result = self.client.read_coils(address=base_address, count=8, device_id=self.slave_id)
+            result = self.client.read_coils(address=base_address, count=8)
             if result.isError():
                 return None
 
@@ -167,8 +168,11 @@ class ModbusClientWrapper:
             return None
 
         try:
-            print(f"🔍 [DEBUG] read_register: Lendo 0x{address:04X} (slave={self.slave_id})")
-            result = self.client.read_holding_registers(address=address, count=1)
+            # pymodbus usa endereçamento base-0 (PDU), mas nossos endereços são base-1 (mbpoll style)
+            # Exemplo: mbpoll -r 1280 lê PDU 1279, então precisamos subtrair 1
+            pdu_address = address - 1
+            print(f"🔍 [DEBUG] read_register: Lendo 0x{address:04X} (PDU: {pdu_address}, slave={self.slave_id})")
+            result = self.client.read_holding_registers(address=pdu_address, count=1)
             if result.isError():
                 print(f"✗ [DEBUG] read_register 0x{address:04X}: result.isError()=True")
                 return None
@@ -224,7 +228,9 @@ class ModbusClientWrapper:
             return False
 
         try:
-            result = self.client.write_coil(address=address, value=value)
+            # pymodbus usa endereçamento base-0, subtrai 1
+            pdu_address = address - 1
+            result = self.client.write_coil(address=pdu_address, value=value)
             return not result.isError()
         except Exception as e:
             print(f"✗ Erro escrevendo coil 0x{address:04X}: {e}")
@@ -249,7 +255,9 @@ class ModbusClientWrapper:
             return False
 
         try:
-            result = self.client.write_register(address=address, value=value)
+            # pymodbus usa endereçamento base-0, subtrai 1 para compatibilidade com mbpoll
+            pdu_address = address - 1
+            result = self.client.write_register(address=pdu_address, value=value)
             return not result.isError()
         except Exception as e:
             print(f"✗ Erro escrevendo registro 0x{address:04X}: {e}")
@@ -625,6 +633,138 @@ class ModbusClientWrapper:
         address = all_keys[key_name]
         return self.press_key(address, hold_ms=100)
 
+    def write_bend_angle(self, bend_number: int, degrees: float) -> bool:
+        """
+        Grava ângulo de dobra na área de setpoints (0x0500+)
+
+        Utiliza endereços VALIDADOS em 16/Nov/2025 que aceitam escrita
+        sem proteção do ladder (área 0x0500-0x0504).
+
+        Args:
+            bend_number (int): 1, 2 ou 3
+            degrees (float): Ângulo em graus (ex: 90.5)
+
+        Returns:
+            bool: True se sucesso
+
+        Exemplo:
+            >>> client.write_bend_angle(1, 90.0)  # Dobra 1: 90°
+            True
+            >>> client.write_bend_angle(2, 120.5)  # Dobra 2: 120.5°
+            True
+        """
+        if bend_number not in [1, 2, 3]:
+            print(f"✗ Número de dobra inválido: {bend_number} (deve ser 1, 2 ou 3)")
+            return False
+
+        # Mapeamento correto: 0x0500, 0x0502, 0x0504
+        addresses = {
+            1: mm.BEND_ANGLES['BEND_1_SETPOINT'],  # 0x0500 (1280)
+            2: mm.BEND_ANGLES['BEND_2_SETPOINT'],  # 0x0502 (1282)
+            3: mm.BEND_ANGLES['BEND_3_SETPOINT']   # 0x0504 (1284)
+        }
+
+        address = addresses[bend_number]
+        value_clp = int(degrees * 10)
+
+        print(f"✎ Gravando Dobra {bend_number}: {degrees}° → Registro 0x{address:04X} = {value_clp}")
+
+        return self.write_register(address, value_clp)
+
+    def read_bend_angle(self, bend_number: int) -> Optional[float]:
+        """
+        Lê ângulo de dobra da área de setpoints
+
+        Args:
+            bend_number (int): 1, 2 ou 3
+
+        Returns:
+            float: Ângulo em graus, ou None se erro
+
+        Exemplo:
+            >>> angle = client.read_bend_angle(1)
+            >>> print(f"Dobra 1: {angle}°")
+            Dobra 1: 90.0°
+        """
+        addresses = {
+            1: mm.BEND_ANGLES['BEND_1_SETPOINT'],
+            2: mm.BEND_ANGLES['BEND_2_SETPOINT'],
+            3: mm.BEND_ANGLES['BEND_3_SETPOINT']
+        }
+
+        if bend_number not in addresses:
+            print(f"✗ Número de dobra inválido: {bend_number}")
+            return None
+
+        value_clp = self.read_register(addresses[bend_number])
+
+        if value_clp is None:
+            return None
+
+        return value_clp / 10.0
+
+    def read_all_bend_angles(self) -> dict:
+        """
+        Lê todos os 3 ângulos de dobra de uma vez
+
+        Returns:
+            dict: {'bend_1': 90.0, 'bend_2': 120.0, 'bend_3': 45.0}
+
+        Exemplo:
+            >>> angles = client.read_all_bend_angles()
+            >>> print(angles)
+            {'bend_1': 90.0, 'bend_2': 120.0, 'bend_3': 45.0}
+        """
+        return {
+            'bend_1': self.read_bend_angle(1),
+            'bend_2': self.read_bend_angle(2),
+            'bend_3': self.read_bend_angle(3)
+        }
+
+    def write_speed_class(self, rpm: int) -> bool:
+        """
+        Muda a classe de velocidade da máquina
+
+        VALIDADO 16/Nov/2025: Escrita direta no registro 0x094C (2380)
+        funciona perfeitamente! NÃO requer K1+K7.
+
+        Args:
+            rpm (int): Velocidade desejada (5, 10 ou 15)
+
+        Returns:
+            bool: True se sucesso
+
+        Exemplo:
+            >>> client.write_speed_class(5)   # 5 rpm
+            True
+            >>> client.write_speed_class(15)  # 15 rpm
+            True
+        """
+        if rpm not in [5, 10, 15]:
+            print(f"✗ Velocidade inválida: {rpm} (deve ser 5, 10 ou 15)")
+            return False
+
+        print(f"⚡ Mudando velocidade para {rpm} rpm...")
+
+        return self.write_register(
+            mm.SUPERVISION_AREA['SPEED_CLASS'],  # 0x094C (2380)
+            rpm
+        )
+
+    def read_speed_class(self) -> Optional[int]:
+        """
+        Lê a classe de velocidade atual
+
+        Returns:
+            int: 5, 10 ou 15 (rpm), ou None se erro
+
+        Exemplo:
+            >>> speed = client.read_speed_class()
+            >>> print(f"Velocidade: {speed} rpm")
+            Velocidade: 10 rpm
+        """
+        return self.read_register(mm.SUPERVISION_AREA['SPEED_CLASS'])
+
     def close(self):
         """Fecha conexão Modbus"""
         if self.client and self.connected:
@@ -644,10 +784,22 @@ if __name__ == "__main__":
     angle_deg = mm.clp_to_degrees(angle_raw) if angle_raw else 0
     print(f"Encoder: {angle_raw} = {angle_deg:.1f}° (stub)")
 
-    # Ler ângulo dobra 1
-    bend1_raw = client.read_32bit(mm.BEND_ANGLES['BEND_1_LEFT_MSW'], mm.BEND_ANGLES['BEND_1_LEFT_LSW'])
-    bend1_deg = mm.clp_to_degrees(bend1_raw) if bend1_raw else 0
-    print(f"Ângulo Dobra 1: {bend1_raw} = {bend1_deg:.1f}° (stub)")
+    # Ler ângulos usando novos métodos
+    print("\n=== TESTANDO NOVOS MÉTODOS DE ÂNGULOS ===")
+    angles = client.read_all_bend_angles()
+    print(f"Todos ângulos: {angles}")
+
+    # Gravar ângulos
+    print("\nGravando novos ângulos...")
+    client.write_bend_angle(1, 135.5)
+    client.write_bend_angle(2, 45.0)
+    client.write_bend_angle(3, 180.0)
+
+    # Ler de volta
+    print("\nLendo de volta:")
+    for i in [1, 2, 3]:
+        angle = client.read_bend_angle(i)
+        print(f"  Dobra {i}: {angle}°")
 
     # Ler LEDs
     leds = client.read_leds()
@@ -661,8 +813,26 @@ if __name__ == "__main__":
     print("Escrevendo tela 4 em supervisão...")
     client.write_screen_number(4)
 
-    # Alterar velocidade
+    # Alterar velocidade (método antigo - K1+K7)
+    print("\n=== TESTANDO MUDANÇA DE VELOCIDADE (ANTIGO) ===")
     print("Alterando velocidade (K1+K7)...")
     client.change_speed_class()
+
+    # Testar novos métodos de velocidade
+    print("\n=== TESTANDO MUDANÇA DE VELOCIDADE (NOVO) ===")
+    current_speed = client.read_speed_class()
+    print(f"Velocidade atual: {current_speed} rpm")
+
+    print("\nMudando para 5 rpm...")
+    client.write_speed_class(5)
+    print(f"Nova velocidade: {client.read_speed_class()} rpm")
+
+    print("\nMudando para 15 rpm...")
+    client.write_speed_class(15)
+    print(f"Nova velocidade: {client.read_speed_class()} rpm")
+
+    print("\nRestaurando 10 rpm...")
+    client.write_speed_class(10)
+    print(f"Velocidade final: {client.read_speed_class()} rpm")
 
     client.close()
