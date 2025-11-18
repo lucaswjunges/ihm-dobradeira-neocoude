@@ -1,0 +1,42 @@
+📁 ihm_esp32/ - IHM Web ESP32
+══════════════════════════════════════════════════════════
+
+✅ ARQUIVOS PRONTOS (6/10 - 60%)
+├── 📄 CLAUDE.md                    [11KB] ✓ Documentação completa
+├── 📄 README.md                    [ 4KB] ✓ Guia rápido
+├── 📄 TODO.md                      [ 8KB] ✓ Lista de tarefas
+├── 🐍 boot.py                      [ 2KB] ✓ Configuração WiFi
+├── 🐍 modbus_map.py                [11KB] ✓ Mapa Modbus (copiado)
+└── 🌐 static/index.html            [24KB] ✓ Interface web (copiada)
+
+⏳ ARQUIVOS A CRIAR (4/10 - 40%)
+├── 🐍 main.py                      [ ~5KB] ⏳ Servidor principal
+├── 🐍 modbus_client_esp32.py       [ ~4KB] ⏳ Cliente Modbus
+├── 🐍 state_manager_esp32.py       [ ~3KB] ⏳ Gerenciador estado
+└── 📁 lib/                                 ⏳ Bibliotecas externas
+    ├── 🐍 microdot.py              [~20KB] ⏳ Web server
+    ├── 🐍 microdot_websocket.py    [~10KB] ⏳ WebSocket
+    └── 📁 umodbus/                         ⏳ Modbus RTU
+        ├── 🐍 __init__.py
+        ├── 🐍 serial.py
+        └── 🐍 functions.py
+
+══════════════════════════════════════════════════════════
+PROGRESSO TOTAL: 60% (6/10 arquivos)
+TEMPO ESTIMADO: 5-7 horas de trabalho
+══════════════════════════════════════════════════════════
+
+PRÓXIMOS PASSOS:
+1. Baixar bibliotecas (lib/*)           [15 min]
+2. Criar modbus_client_esp32.py         [ 2h  ]
+3. Criar state_manager_esp32.py         [ 1h  ]
+4. Criar main.py                        [ 2h  ]
+5. Testar sistema completo              [ 1h  ]
+
+DIFERENÇAS vs VERSÃO UBUNTU:
+- ✅ modbus_map.py      → 100% IGUAL
+- ✅ static/index.html  → 100% IGUAL
+- 🔄 boot.py            → NOVO (config WiFi)
+- 🔄 main.py            → aiohttp → microdot
+- 🔄 modbus_client      → pymodbus → umodbus
+- 🔄 state_manager      → asyncio → uasyncio

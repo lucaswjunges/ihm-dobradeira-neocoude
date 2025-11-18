@@ -1,0 +1,58 @@
+# TESTE RÁPIDO MODBUS - Cole no console do Thonny
+
+# ==============================================
+# INSTRUÇÕES:
+# 1. Abrir Thonny
+# 2. Tools → Options → Interpreter → MicroPython (ESP32) em /dev/ttyACM0
+# 3. Copiar e colar os comandos abaixo linha por linha no console
+# ==============================================
+
+# Importar bibliotecas
+from lib.umodbus.serial import ModbusRTU
+import modbus_map as mm
+
+# Inicializar Modbus
+print("Inicializando Modbus...")
+modbus = ModbusRTU(uart_id=2, baudrate=57600, tx_pin=17, rx_pin=16, ctrl_pin=4)
+print("OK")
+
+# TESTE 1: Ler encoder (32-bit)
+print("\n=== TESTE 1: ENCODER ===")
+print(f"Lendo registros {mm.ENCODER['ANGLE_MSW']} e {mm.ENCODER['ANGLE_LSW']}...")
+result = modbus.read_holding_registers(1, mm.ENCODER['ANGLE_MSW'], 2)
+print(f"Resultado: {result}")
+if result:
+    msw = result[0]
+    lsw = result[1]
+    encoder = (msw << 16) | lsw
+    print(f"MSW: {msw}, LSW: {lsw}")
+    print(f"Encoder: {encoder} ({encoder/10.0}°)")
+    print("✓ SUCESSO!")
+else:
+    print("✗ FALHOU - CLP não respondeu")
+
+# TESTE 2: Ler ângulo dobra 1
+print("\n=== TESTE 2: ÂNGULO DOBRA 1 ===")
+print(f"Lendo registro {mm.BEND_ANGLES['BEND_1_SETPOINT']}...")
+result = modbus.read_holding_registers(1, mm.BEND_ANGLES['BEND_1_SETPOINT'], 1)
+print(f"Resultado: {result}")
+if result:
+    angle = result[0] / 10.0
+    print(f"Ângulo: {angle}°")
+    print("✓ SUCESSO!")
+else:
+    print("✗ FALHOU - CLP não respondeu")
+
+# TESTE 3: Ler entrada digital E0
+print("\n=== TESTE 3: ENTRADA E0 ===")
+print("Lendo registro 256...")
+result = modbus.read_holding_registers(1, 256, 1)
+print(f"Resultado: {result}")
+if result:
+    status = "ON" if (result[0] & 0x01) else "OFF"
+    print(f"E0: {status}")
+    print("✓ SUCESSO!")
+else:
+    print("✗ FALHOU - CLP não respondeu")
+
+print("\n=== FIM DOS TESTES ===")
