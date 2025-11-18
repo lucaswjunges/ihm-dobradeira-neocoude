@@ -1,0 +1,50 @@
+✅ VERIFICAÇÃO FINAL - clp_pronto_CORRIGIDO.sup
+Data: 2025-11-11 21:10
+
+═══════════════════════════════════════════════════════════
+
+PROBLEMA CORRIGIDO #1: Nomes de arquivo truncados (DOS 8.3)
+─────────────────────────────────────────────────────────────
+❌ ANTES: PRINCIPA.LAD (truncado)
+✅ AGORA: Principal.lad (completo)
+
+PROBLEMA CORRIGIDO #2: Instrução RESET não suportada
+─────────────────────────────────────────────────────────────
+❌ ANTES: ROT5 linha 7 usava RESET T:0042 (não suportado)
+✅ AGORA: ROT5 com 7 linhas, apenas SETR T:0043 (suportado)
+
+═══════════════════════════════════════════════════════════
+
+TESTES REALIZADOS
+─────────────────────────────────────────────────────────────
+✅ Total de arquivos: 27 (correto)
+✅ Principal.lad: 11.679 bytes, 24 linhas (presente)
+✅ Conf.nsx: 4.096 bytes (presente)
+✅ Int1.lad: 13 bytes (presente)
+✅ Int2.lad: 13 bytes (presente)
+✅ ROT0-ROT4: Originais preservados
+✅ ROT5.lad: 2.843 bytes, 7 linhas (corrigido)
+✅ Nenhuma instrução RESET T:0042 encontrada
+✅ Todas instruções usam SETR T:0043
+
+═══════════════════════════════════════════════════════════
+
+BACKDOORS MODBUS ATIVOS (ROT5)
+─────────────────────────────────────────────────────────────
+1. ✅ Emular K1 via Modbus → HMI bit 00A0
+2. ✅ Emular S1 via Modbus → HMI bit 00DC
+3. ✅ Emular ENTER via Modbus → HMI bit 0025
+4. ✅ Botão AVANÇAR virtual → Flag 03F1
+5. ✅ Botão RECUAR virtual → Flag 03F2
+6. ✅ Botão PARADA virtual → Flag 03F3
+7. ✅ Status interface Modbus → Flag 03FF
+
+═══════════════════════════════════════════════════════════
+
+STATUS: ✅ PRONTO PARA UPLOAD NO CLP
+
+Arquivo: clp_pronto_CORRIGIDO.sup
+Tamanho: 27 KB (307.618 bytes descomprimido)
+Localização: /home/lucas-junges/Documents/clientes/w&co/
+
+═══════════════════════════════════════════════════════════

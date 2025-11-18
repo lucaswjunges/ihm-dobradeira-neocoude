@@ -1,0 +1,282 @@
+════════════════════════════════════════════════════════════════════════════════
+  ARQUIVO FINAL PRONTO PARA IMPORTAR NO WINSUP 2
+════════════════════════════════════════════════════════════════════════════════
+
+📁 ARQUIVO: apr03_v2_FINAL.sup
+
+Data de criação: 2025-11-10
+Baseado em: apr03.sup (programa original da dobradeira)
+
+════════════════════════════════════════════════════════════════════════════════
+  ✅ CONFIGURAÇÕES APLICADAS
+════════════════════════════════════════════════════════════════════════════════
+
+1. IHM REMOTA:           FRONTREMOTO=1    ✅ ATIVADA
+   → Permite tablet/PC conectar como IHM via RS232/RS485
+
+2. WATCHDOG TIMER:       WATCHDOGTIMER=1  ✅ ATIVO (segurança)
+   → CLP reseta automaticamente se travar
+
+3. PROTEÇÃO SENHA:       HAB_SENHA=0      ✅ DESATIVADA
+   → Sem senha, acesso livre via WinSup 2
+
+4. MODO FORCE:           FORCE=0          ✅ DESATIVADO
+   → Segurança: não permite forçar I/O em produção
+
+5. MODO ESCUTA:          ESCUTA=0         ✅ Como estava
+   → Mantido valor original
+
+6. FRONTAL:              FRONTAL=0        ✅ Como estava
+   → Mantido valor original
+
+════════════════════════════════════════════════════════════════════════════════
+  📋 SUB-ROTINAS DO PROJETO
+════════════════════════════════════════════════════════════════════════════════
+
+✅ ROT0 - Sub-rotina 0 (lógica original)
+✅ ROT1 - Sub-rotina 1 (lógica original)
+✅ ROT2 - Sub-rotina 2 (lógica original)
+✅ ROT3 - Sub-rotina 3 (lógica original)
+✅ ROT4 - Sub-rotina 4 (lógica original)
+⭐ ROT5 - INTERFACE MODBUS RTU (NOVA!)
+
+════════════════════════════════════════════════════════════════════════════════
+  ⭐ NOVA FUNCIONALIDADE: ROT5 - INTERFACE MODBUS RTU
+════════════════════════════════════════════════════════════════════════════════
+
+A ROT5 implementa a interface Modbus RTU para comunicação com a IHM web.
+
+CARACTERÍSTICAS:
+
+1. TIMER DE STARTUP (120 segundos)
+   - Timer T56 conta 120s após power-on
+   - Evita ativação prematura do Modbus durante inicialização do CLP
+   - Garante que sistema está estável antes de aceitar comandos externos
+
+2. ATIVAÇÃO AUTOMÁTICA DO MODBUS SLAVE
+   - Após 120s: força bit 00BE (190 dec) = ON
+   - Bit 00BE habilita modo Modbus Slave no CLP
+   - Também verifica bit 03FA antes de ativar (segurança)
+
+3. COMANDOS VIA MODBUS
+   Bits de comando (escritos pelo servidor Python via Modbus):
+
+   • 03E0 (992)  - MB_BTN_AVANCAR  → emula botão AVANÇAR (E2)
+   • 03E1 (993)  - MB_BTN_RECUAR   → emula botão RECUAR (E4)
+   • 03E2 (994)  - MB_BTN_PARADA   → emula botão PARADA (E3)
+   • 03E3 (995)  - MB_S1_CMD       → emula tecla S1 (mudança de modo)
+   • 03E5 (997)  - MB_MODO_AUTO    → força modo AUTOMÁTICO
+   • 03E6 (998)  - MB_MODO_MANUAL  → força modo MANUAL
+
+4. EMULAÇÃO DE BOTÕES FÍSICOS
+   Quando um bit de comando é ativado (ex: 03E0=1):
+   - Ativa bit interno 03F1, 03F2 ou 03F3
+   - Esse bit aciona a saída correspondente (E2, E3 ou E4)
+   - Simula pressionamento do botão físico
+   - Lógica original do CLP responde normalmente
+
+5. DETECÇÃO DE PULSO S1
+   - Detecta borda de subida de 03E3 (MB_S1_CMD)
+   - Gera pulso em 03F0
+   - Usado para mudança de modo Manual ↔ Automático
+
+6. MUDANÇA FORÇADA DE MODO
+   MB_MODO_AUTO (03E5):
+   - Força bit 0191 = ON (modo automático)
+   - Reseta bit 0190 = OFF (modo manual)
+   - Também ativa bits 02FF e 0300 (condições de transição)
+
+   MB_MODO_MANUAL (03E6):
+   - Força bit 0190 = ON (modo manual)
+   - Reseta bit 0191 = OFF (modo automático)
+   - Ativa bit 02FF (condição de transição)
+
+7. AUTO-RESET DE COMANDOS
+   - Linha 11 reseta automaticamente bits 03E5 e 03E6
+   - Após execução, comandos voltam a 0
+   - Evita comandos "travados"
+
+8. STATUS DA INTERFACE
+   - Bit 03FF = ON quando:
+     • Modbus ativo (00BE=ON)
+     • Sistema não em emergência (02FF=ON)
+   - Pode ser lido pela IHM para verificar conexão
+
+════════════════════════════════════════════════════════════════════════════════
+  🔧 CONFIGURAÇÃO MODBUS RTU NO CLP
+════════════════════════════════════════════════════════════════════════════════
+
+Canal: RS485-B (porta lateral do CLP)
+Baudrate: 57600 bps
+Paridade: None
+Data bits: 8
+Stop bits: 1
+Slave Address: Lido do registro 1988H (6536 dec) - verificar no CLP
+
+Bit de habilitação: 00BE (190 dec) - DEVE estar ON (ativado por ROT5)
+
+════════════════════════════════════════════════════════════════════════════════
+  📂 ARQUIVOS DE BACKUP
+════════════════════════════════════════════════════════════════════════════════
+
+✅ apr03_v2_alterado_BACKUP_ORIGINAL.sup
+   → Cópia de segurança antes da modificação FRONTREMOTO
+
+✅ apr03_v2_alterado.bak
+   → Backup automático do WinSup
+
+✅ apr03_v2_alterado.sup
+   → Versão anterior (sem FRONTREMOTO ativado)
+
+════════════════════════════════════════════════════════════════════════════════
+  🚀 COMO USAR NO WINSUP 2
+════════════════════════════════════════════════════════════════════════════════
+
+1. Abra o WinSup 2
+
+2. Vá em: Arquivo → Abrir Projeto
+
+3. Selecione: apr03_v2_FINAL.sup
+
+4. O WinSup deve abrir o projeto mostrando:
+   - Programa Principal
+   - ROT0, ROT1, ROT2, ROT3, ROT4, ROT5
+
+5. Compile o projeto (F7 ou Compilar → Compilar Projeto)
+
+6. Verifique se não há erros de compilação
+
+7. Transfira para o CLP:
+   - Conecte cabo USB-RS485 ao canal A do CLP
+   - Online → Enviar Programa
+   - Aguarde transferência completa
+
+8. Após gravação:
+   - CLP vai reiniciar automaticamente
+   - Timer de 120s começa a contar
+   - Após 120s: bit 00BE é ativado
+   - Modbus RTU fica disponível no canal B
+
+════════════════════════════════════════════════════════════════════════════════
+  ⚠️ VERIFICAÇÕES IMPORTANTES APÓS GRAVAR NO CLP
+════════════════════════════════════════════════════════════════════════════════
+
+1. VERIFICAR BIT 00BE (Modbus Slave)
+   - Após 120s do power-on, verificar se bit 00BE = ON
+   - Se OFF: verificar lógica da ROT5
+
+2. VERIFICAR ENDEREÇO MODBUS
+   - Ler registro 1988H (6536 dec)
+   - Anotar o Slave Address (provavelmente 1)
+
+3. TESTAR COMUNICAÇÃO MODBUS
+   - Conectar conversor USB-RS485 ao canal B
+   - Usar software de teste Modbus (ex: Modbus Poll)
+   - Tentar ler registro 0100 (entrada E0)
+   - Deve responder se configuração estiver OK
+
+4. TESTAR COMANDOS VIA MODBUS
+   - Escrever bit 03E0 = 1 (comando AVANÇAR)
+   - Verificar se saída E2 ativa
+   - Escrever bit 03E0 = 0
+   - Verificar se saída E2 desativa
+
+════════════════════════════════════════════════════════════════════════════════
+  📊 MAPEAMENTO DE BITS PARA SERVIDOR PYTHON
+════════════════════════════════════════════════════════════════════════════════
+
+COMANDOS (escrever via Modbus Function 0x05 - Force Single Coil):
+
+  Decimal | Hex  | Nome               | Função
+  --------|------|--------------------|---------------------------------
+  992     | 03E0 | MB_BTN_AVANCAR     | Botão AVANÇAR (CCW)
+  993     | 03E1 | MB_BTN_RECUAR      | Botão RECUAR (CW)
+  994     | 03E2 | MB_BTN_PARADA      | Botão PARADA
+  995     | 03E3 | MB_S1_CMD          | Tecla S1 (mudança modo)
+  997     | 03E5 | MB_MODO_AUTO       | Força modo AUTOMÁTICO
+  998     | 03E6 | MB_MODO_MANUAL     | Força modo MANUAL
+
+STATUS (ler via Modbus Function 0x01 - Read Coil Status):
+
+  Decimal | Hex  | Nome               | Significado
+  --------|------|--------------------|---------------------------------
+  190     | 00BE | MODBUS_SLAVE_ON    | Modbus ativo (deve ser 1)
+  256-263 | 0100 | E0-E7              | Entradas digitais
+  384-391 | 0180 | S0-S7              | Saídas digitais
+  1023    | 03FF | INTERFACE_OK       | Interface Modbus OK
+
+REGISTROS (ler via Modbus Function 0x03 - Read Holding Registers):
+
+  Decimal     | Hex      | Nome            | Tipo
+  ------------|----------|-----------------|---------------------------
+  1238/1239   | 04D6/D7  | ENCODER_VALUE   | 32-bit (MSW/LSW)
+  256-263     | 0100-107 | E0-E7 STATUS    | 16-bit (bit 0 = status)
+  384-391     | 0180-187 | S0-S7 STATUS    | 16-bit (bit 0 = status)
+
+════════════════════════════════════════════════════════════════════════════════
+  📝 NOTAS TÉCNICAS
+════════════════════════════════════════════════════════════════════════════════
+
+1. Timer T56 usa preset 0438H (1080 dec) com valor 12000
+   - 12000 × 10ms = 120.000ms = 120 segundos
+   - Ajustável se necessário
+
+2. Bits 03F1, 03F2, 03F3 são internos de emulação
+   - Não devem ser escritos diretamente pela IHM
+   - Apenas leitura para debug
+
+3. Comunicação bidirecional:
+   - IHM → CLP: comandos via bits (Write Coil)
+   - CLP → IHM: status via leitura (Read Coil/Register)
+
+4. Estados importantes da máquina (a serem mapeados):
+   - 0190: Modo MANUAL ativo
+   - 0191: Modo AUTOMÁTICO ativo
+   - 02FF: Sistema não em emergência
+   - Ver programa original para mapear outros bits
+
+════════════════════════════════════════════════════════════════════════════════
+  ✅ CHECKLIST PRE-OPERAÇÃO
+════════════════════════════════════════════════════════════════════════════════
+
+□ Arquivo apr03_v2_FINAL.sup aberto no WinSup 2
+□ Projeto compilado sem erros
+□ Backup do programa atual do CLP feito
+□ Programa transferido para o CLP
+□ CLP reiniciado após gravação
+□ Aguardado 120 segundos para ativação Modbus
+□ Bit 00BE verificado = ON
+□ Slave Address lido do registro 1988H
+□ Comunicação Modbus testada com software de teste
+□ Servidor Python configurado com endereços corretos
+□ Teste de comando básico OK (ex: acionar AVANÇAR)
+
+════════════════════════════════════════════════════════════════════════════════
+  🆘 SUPORTE
+════════════════════════════════════════════════════════════════════════════════
+
+Em caso de problemas:
+
+1. MODBUS NÃO RESPONDE
+   - Verificar bit 00BE = ON (após 120s)
+   - Verificar cabo RS485 no canal B
+   - Verificar baudrate 57600
+   - Verificar Slave Address correto
+
+2. COMANDOS NÃO FUNCIONAM
+   - Verificar se sistema não está em emergência (bit 02FF)
+   - Verificar modo de operação (manual/auto)
+   - Ver lógica original que processa os botões
+
+3. RESTAURAR PROGRAMA ANTERIOR
+   - Abrir backup: apr03_v2_alterado_BACKUP_ORIGINAL.sup
+   - Recompilar e transferir
+
+════════════════════════════════════════════════════════════════════════════════
+
+Arquivo preparado para importação no WinSup 2 e gravação no CLP ATOS MPC4004.
+
+Data: 2025-11-10
+Projeto: IHM Web para Dobradeira NEOCOUDE-HD-15
+
+════════════════════════════════════════════════════════════════════════════════

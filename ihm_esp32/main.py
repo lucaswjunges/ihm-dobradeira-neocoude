@@ -63,27 +63,30 @@ def update_state():
         except:
             pass  # Timeout - não bloqueia
 
-        # Ângulos setpoint
+        # Ângulos - ler DIRETO da área SHADOW (0x0840)
+        # ROT5: 0x0A00->0x0842(MSW), 0x0A02->0x0840(LSW) - NAO CONSECUTIVOS!
+        # Formato: LSW em addr, MSW em addr+2 (igual SCADA)
+        # Usar read_register_32bit_scada que le com gap
         try:
-            bend1 = modbus.read_register(mm.BEND_ANGLES['BEND_1_SETPOINT'])
-            if bend1 is not None:
-                machine_state['bend_1_angle'] = bend1 / 10.0
+            bend1_raw = modbus.read_register_32bit_scada(mm.BEND_ANGLES_SHADOW['BEND_1_LEFT_LSW'])
+            if bend1_raw is not None:
+                machine_state['bend_1_angle'] = bend1_raw / 10.0
                 any_success = True
         except:
             pass
 
         try:
-            bend2 = modbus.read_register(mm.BEND_ANGLES['BEND_2_SETPOINT'])
-            if bend2 is not None:
-                machine_state['bend_2_angle'] = bend2 / 10.0
+            bend2_raw = modbus.read_register_32bit_scada(mm.BEND_ANGLES_SHADOW['BEND_2_LEFT_LSW'])
+            if bend2_raw is not None:
+                machine_state['bend_2_angle'] = bend2_raw / 10.0
                 any_success = True
         except:
             pass
 
         try:
-            bend3 = modbus.read_register(mm.BEND_ANGLES['BEND_3_SETPOINT'])
-            if bend3 is not None:
-                machine_state['bend_3_angle'] = bend3 / 10.0
+            bend3_raw = modbus.read_register_32bit_scada(mm.BEND_ANGLES_SHADOW['BEND_3_LEFT_LSW'])
+            if bend3_raw is not None:
+                machine_state['bend_3_angle'] = bend3_raw / 10.0
                 any_success = True
         except:
             pass
@@ -258,6 +261,43 @@ def handle_http_request(client_socket):
                 response += error_msg
                 client_socket.send(response.encode('utf-8'))
 
+        # GET /api/write_bend?bend=X&angle=Y (escrever ângulo via 0x0A00)
+        elif 'GET /api/write_bend' in first_line:
+            try:
+                import re
+                match_bend = re.search(r'bend=(\d+)', first_line)
+                match_angle = re.search(r'angle=([\d.]+)', first_line)
+
+                if match_bend and match_angle:
+                    bend = int(match_bend.group(1))
+                    angle = float(match_angle.group(1))
+
+                    success = modbus.write_bend_angle(bend, angle)
+                    result = {
+                        'success': success,
+                        'bend': bend,
+                        'angle': angle,
+                        'message': 'OK' if success else 'FAILED'
+                    }
+                else:
+                    result = {'success': False, 'message': 'Missing parameters (bend, angle)'}
+
+                result_json = json.dumps(result)
+                response = 'HTTP/1.1 200 OK\r\n'
+                response += 'Content-Type: application/json\r\n'
+                response += f'Content-Length: {len(result_json)}\r\n'
+                response += 'Connection: close\r\n\r\n'
+                response += result_json
+                client_socket.send(response.encode('utf-8'))
+            except Exception as e:
+                error_msg = json.dumps({'success': False, 'error': str(e)})
+                response = 'HTTP/1.1 500 Error\r\n'
+                response += 'Content-Type: application/json\r\n'
+                response += f'Content-Length: {len(error_msg)}\r\n'
+                response += 'Connection: close\r\n\r\n'
+                response += error_msg
+                client_socket.send(response.encode('utf-8'))
+
         # GET /api/read_test?address=XXX (ler registro de teste)
         elif 'GET /api/read_test' in first_line:
             try:
@@ -340,16 +380,14 @@ def handle_command(cmd):
 
     elif action == 'set_angle':
         bend = cmd.get('bend')
-        value = int(cmd.get('value', 0) * 10)
+        value = float(cmd.get('value', 0))
 
-        if bend == 1:
-            modbus.write_register(mm.BEND_ANGLES['BEND_1_SETPOINT'], value)
-        elif bend == 2:
-            modbus.write_register(mm.BEND_ANGLES['BEND_2_SETPOINT'], value)
-        elif bend == 3:
-            modbus.write_register(mm.BEND_ANGLES['BEND_3_SETPOINT'], value)
-
-        print(f"✓ Ângulo {bend} → {value/10}°")
+        # Usar write_bend_angle (0x0A00 + trigger)
+        success = modbus.write_bend_angle(bend, value)
+        if success:
+            print(f"✓ Ângulo {bend} → {value}°")
+        else:
+            print(f"✗ Erro ao gravar ângulo {bend}")
 
     elif action == 'set_speed':
         speed_class = cmd.get('class', 1)

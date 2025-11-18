@@ -635,10 +635,20 @@ class ModbusClientWrapper:
 
     def write_bend_angle(self, bend_number: int, degrees: float) -> bool:
         """
-        Grava ângulo de dobra na área de setpoints (0x0500+)
+        Grava ângulo de dobra na área MODBUS INPUT (0x0A00+) e aciona trigger
 
-        Utiliza endereços VALIDADOS em 16/Nov/2025 que aceitam escrita
-        sem proteção do ladder (área 0x0500-0x0504).
+        MODIFICADO 18/Nov/2025 (CORRIGIDO): Grava em 0x0A00 (Modbus Input Buffer)
+        e aciona trigger para ROT5 copiar automaticamente para 0x0840 (shadow).
+
+        FLUXO:
+          1. IHM grava em 0x0A00/0x0A02 (MSW/LSW)
+          2. IHM aciona trigger 0x0390 (coil bit)
+          3. ROT5 detecta trigger e copia: 0x0A00→0x0842, 0x0A02→0x0840
+          4. Principal.lad lê de 0x0840/0x0842 (sincronizado)
+
+        Formato: 32-bit MSW/LSW
+        - MSW (Most Significant Word): bits 31-16
+        - LSW (Least Significant Word): bits 15-0
 
         Args:
             bend_number (int): 1, 2 ou 3
@@ -657,23 +667,67 @@ class ModbusClientWrapper:
             print(f"✗ Número de dobra inválido: {bend_number} (deve ser 1, 2 ou 3)")
             return False
 
-        # Mapeamento correto: 0x0500, 0x0502, 0x0504
+        # Mapeamento: 0x0A00 (Modbus Input Buffer) + Triggers
         addresses = {
-            1: mm.BEND_ANGLES['BEND_1_SETPOINT'],  # 0x0500 (1280)
-            2: mm.BEND_ANGLES['BEND_2_SETPOINT'],  # 0x0502 (1282)
-            3: mm.BEND_ANGLES['BEND_3_SETPOINT']   # 0x0504 (1284)
+            1: {'msw': mm.BEND_ANGLES_MODBUS_INPUT['BEND_1_INPUT_MSW'],      # 0x0A00
+                'lsw': mm.BEND_ANGLES_MODBUS_INPUT['BEND_1_INPUT_LSW'],      # 0x0A02
+                'trigger': mm.BEND_ANGLES_MODBUS_INPUT['BEND_1_TRIGGER']},   # 0x0390
+            2: {'msw': mm.BEND_ANGLES_MODBUS_INPUT['BEND_2_INPUT_MSW'],      # 0x0A04
+                'lsw': mm.BEND_ANGLES_MODBUS_INPUT['BEND_2_INPUT_LSW'],      # 0x0A06
+                'trigger': mm.BEND_ANGLES_MODBUS_INPUT['BEND_2_TRIGGER']},   # 0x0391
+            3: {'msw': mm.BEND_ANGLES_MODBUS_INPUT['BEND_3_INPUT_MSW'],      # 0x0A08
+                'lsw': mm.BEND_ANGLES_MODBUS_INPUT['BEND_3_INPUT_LSW'],      # 0x0A0A
+                'trigger': mm.BEND_ANGLES_MODBUS_INPUT['BEND_3_TRIGGER']},   # 0x0392
         }
 
-        address = addresses[bend_number]
-        value_clp = int(degrees * 10)
+        addr = addresses[bend_number]
 
-        print(f"✎ Gravando Dobra {bend_number}: {degrees}° → Registro 0x{address:04X} = {value_clp}")
+        # Converter graus para valor CLP 32-bit
+        value_32bit = mm.degrees_to_clp(degrees)
 
-        return self.write_register(address, value_clp)
+        # Dividir em MSW e LSW
+        msw, lsw = mm.split_32bit(value_32bit)
+
+        print(f"✎ Gravando Dobra {bend_number}: {degrees}° → 0x{addr['msw']:04X}/0x{addr['lsw']:04X} (MSW={msw}, LSW={lsw}, 32bit={value_32bit})")
+
+        # 1. Escrever MSW e LSW no buffer Modbus Input
+        success_msw = self.write_register(addr['msw'], msw)
+        success_lsw = self.write_register(addr['lsw'], lsw)
+
+        if not (success_msw and success_lsw):
+            print(f"  ✗ Erro ao gravar no buffer (MSW={success_msw}, LSW={success_lsw})")
+            return False
+
+        # 2. Acionar trigger para ROT5 copiar para shadow
+        print(f"  ⚡ Acionando trigger 0x{addr['trigger']:04X}...")
+        success_trigger_on = self.write_coil(addr['trigger'], True)
+
+        if not success_trigger_on:
+            print(f"  ✗ Erro ao acionar trigger")
+            return False
+
+        # Aguardar scan do CLP (~50ms para segurança)
+        import time
+        time.sleep(0.05)
+
+        # Desligar trigger
+        success_trigger_off = self.write_coil(addr['trigger'], False)
+
+        if success_trigger_off:
+            print(f"  ✓ Dobra {bend_number} gravada e ROT5 acionado")
+            return True
+        else:
+            print(f"  ⚠ Gravado mas erro ao desligar trigger")
+            return True  # Ainda assim consideramos sucesso
 
     def read_bend_angle(self, bend_number: int) -> Optional[float]:
         """
-        Lê ângulo de dobra da área de setpoints
+        Lê ângulo de dobra da área SHADOW (0x0840+) - mesma área do ladder
+
+        MODIFICADO 18/Nov/2025: Lê de 0x0840 (área que o ladder usa)
+        para garantir que IHM exibe exatamente o que a máquina vai executar.
+
+        Formato: 32-bit MSW/LSW
 
         Args:
             bend_number (int): 1, 2 ou 3
@@ -686,22 +740,34 @@ class ModbusClientWrapper:
             >>> print(f"Dobra 1: {angle}°")
             Dobra 1: 90.0°
         """
+        # Mapeamento: 0x0840-0x0852 (área SHADOW lida pelo ladder)
         addresses = {
-            1: mm.BEND_ANGLES['BEND_1_SETPOINT'],
-            2: mm.BEND_ANGLES['BEND_2_SETPOINT'],
-            3: mm.BEND_ANGLES['BEND_3_SETPOINT']
+            1: {'msw': mm.BEND_ANGLES_SHADOW['BEND_1_LEFT_MSW'],  # 0x0842
+                'lsw': mm.BEND_ANGLES_SHADOW['BEND_1_LEFT_LSW']}, # 0x0840
+            2: {'msw': mm.BEND_ANGLES_SHADOW['BEND_2_LEFT_MSW'],  # 0x0848
+                'lsw': mm.BEND_ANGLES_SHADOW['BEND_2_LEFT_LSW']}, # 0x0846
+            3: {'msw': mm.BEND_ANGLES_SHADOW['BEND_3_LEFT_MSW'],  # 0x0852
+                'lsw': mm.BEND_ANGLES_SHADOW['BEND_3_LEFT_LSW']}, # 0x0850
         }
 
         if bend_number not in addresses:
             print(f"✗ Número de dobra inválido: {bend_number}")
             return None
 
-        value_clp = self.read_register(addresses[bend_number])
+        addr = addresses[bend_number]
 
-        if value_clp is None:
+        # Ler MSW e LSW
+        msw = self.read_register(addr['msw'])
+        lsw = self.read_register(addr['lsw'])
+
+        if msw is None or lsw is None:
             return None
 
-        return value_clp / 10.0
+        # Combinar em 32-bit
+        value_32bit = mm.read_32bit(msw, lsw)
+
+        # Converter para graus
+        return mm.clp_to_degrees(value_32bit)
 
     def read_all_bend_angles(self) -> dict:
         """

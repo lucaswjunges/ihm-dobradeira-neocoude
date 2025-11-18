@@ -88,18 +88,56 @@ ENCODER = {
 }
 
 # ==========================================
-# ÂNGULOS SETPOINT (16-bit ÚNICO)
+# ÁREA MODBUS INPUT (32-bit) - ESCRITA IHM WEB
 # ==========================================
-# ✅ VALIDADO 16/Nov/2025 - Área 0x0500 aceita escrita sem proteção!
-# Formato: Valor único de 16 bits (NÃO usa MSW/LSW)
+# ✅ VALIDADO 18/Nov/2025 - Área 0x0A00 confirmada no ladder ROT5.lad
+# FLUXO: IHM escreve 0x0A00 → trigger 0x0390 → ROT5 copia → 0x0840 → ladder lê
+# Formato: 32-bit MSW/LSW (ATENÇÃO: MSW primeiro, LSW depois)
 # Conversão: value_clp = graus * 10
-# Conforme manual MPC4004 página 85 - Área oficial de setpoints
+#
+# ROT5.lad Lines 7-12:
+#   Quando trigger 0x0390 = ON:
+#     MOV 0x0A00 → 0x0842  (MSW Dobra 1)
+#     MOV 0x0A02 → 0x0840  (LSW Dobra 1)
 
-BEND_ANGLES = {
-    # Endereços validados empiricamente - 100% precisão
-    'BEND_1_SETPOINT': 0x0500,  # 1280 - Ângulo Dobra 1 ✅ TESTADO
-    'BEND_2_SETPOINT': 0x0502,  # 1282 - Ângulo Dobra 2 ✅ TESTADO
-    'BEND_3_SETPOINT': 0x0504,  # 1284 - Ângulo Dobra 3 ✅ TESTADO
+BEND_ANGLES_MODBUS_INPUT = {
+    # Dobra 1 - MSW/LSW + Trigger (coil)
+    'BEND_1_INPUT_MSW': 0x0A00,  # 2560 - Dobra 1 MSW (bits 31-16)
+    'BEND_1_INPUT_LSW': 0x0A02,  # 2562 - Dobra 1 LSW (bits 15-0)
+    'BEND_1_TRIGGER':   0x0390,  # 912  - Trigger Dobra 1 (COIL)
+
+    # Dobra 2 - MSW/LSW + Trigger (coil)
+    'BEND_2_INPUT_MSW': 0x0A04,  # 2564 - Dobra 2 MSW (bits 31-16)
+    'BEND_2_INPUT_LSW': 0x0A06,  # 2566 - Dobra 2 LSW (bits 15-0)
+    'BEND_2_TRIGGER':   0x0391,  # 913  - Trigger Dobra 2 (COIL)
+
+    # Dobra 3 - MSW/LSW + Trigger (coil)
+    'BEND_3_INPUT_MSW': 0x0A08,  # 2568 - Dobra 3 MSW (bits 31-16)
+    'BEND_3_INPUT_LSW': 0x0A0A,  # 2570 - Dobra 3 LSW (bits 15-0)
+    'BEND_3_TRIGGER':   0x0392,  # 914  - Trigger Dobra 3 (COIL)
+}
+
+# ==========================================
+# ÁREA SCADA (32-bit) - ESPELHO PARA LEITURA
+# ==========================================
+# ✅ RECOMENDADO para leitura pela IHM Web
+# ROT5 copia automaticamente de 0x0840 para 0x0B00
+# Formato: 32-bit MSW/LSW
+
+BEND_ANGLES_SCADA = {
+    # Dobra 1 - READ-ONLY (espelho SCADA)
+    # NOTA: No CLP a ordem é LSW primeiro, MSW depois
+    # Mas para read_register_32bit precisamos passar endereço MSW
+    'BEND_1_SCADA_MSW': 0x0B02,  # 2818 - MSW Dobra 1 (SCADA mirror)
+    'BEND_1_SCADA_LSW': 0x0B00,  # 2816 - LSW Dobra 1 (SCADA mirror)
+
+    # Dobra 2 - READ-ONLY
+    'BEND_2_SCADA_MSW': 0x0B06,  # 2822 - MSW Dobra 2 (SCADA mirror)
+    'BEND_2_SCADA_LSW': 0x0B04,  # 2820 - LSW Dobra 2 (SCADA mirror)
+
+    # Dobra 3 - READ-ONLY
+    'BEND_3_SCADA_MSW': 0x0B0A,  # 2826 - MSW Dobra 3 (SCADA mirror)
+    'BEND_3_SCADA_LSW': 0x0B08,  # 2824 - LSW Dobra 3 (SCADA mirror)
 }
 
 # ==========================================

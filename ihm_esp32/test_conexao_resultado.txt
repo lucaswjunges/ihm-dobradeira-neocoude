@@ -1,0 +1,98 @@
+============================================================
+ DIAGNÓSTICO DE CONEXÃO MODBUS - CLP ATOS
+============================================================
+
+[Teste 1] Verificando porta serial...
+✓ Porta /dev/ttyUSB0 aberta com sucesso
+  Configuração: Serial<id=0x705e16e1d930, open=True>(port='/dev/ttyUSB0', baudrate=57600, bytesize=8, parity='N', stopbits=2, timeout=1, xonxoff=False, rtscts=False, dsrdtr=False)
+
+[Teste 2] Testando combinações de configurações...
+
+Testando: Baudrate=57600, Parity=N, Stopbits=1, Slave=1... ✗ Exceção: ModbusClientMixin.read_holding_registers() got an 
+Testando: Baudrate=57600, Parity=N, Stopbits=1, Slave=2... ✗ Exceção: ModbusClientMixin.read_holding_registers() got an 
+Testando: Baudrate=57600, Parity=N, Stopbits=1, Slave=247... ✗ Exceção: ModbusClientMixin.read_holding_registers() got an 
+Testando: Baudrate=57600, Parity=N, Stopbits=2, Slave=1... ✗ Exceção: ModbusClientMixin.read_holding_registers() got an 
+Testando: Baudrate=57600, Parity=N, Stopbits=2, Slave=2... ✗ Exceção: ModbusClientMixin.read_holding_registers() got an 
+Testando: Baudrate=57600, Parity=N, Stopbits=2, Slave=247... ✗ Exceção: ModbusClientMixin.read_holding_registers() got an 
+Testando: Baudrate=57600, Parity=E, Stopbits=1, Slave=1... ✗ Exceção: ModbusClientMixin.read_holding_registers() got an 
+Testando: Baudrate=57600, Parity=E, Stopbits=1, Slave=2... ✗ Exceção: ModbusClientMixin.read_holding_registers() got an 
+Testando: Baudrate=57600, Parity=E, Stopbits=1, Slave=247... ✗ Exceção: ModbusClientMixin.read_holding_registers() got an 
+Testando: Baudrate=57600, Parity=E, Stopbits=2, Slave=1... ✗ Exceção: ModbusClientMixin.read_holding_registers() got an 
+Testando: Baudrate=57600, Parity=E, Stopbits=2, Slave=2... ✗ Exceção: ModbusClientMixin.read_holding_registers() got an 
+Testando: Baudrate=57600, Parity=E, Stopbits=2, Slave=247... ✗ Exceção: ModbusClientMixin.read_holding_registers() got an 
+Testando: Baudrate=57600, Parity=O, Stopbits=1, Slave=1... ✗ Exceção: ModbusClientMixin.read_holding_registers() got an 
+Testando: Baudrate=57600, Parity=O, Stopbits=1, Slave=2... ✗ Exceção: ModbusClientMixin.read_holding_registers() got an 
+Testando: Baudrate=57600, Parity=O, Stopbits=1, Slave=247... ✗ Exceção: ModbusClientMixin.read_holding_registers() got an 
+Testando: Baudrate=57600, Parity=O, Stopbits=2, Slave=1... ✗ Exceção: ModbusClientMixin.read_holding_registers() got an 
+Testando: Baudrate=57600, Parity=O, Stopbits=2, Slave=2... ✗ Exceção: ModbusClientMixin.read_holding_registers() got an 
+Testando: Baudrate=57600, Parity=O, Stopbits=2, Slave=247... ✗ Exceção: ModbusClientMixin.read_holding_registers() got an 
+Testando: Baudrate=19200, Parity=N, Stopbits=1, Slave=1... ✗ Exceção: ModbusClientMixin.read_holding_registers() got an 
+Testando: Baudrate=19200, Parity=N, Stopbits=1, Slave=2... ✗ Exceção: ModbusClientMixin.read_holding_registers() got an 
+Testando: Baudrate=19200, Parity=N, Stopbits=1, Slave=247... ✗ Exceção: ModbusClientMixin.read_holding_registers() got an 
+Testando: Baudrate=19200, Parity=N, Stopbits=2, Slave=1... ✗ Exceção: ModbusClientMixin.read_holding_registers() got an 
+Testando: Baudrate=19200, Parity=N, Stopbits=2, Slave=2... ✗ Exceção: ModbusClientMixin.read_holding_registers() got an 
+Testando: Baudrate=19200, Parity=N, Stopbits=2, Slave=247... ✗ Exceção: ModbusClientMixin.read_holding_registers() got an 
+Testando: Baudrate=19200, Parity=E, Stopbits=1, Slave=1... ✗ Exceção: ModbusClientMixin.read_holding_registers() got an 
+Testando: Baudrate=19200, Parity=E, Stopbits=1, Slave=2... ✗ Exceção: ModbusClientMixin.read_holding_registers() got an 
+Testando: Baudrate=19200, Parity=E, Stopbits=1, Slave=247... ✗ Exceção: ModbusClientMixin.read_holding_registers() got an 
+Testando: Baudrate=19200, Parity=E, Stopbits=2, Slave=1... ✗ Exceção: ModbusClientMixin.read_holding_registers() got an 
+Testando: Baudrate=19200, Parity=E, Stopbits=2, Slave=2... ✗ Exceção: ModbusClientMixin.read_holding_registers() got an 
+Testando: Baudrate=19200, Parity=E, Stopbits=2, Slave=247... ✗ Exceção: ModbusClientMixin.read_holding_registers() got an 
+Testando: Baudrate=19200, Parity=O, Stopbits=1, Slave=1... ✗ Exceção: ModbusClientMixin.read_holding_registers() got an 
+Testando: Baudrate=19200, Parity=O, Stopbits=1, Slave=2... ✗ Exceção: ModbusClientMixin.read_holding_registers() got an 
+Testando: Baudrate=19200, Parity=O, Stopbits=1, Slave=247... ✗ Exceção: ModbusClientMixin.read_holding_registers() got an 
+Testando: Baudrate=19200, Parity=O, Stopbits=2, Slave=1... ✗ Exceção: ModbusClientMixin.read_holding_registers() got an 
+Testando: Baudrate=19200, Parity=O, Stopbits=2, Slave=2... ✗ Exceção: ModbusClientMixin.read_holding_registers() got an 
+Testando: Baudrate=19200, Parity=O, Stopbits=2, Slave=247... ✗ Exceção: ModbusClientMixin.read_holding_registers() got an 
+Testando: Baudrate=9600, Parity=N, Stopbits=1, Slave=1... ✗ Exceção: ModbusClientMixin.read_holding_registers() got an 
+Testando: Baudrate=9600, Parity=N, Stopbits=1, Slave=2... ✗ Exceção: ModbusClientMixin.read_holding_registers() got an 
+Testando: Baudrate=9600, Parity=N, Stopbits=1, Slave=247... ✗ Exceção: ModbusClientMixin.read_holding_registers() got an 
+Testando: Baudrate=9600, Parity=N, Stopbits=2, Slave=1... ✗ Exceção: ModbusClientMixin.read_holding_registers() got an 
+Testando: Baudrate=9600, Parity=N, Stopbits=2, Slave=2... ✗ Exceção: ModbusClientMixin.read_holding_registers() got an 
+Testando: Baudrate=9600, Parity=N, Stopbits=2, Slave=247... ✗ Exceção: ModbusClientMixin.read_holding_registers() got an 
+Testando: Baudrate=9600, Parity=E, Stopbits=1, Slave=1... ✗ Exceção: ModbusClientMixin.read_holding_registers() got an 
+Testando: Baudrate=9600, Parity=E, Stopbits=1, Slave=2... ✗ Exceção: ModbusClientMixin.read_holding_registers() got an 
+Testando: Baudrate=9600, Parity=E, Stopbits=1, Slave=247... ✗ Exceção: ModbusClientMixin.read_holding_registers() got an 
+Testando: Baudrate=9600, Parity=E, Stopbits=2, Slave=1... ✗ Exceção: ModbusClientMixin.read_holding_registers() got an 
+Testando: Baudrate=9600, Parity=E, Stopbits=2, Slave=2... ✗ Exceção: ModbusClientMixin.read_holding_registers() got an 
+Testando: Baudrate=9600, Parity=E, Stopbits=2, Slave=247... ✗ Exceção: ModbusClientMixin.read_holding_registers() got an 
+Testando: Baudrate=9600, Parity=O, Stopbits=1, Slave=1... ✗ Exceção: ModbusClientMixin.read_holding_registers() got an 
+Testando: Baudrate=9600, Parity=O, Stopbits=1, Slave=2... ✗ Exceção: ModbusClientMixin.read_holding_registers() got an 
+Testando: Baudrate=9600, Parity=O, Stopbits=1, Slave=247... ✗ Exceção: ModbusClientMixin.read_holding_registers() got an 
+Testando: Baudrate=9600, Parity=O, Stopbits=2, Slave=1... ✗ Exceção: ModbusClientMixin.read_holding_registers() got an 
+Testando: Baudrate=9600, Parity=O, Stopbits=2, Slave=2... ✗ Exceção: ModbusClientMixin.read_holding_registers() got an 
+Testando: Baudrate=9600, Parity=O, Stopbits=2, Slave=247... ✗ Exceção: ModbusClientMixin.read_holding_registers() got an 
+Testando: Baudrate=115200, Parity=N, Stopbits=1, Slave=1... ✗ Exceção: ModbusClientMixin.read_holding_registers() got an 
+Testando: Baudrate=115200, Parity=N, Stopbits=1, Slave=2... ✗ Exceção: ModbusClientMixin.read_holding_registers() got an 
+Testando: Baudrate=115200, Parity=N, Stopbits=1, Slave=247... ✗ Exceção: ModbusClientMixin.read_holding_registers() got an 
+Testando: Baudrate=115200, Parity=N, Stopbits=2, Slave=1... ✗ Exceção: ModbusClientMixin.read_holding_registers() got an 
+Testando: Baudrate=115200, Parity=N, Stopbits=2, Slave=2... ✗ Exceção: ModbusClientMixin.read_holding_registers() got an 
+Testando: Baudrate=115200, Parity=N, Stopbits=2, Slave=247... ✗ Exceção: ModbusClientMixin.read_holding_registers() got an 
+Testando: Baudrate=115200, Parity=E, Stopbits=1, Slave=1... ✗ Exceção: ModbusClientMixin.read_holding_registers() got an 
+Testando: Baudrate=115200, Parity=E, Stopbits=1, Slave=2... ✗ Exceção: ModbusClientMixin.read_holding_registers() got an 
+Testando: Baudrate=115200, Parity=E, Stopbits=1, Slave=247... ✗ Exceção: ModbusClientMixin.read_holding_registers() got an 
+Testando: Baudrate=115200, Parity=E, Stopbits=2, Slave=1... ✗ Exceção: ModbusClientMixin.read_holding_registers() got an 
+Testando: Baudrate=115200, Parity=E, Stopbits=2, Slave=2... ✗ Exceção: ModbusClientMixin.read_holding_registers() got an 
+Testando: Baudrate=115200, Parity=E, Stopbits=2, Slave=247... ✗ Exceção: ModbusClientMixin.read_holding_registers() got an 
+Testando: Baudrate=115200, Parity=O, Stopbits=1, Slave=1... ✗ Exceção: ModbusClientMixin.read_holding_registers() got an 
+Testando: Baudrate=115200, Parity=O, Stopbits=1, Slave=2... ✗ Exceção: ModbusClientMixin.read_holding_registers() got an 
+Testando: Baudrate=115200, Parity=O, Stopbits=1, Slave=247... ✗ Exceção: ModbusClientMixin.read_holding_registers() got an 
+Testando: Baudrate=115200, Parity=O, Stopbits=2, Slave=1... ✗ Exceção: ModbusClientMixin.read_holding_registers() got an 
+Testando: Baudrate=115200, Parity=O, Stopbits=2, Slave=2... ✗ Exceção: ModbusClientMixin.read_holding_registers() got an 
+Testando: Baudrate=115200, Parity=O, Stopbits=2, Slave=247... ✗ Exceção: ModbusClientMixin.read_holding_registers() got an 
+
+============================================================
+ NENHUMA CONFIGURAÇÃO FUNCIONOU
+============================================================
+
+Possíveis causas:
+  1. CLP não está ligado
+  2. Cabo RS485 invertido (A/B trocados)
+  3. Bit 0x00BE não está habilitado no ladder
+  4. CLP usando baudrate/configuração diferente
+  5. Problema no conversor USB-RS485
+
+Próximos passos:
+  1. Verificar LED do conversor RS485
+  2. Verificar ladder do CLP (registros 0x1987, 0x1988)
+  3. Testar com outro conversor/cabo

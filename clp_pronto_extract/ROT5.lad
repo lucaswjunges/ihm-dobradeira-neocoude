@@ -1,0 +1,165 @@
+Lines:00007
+
+[Line00001]
+  [Features]
+    Branchs:01
+    Type:0
+    Label:0
+    Comment:EMULAR K1 VIA MODBUS
+    Out:SETR    T:0043 Size:001 E:00A0
+    Height:01
+  [Branch01]
+    X1position:00
+    X2position:13
+    Yposition:00
+    Height:01
+    B1:00
+    B2:00
+    BInputnumber:00
+    {0;00;03E0;-1;-1;-1;-1;00}
+    ###
+
+[Line00002]
+  [Features]
+    Branchs:01
+    Type:0
+    Label:0
+    Comment:EMULAR S1 VIA MODBUS
+    Out:SETR    T:0043 Size:001 E:00DC
+    Height:01
+  [Branch01]
+    X1position:00
+    X2position:13
+    Yposition:00
+    Height:01
+    B1:00
+    B2:00
+    BInputnumber:00
+    {0;00;03EA;-1;-1;-1;-1;00}
+    ###
+
+[Line00003]
+  [Features]
+    Branchs:01
+    Type:0
+    Label:0
+    Comment:EMULAR ENTER VIA MODBUS
+    Out:SETR    T:0043 Size:001 E:0025
+    Height:01
+  [Branch01]
+    X1position:00
+    X2position:13
+    Yposition:00
+    Height:01
+    B1:00
+    B2:00
+    BInputnumber:00
+    {0;00;03EE;-1;-1;-1;-1;00}
+    ###
+
+[Line00004]
+  [Features]
+    Branchs:02
+    Type:0
+    Label:0
+    Comment:BOTAO AVANCAR VIRTUAL (E2)
+    Out:SETR    T:0043 Size:001 E:03F1
+    Height:02
+  [Branch01]
+    X1position:00
+    X2position:13
+    Yposition:00
+    Height:01
+    B1:00
+    B2:00
+    BInputnumber:00
+    {0;00;0102;-1;-1;-1;-1;00}
+    ###
+  [Branch02]
+    X1position:00
+    X2position:13
+    Yposition:01
+    Height:01
+    B1:01
+    B2:00
+    BInputnumber:01
+    {0;00;03E0;-1;-1;-1;-1;00}
+    ###
+
+[Line00005]
+  [Features]
+    Branchs:02
+    Type:0
+    Label:0
+    Comment:BOTAO RECUAR VIRTUAL (E4)
+    Out:SETR    T:0043 Size:001 E:03F2
+    Height:02
+  [Branch01]
+    X1position:00
+    X2position:13
+    Yposition:00
+    Height:01
+    B1:00
+    B2:00
+    BInputnumber:00
+    {0;00;0104;-1;-1;-1;-1;00}
+    ###
+  [Branch02]
+    X1position:00
+    X2position:13
+    Yposition:01
+    Height:01
+    B1:01
+    B2:00
+    BInputnumber:01
+    {0;00;03E3;-1;-1;-1;-1;00}
+    ###
+
+[Line00006]
+  [Features]
+    Branchs:02
+    Type:0
+    Label:0
+    Comment:BOTAO PARADA VIRTUAL (E3)
+    Out:SETR    T:0043 Size:001 E:03F3
+    Height:02
+  [Branch01]
+    X1position:00
+    X2position:13
+    Yposition:00
+    Height:01
+    B1:00
+    B2:00
+    BInputnumber:00
+    {0;00;0103;-1;-1;-1;-1;00}
+    ###
+  [Branch02]
+    X1position:00
+    X2position:13
+    Yposition:01
+    Height:01
+    B1:01
+    B2:00
+    BInputnumber:01
+    {0;00;03E2;-1;-1;-1;-1;00}
+    ###
+
+
+[Line00008]
+  [Features]
+    Branchs:01
+    Type:0
+    Label:0
+    Comment:STATUS INTERFACE MODBUS OK
+    Out:SETR    T:0043 Size:001 E:03FF
+    Height:01
+  [Branch01]
+    X1position:00
+    X2position:13
+    Yposition:00
+    Height:01
+    B1:00
+    B2:00
+    BInputnumber:00
+    {0;00;00BE;-1;-1;-1;-1;00}
+    ###

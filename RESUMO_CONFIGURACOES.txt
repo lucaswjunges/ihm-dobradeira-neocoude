@@ -1,0 +1,118 @@
+════════════════════════════════════════════════════════════════════════════════
+  CONFIGURAÇÕES BLOQUEADAS NO WINSUP 2 - GUIA RÁPIDO
+════════════════════════════════════════════════════════════════════════════════
+
+✅ SIM! É possível modificar configurações que o WinSup 2 bloqueia!
+
+O arquivo Conf.smt dentro do .sup contém configurações avançadas que estão
+"grayed out" (desabilitadas) na interface do WinSup 2.
+
+════════════════════════════════════════════════════════════════════════════════
+  CONFIGURAÇÃO MAIS IMPORTANTE: FRONTREMOTO (IHM REMOTA)
+════════════════════════════════════════════════════════════════════════════════
+
+⭐ FRONTREMOTO=0 → Alterar para FRONTREMOTO=1
+
+Esta é EXATAMENTE a configuração que você precisa para o projeto!
+
+Benefícios:
+  • Permite tablet/PC se conectar ao CLP como IHM
+  • Habilita comunicação remota via RS232/RS485
+  • Essencial para sua IHM web da dobradeira
+  • No WinSup 2 esta opção aparece BLOQUEADA (não editável)
+
+════════════════════════════════════════════════════════════════════════════════
+  OUTRAS CONFIGURAÇÕES INTERESSANTES
+════════════════════════════════════════════════════════════════════════════════
+
+1. FORCE=1          → Habilita modo FORCE (forçar I/O para debug)
+                       ⚠️ Use apenas em bancada de testes!
+
+2. ESCUTA=1         → Permite monitorar CLP sem parar execução
+
+3. FRONTAL=1        → Habilita comunicação com painel frontal
+
+4. RECFRONTAL=1     → Habilita sistema de receitas
+
+5. HAB_SENHA=1      → Ativa proteção por senha (cuidado!)
+
+6. WATCHDOGTIMER=0  → Desabilita watchdog
+                       ⚠️⚠️ NÃO RECOMENDADO EM PRODUÇÃO!
+
+════════════════════════════════════════════════════════════════════════════════
+  COMO MODIFICAR - 3 OPÇÕES
+════════════════════════════════════════════════════════════════════════════════
+
+📌 OPÇÃO 1: Script Automático (MAIS FÁCIL)
+   
+   cd /home/lucas-junges/Documents/clientes/w&co
+   python3 modificar_config_clp.py
+   
+   → Faz backup automático
+   → Menu interativo
+   → Seguro e fácil
+
+📌 OPÇÃO 2: Comando Rápido (Uma linha)
+   
+   cd apr03_alterado
+   mkdir temp && unzip apr03_v2_alterado.sup -d temp
+   sed -i 's/FRONTREMOTO=0/FRONTREMOTO=1/g' temp/Conf.smt
+   cd temp && zip ../apr03_v2_modificado.sup * && cd ..
+   rm -rf temp
+
+📌 OPÇÃO 3: Manual (Editor Hexadecimal)
+   
+   1. Extrair .sup com WinRAR/7-Zip
+   2. Editar Conf.smt em editor hexadecimal
+   3. Buscar texto "FRONTREMOTO=0"
+   4. Substituir por "FRONTREMOTO=1"
+   5. Salvar e recompilar ZIP
+
+════════════════════════════════════════════════════════════════════════════════
+  RECOMENDAÇÃO PARA SEU PROJETO
+════════════════════════════════════════════════════════════════════════════════
+
+✅ Habilite:
+   - FRONTREMOTO=1  (ESSENCIAL para IHM remota)
+   - ESCUTA=1       (útil para debug online)
+   - FRONTAL=1      (comunicação com frontal)
+
+❌ NÃO habilite:
+   - FORCE=1        (só em bancada, perigoso em produção)
+   - HAB_SENHA=1    (pode te bloquear se esquecer senha)
+   - WATCHDOGTIMER=0 (remove proteção)
+
+════════════════════════════════════════════════════════════════════════════════
+  ARQUIVOS CRIADOS
+════════════════════════════════════════════════════════════════════════════════
+
+📄 modificar_config_clp.py
+   → Script Python interativo para modificar configurações
+
+📄 CONFIGURACOES_EDITAVEIS_CLP.md
+   → Documentação completa de todas as configurações
+   → Explicação detalhada de cada parâmetro
+   → Riscos e benefícios
+
+📄 RESUMO_CONFIGURACOES.txt
+   → Este arquivo (guia rápido)
+
+════════════════════════════════════════════════════════════════════════════════
+  PRÓXIMOS PASSOS
+════════════════════════════════════════════════════════════════════════════════
+
+1. ✅ Execute o script: python3 modificar_config_clp.py
+2. ✅ Escolha opção 1 (FRONTREMOTO)
+3. ✅ Confirme a modificação
+4. ✅ Abra o .sup modificado no WinSup 2
+5. ✅ Compile e envie para o CLP
+6. ✅ Teste a comunicação remota
+
+════════════════════════════════════════════════════════════════════════════════
+
+⚠️ IMPORTANTE: Sempre faça backup antes de modificar!
+
+O script já faz backup automático, mas você pode fazer manual também:
+  cp apr03_v2_alterado.sup apr03_v2_alterado.BACKUP.sup
+
+════════════════════════════════════════════════════════════════════════════════

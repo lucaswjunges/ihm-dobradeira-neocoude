@@ -1,123 +1,339 @@
-2025-11-10 07:19:14,436 - __main__ - INFO - ================================================================================
-2025-11-10 07:19:14,436 - __main__ - INFO - IHM SERVIDOR FINAL - NEOCOUDE-HD-15
-2025-11-10 07:19:14,436 - __main__ - INFO - ================================================================================
-2025-11-10 07:19:14,436 - __main__ - INFO - Porta serial: /dev/ttyUSB0
-2025-11-10 07:19:14,436 - __main__ - INFO - WebSocket: localhost:8086
-2025-11-10 07:19:14,436 - __main__ - INFO - Modo: LIVE (CLP real)
-2025-11-10 07:19:14,436 - __main__ - INFO - ================================================================================
-2025-11-10 07:19:14,436 - modbus_client - INFO - Modbus client initialized in LIVE MODE: /dev/ttyUSB0 @ 57600
-2025-11-10 07:19:14,437 - modbus_client - INFO - Connected to PLC on /dev/ttyUSB0
-2025-11-10 07:19:14,453 - modbus_client - ERROR - Error reading register 6536: ExceptionResponse(dev_id=1, function_code=131, exception_code=2)
-2025-11-10 07:19:14,453 - __main__ - INFO - ✓ Conectado ao CLP via Modbus RTU
-2025-11-10 07:19:14,453 - __main__ - INFO - Iniciando servidor WebSocket na porta 8086...
-2025-11-10 07:19:14,487 - websockets.server - INFO - server listening on 127.0.0.1:8086
-2025-11-10 07:19:14,487 - __main__ - INFO - ✓ Servidor WebSocket rodando em ws://localhost:8086
-2025-11-10 07:19:14,488 - __main__ - INFO - Iniciando polling do CLP...
-2025-11-10 07:19:14,926 - websockets.server - INFO - connection open
-2025-11-10 07:19:14,926 - __main__ - INFO - Cliente conectado. Total de clientes: 1
-2025-11-10 07:19:31,613 - __main__ - INFO - Cliente removido. Total de clientes: 0
-2025-11-10 07:19:31,642 - websockets.server - INFO - connection open
-2025-11-10 07:19:31,642 - __main__ - INFO - Cliente conectado. Total de clientes: 1
-2025-11-10 07:19:33,097 - __main__ - INFO - Cliente removido. Total de clientes: 0
-2025-11-10 07:19:33,315 - websockets.server - INFO - connection open
-2025-11-10 07:19:33,315 - __main__ - INFO - Cliente conectado. Total de clientes: 1
-2025-11-10 07:19:35,886 - __main__ - INFO - Ação recebida: press_key
-2025-11-10 07:19:35,886 - modbus_client - INFO - Pressing button S1 (address 220)
-2025-11-10 07:19:36,030 - modbus_client - INFO - Button S1 press completed
-2025-11-10 07:19:36,030 - __main__ - INFO - Tecla 220 enviada com sucesso
-2025-11-10 07:19:36,919 - __main__ - INFO - Ação recebida: press_key
-2025-11-10 07:19:36,919 - modbus_client - INFO - Pressing button S1 (address 220)
-2025-11-10 07:19:37,053 - modbus_client - INFO - Button S1 press completed
-2025-11-10 07:19:37,053 - __main__ - INFO - Tecla 220 enviada com sucesso
-2025-11-10 07:19:37,637 - __main__ - INFO - Ação recebida: press_key
-2025-11-10 07:19:37,637 - modbus_client - INFO - Pressing button S2 (address 221)
-2025-11-10 07:19:37,778 - modbus_client - INFO - Button S2 press completed
-2025-11-10 07:19:37,778 - __main__ - INFO - Tecla 221 enviada com sucesso
-2025-11-10 07:19:38,555 - __main__ - INFO - Ação recebida: press_key
-2025-11-10 07:19:38,556 - modbus_client - INFO - Pressing button S2 (address 221)
-2025-11-10 07:19:38,691 - modbus_client - INFO - Button S2 press completed
-2025-11-10 07:19:38,691 - __main__ - INFO - Tecla 221 enviada com sucesso
-2025-11-10 07:19:39,505 - __main__ - INFO - Ação recebida: press_key
-2025-11-10 07:19:39,505 - modbus_client - INFO - Pressing button S1 (address 220)
-2025-11-10 07:19:39,636 - modbus_client - INFO - Button S1 press completed
-2025-11-10 07:19:39,637 - __main__ - INFO - Tecla 220 enviada com sucesso
-2025-11-10 07:19:40,157 - __main__ - INFO - Ação recebida: press_key
-2025-11-10 07:19:40,157 - modbus_client - INFO - Pressing button S1 (address 220)
-2025-11-10 07:19:40,294 - modbus_client - INFO - Button S1 press completed
-2025-11-10 07:19:40,294 - __main__ - INFO - Tecla 220 enviada com sucesso
-2025-11-10 07:19:42,153 - __main__ - INFO - Ação recebida: press_key
-2025-11-10 07:19:42,153 - modbus_client - INFO - Pressing button S1 (address 220)
-2025-11-10 07:19:42,295 - modbus_client - INFO - Button S1 press completed
-2025-11-10 07:19:42,295 - __main__ - INFO - Tecla 220 enviada com sucesso
-2025-11-10 07:19:43,788 - __main__ - INFO - Ação recebida: press_key
-2025-11-10 07:19:43,788 - modbus_client - INFO - Pressing button S1 (address 220)
-2025-11-10 07:19:43,926 - modbus_client - INFO - Button S1 press completed
-2025-11-10 07:19:43,926 - __main__ - INFO - Tecla 220 enviada com sucesso
-2025-11-10 07:19:48,127 - __main__ - INFO - Ação recebida: press_key
-2025-11-10 07:19:48,127 - modbus_client - INFO - Pressing button K4 (address 163)
-2025-11-10 07:19:48,268 - modbus_client - INFO - Button K4 press completed
-2025-11-10 07:19:48,268 - __main__ - INFO - Tecla 163 enviada com sucesso
-2025-11-10 07:19:49,523 - __main__ - INFO - Ação recebida: press_key
-2025-11-10 07:19:49,523 - modbus_client - INFO - Pressing button K5 (address 164)
-2025-11-10 07:19:49,655 - modbus_client - INFO - Button K5 press completed
-2025-11-10 07:19:49,656 - __main__ - INFO - Tecla 164 enviada com sucesso
-2025-11-10 07:19:50,201 - __main__ - INFO - Ação recebida: press_key
-2025-11-10 07:19:50,201 - modbus_client - INFO - Pressing button K6 (address 165)
-2025-11-10 07:19:50,343 - modbus_client - INFO - Button K6 press completed
-2025-11-10 07:19:50,343 - __main__ - INFO - Tecla 165 enviada com sucesso
-2025-11-10 07:19:50,700 - __main__ - INFO - Ação recebida: press_key
-2025-11-10 07:19:50,700 - modbus_client - INFO - Pressing button K7 (address 166)
-2025-11-10 07:19:50,835 - modbus_client - INFO - Button K7 press completed
-2025-11-10 07:19:50,835 - __main__ - INFO - Tecla 166 enviada com sucesso
-2025-11-10 07:19:51,469 - __main__ - INFO - Ação recebida: press_key
-2025-11-10 07:19:51,469 - modbus_client - INFO - Pressing button K8 (address 167)
-2025-11-10 07:19:51,611 - modbus_client - INFO - Button K8 press completed
-2025-11-10 07:19:51,611 - __main__ - INFO - Tecla 167 enviada com sucesso
-2025-11-10 07:19:52,053 - __main__ - INFO - Ação recebida: press_key
-2025-11-10 07:19:52,053 - modbus_client - INFO - Pressing button K9 (address 168)
-2025-11-10 07:19:52,195 - modbus_client - INFO - Button K9 press completed
-2025-11-10 07:19:52,195 - __main__ - INFO - Tecla 168 enviada com sucesso
-2025-11-10 07:19:52,593 - __main__ - INFO - Ação recebida: press_key
-2025-11-10 07:19:52,593 - modbus_client - INFO - Pressing button K0 (address 169)
-2025-11-10 07:19:52,724 - modbus_client - INFO - Button K0 press completed
-2025-11-10 07:19:52,724 - __main__ - INFO - Tecla 169 enviada com sucesso
-2025-11-10 07:19:55,059 - __main__ - INFO - Ação recebida: press_key
-2025-11-10 07:19:55,059 - modbus_client - INFO - Pressing button K3 (address 162)
-2025-11-10 07:19:55,200 - modbus_client - INFO - Button K3 press completed
-2025-11-10 07:19:55,200 - __main__ - INFO - Tecla 162 enviada com sucesso
-2025-11-10 07:19:56,701 - __main__ - INFO - Ação recebida: press_key
-2025-11-10 07:19:56,701 - modbus_client - INFO - Pressing button ESC (address 188)
-2025-11-10 07:19:56,843 - modbus_client - INFO - Button ESC press completed
-2025-11-10 07:19:56,843 - __main__ - INFO - Tecla 188 enviada com sucesso
-2025-11-10 07:19:59,000 - __main__ - INFO - Ação recebida: press_key
-2025-11-10 07:19:59,000 - modbus_client - INFO - Pressing button ESC (address 188)
-2025-11-10 07:19:59,145 - modbus_client - INFO - Button ESC press completed
-2025-11-10 07:19:59,145 - __main__ - INFO - Tecla 188 enviada com sucesso
-2025-11-10 07:20:01,001 - __main__ - INFO - Ação recebida: press_key
-2025-11-10 07:20:01,001 - modbus_client - INFO - Pressing button ESC (address 188)
-2025-11-10 07:20:01,145 - modbus_client - INFO - Button ESC press completed
-2025-11-10 07:20:01,145 - __main__ - INFO - Tecla 188 enviada com sucesso
-2025-11-10 07:20:03,138 - __main__ - INFO - Ação recebida: press_key
-2025-11-10 07:20:03,138 - modbus_client - INFO - Pressing button ENTER (address 37)
-2025-11-10 07:20:03,278 - modbus_client - INFO - Button ENTER press completed
-2025-11-10 07:20:03,278 - __main__ - INFO - Tecla 37 enviada com sucesso
-2025-11-10 07:20:09,810 - __main__ - INFO - Ação recebida: press_key
-2025-11-10 07:20:09,810 - modbus_client - INFO - Pressing button EDIT (address 38)
-2025-11-10 07:20:09,943 - modbus_client - INFO - Button EDIT press completed
-2025-11-10 07:20:09,943 - __main__ - INFO - Tecla 38 enviada com sucesso
-2025-11-10 07:20:13,187 - __main__ - INFO - Ação recebida: press_key
-2025-11-10 07:20:13,188 - modbus_client - INFO - Pressing button EDIT (address 38)
-2025-11-10 07:20:13,322 - modbus_client - INFO - Button EDIT press completed
-2025-11-10 07:20:13,322 - __main__ - INFO - Tecla 38 enviada com sucesso
-2025-11-10 07:20:21,423 - __main__ - INFO - Ação recebida: press_key
-2025-11-10 07:20:21,423 - modbus_client - INFO - Pressing button ENTER (address 37)
-2025-11-10 07:20:21,566 - modbus_client - INFO - Button ENTER press completed
-2025-11-10 07:20:21,566 - __main__ - INFO - Tecla 37 enviada com sucesso
-2025-11-10 07:20:23,059 - __main__ - INFO - Ação recebida: press_key
-2025-11-10 07:20:23,060 - modbus_client - INFO - Pressing button S1 (address 220)
-2025-11-10 07:20:23,200 - modbus_client - INFO - Button S1 press completed
-2025-11-10 07:20:23,200 - __main__ - INFO - Tecla 220 enviada com sucesso
-2025-11-10 07:20:23,787 - __main__ - INFO - Ação recebida: press_key
-2025-11-10 07:20:23,788 - modbus_client - INFO - Pressing button S1 (address 220)
-2025-11-10 07:20:23,924 - modbus_client - INFO - Button S1 press completed
-2025-11-10 07:20:23,924 - __main__ - INFO - Tecla 220 enviada com sucesso
+2025-11-10 08:16:02,938 - __main__ - INFO - ================================================================================
+2025-11-10 08:16:02,938 - __main__ - INFO - IHM SERVIDOR FINAL - NEOCOUDE-HD-15
+2025-11-10 08:16:02,938 - __main__ - INFO - ================================================================================
+2025-11-10 08:16:02,938 - __main__ - INFO - Porta serial: /dev/ttyUSB0
+2025-11-10 08:16:02,938 - __main__ - INFO - WebSocket: localhost:8086
+2025-11-10 08:16:02,938 - __main__ - INFO - Modo: LIVE (CLP real)
+2025-11-10 08:16:02,938 - __main__ - INFO - ================================================================================
+2025-11-10 08:16:02,938 - modbus_client - INFO - Modbus client initialized in LIVE MODE: /dev/ttyUSB0 @ 57600
+2025-11-10 08:16:02,939 - modbus_client - INFO - Connected to PLC on /dev/ttyUSB0
+2025-11-10 08:16:02,950 - modbus_client - ERROR - Error reading register 6536: ExceptionResponse(dev_id=1, function_code=131, exception_code=2)
+2025-11-10 08:16:02,951 - __main__ - INFO - ✓ Conectado ao CLP via Modbus RTU
+2025-11-10 08:16:02,951 - __main__ - INFO - Iniciando servidor WebSocket na porta 8086...
+2025-11-10 08:16:02,970 - websockets.server - INFO - server listening on 127.0.0.1:8086
+2025-11-10 08:16:02,970 - __main__ - INFO - ✓ Servidor WebSocket rodando em ws://localhost:8086
+2025-11-10 08:16:02,970 - __main__ - INFO - Iniciando polling do CLP...
+2025-11-10 08:16:03,706 - websockets.server - INFO - connection open
+2025-11-10 08:16:03,706 - __main__ - INFO - Cliente conectado. Total de clientes: 1
+2025-11-10 08:16:03,926 - websockets.server - INFO - connection open
+2025-11-10 08:16:03,926 - __main__ - INFO - Cliente conectado. Total de clientes: 2
+2025-11-10 08:16:04,294 - websockets.server - INFO - connection open
+2025-11-10 08:16:04,295 - __main__ - INFO - Cliente conectado. Total de clientes: 3
+2025-11-10 08:16:06,131 - websockets.server - INFO - connection open
+2025-11-10 08:16:06,131 - __main__ - INFO - Cliente conectado. Total de clientes: 4
+2025-11-10 08:30:09,753 - pymodbus.logging - ERROR - No response received after 3 retries, continue with next request
+2025-11-10 08:30:09,753 - modbus_client - ERROR - Modbus error reading register 1238: Modbus Error: [Input/Output] No response received after 3 retries, continue with next request
+2025-11-10 08:30:13,757 - pymodbus.logging - ERROR - Repeating....
+2025-11-10 08:30:13,757 - modbus_client - ERROR - Modbus error reading register 1239: Modbus Error: [Input/Output] No response received after 3 retries, continue with next request
+2025-11-10 08:30:17,760 - pymodbus.logging - ERROR - No response received after 3 retries, continue with next request
+2025-11-10 08:30:17,760 - modbus_client - ERROR - Modbus error reading register 2114: Modbus Error: [Input/Output] No response received after 3 retries, continue with next request
+2025-11-10 08:30:21,764 - pymodbus.logging - ERROR - No response received after 3 retries, continue with next request
+2025-11-10 08:30:21,764 - modbus_client - ERROR - Modbus error reading register 2120: Modbus Error: [Input/Output] No response received after 3 retries, continue with next request
+2025-11-10 08:30:25,768 - pymodbus.logging - ERROR - No response received after 3 retries, continue with next request
+2025-11-10 08:30:25,768 - modbus_client - ERROR - Modbus error reading register 2130: Modbus Error: [Input/Output] No response received after 3 retries, continue with next request
+2025-11-10 08:30:29,772 - pymodbus.logging - ERROR - No response received after 3 retries, continue with next request
+2025-11-10 08:30:29,772 - modbus_client - ERROR - Modbus error reading coil 767: Modbus Error: [Input/Output] No response received after 3 retries, continue with next request
+2025-11-10 08:30:34,028 - pymodbus.logging - ERROR - No response received after 3 retries, continue with next request
+2025-11-10 08:30:34,028 - modbus_client - ERROR - Modbus error reading register 1238: Modbus Error: [Input/Output] No response received after 3 retries, continue with next request
+2025-11-10 08:30:38,029 - modbus_client - ERROR - Modbus error reading register 1239: Modbus Error: [Input/Output] ERROR: No response received of the last requests (default: retries+3), CLOSING CONNECTION.
+2025-11-10 08:30:42,031 - modbus_client - ERROR - Modbus error reading register 2114: Modbus Error: [Input/Output] ERROR: No response received of the last requests (default: retries+3), CLOSING CONNECTION.
+2025-11-10 08:30:46,033 - modbus_client - ERROR - Modbus error reading register 2120: Modbus Error: [Input/Output] ERROR: No response received of the last requests (default: retries+3), CLOSING CONNECTION.
+2025-11-10 08:30:50,035 - modbus_client - ERROR - Modbus error reading register 2130: Modbus Error: [Input/Output] ERROR: No response received of the last requests (default: retries+3), CLOSING CONNECTION.
+2025-11-10 08:30:54,038 - modbus_client - ERROR - Modbus error reading coil 767: Modbus Error: [Input/Output] ERROR: No response received of the last requests (default: retries+3), CLOSING CONNECTION.
+2025-11-10 08:30:58,295 - modbus_client - ERROR - Modbus error reading register 1238: Modbus Error: [Input/Output] ERROR: No response received of the last requests (default: retries+3), CLOSING CONNECTION.
+2025-11-10 08:31:02,298 - modbus_client - ERROR - Modbus error reading register 1239: Modbus Error: [Input/Output] ERROR: No response received of the last requests (default: retries+3), CLOSING CONNECTION.
+2025-11-10 08:31:06,301 - modbus_client - ERROR - Modbus error reading register 2114: Modbus Error: [Input/Output] ERROR: No response received of the last requests (default: retries+3), CLOSING CONNECTION.
+2025-11-10 08:31:10,304 - modbus_client - ERROR - Modbus error reading register 2120: Modbus Error: [Input/Output] ERROR: No response received of the last requests (default: retries+3), CLOSING CONNECTION.
+2025-11-10 08:31:14,307 - modbus_client - ERROR - Modbus error reading register 2130: Modbus Error: [Input/Output] ERROR: No response received of the last requests (default: retries+3), CLOSING CONNECTION.
+2025-11-10 08:31:18,311 - modbus_client - ERROR - Modbus error reading coil 767: Modbus Error: [Input/Output] ERROR: No response received of the last requests (default: retries+3), CLOSING CONNECTION.
+2025-11-10 08:31:22,566 - modbus_client - ERROR - Modbus error reading register 1238: Modbus Error: [Input/Output] ERROR: No response received of the last requests (default: retries+3), CLOSING CONNECTION.
+2025-11-10 08:31:26,569 - modbus_client - ERROR - Modbus error reading register 1239: Modbus Error: [Input/Output] ERROR: No response received of the last requests (default: retries+3), CLOSING CONNECTION.
+2025-11-10 08:31:30,572 - modbus_client - ERROR - Modbus error reading register 2114: Modbus Error: [Input/Output] ERROR: No response received of the last requests (default: retries+3), CLOSING CONNECTION.
+2025-11-10 08:31:34,575 - modbus_client - ERROR - Modbus error reading register 2120: Modbus Error: [Input/Output] ERROR: No response received of the last requests (default: retries+3), CLOSING CONNECTION.
+2025-11-10 08:31:38,577 - modbus_client - ERROR - Modbus error reading register 2130: Modbus Error: [Input/Output] ERROR: No response received of the last requests (default: retries+3), CLOSING CONNECTION.
+2025-11-10 08:31:42,579 - modbus_client - ERROR - Modbus error reading coil 767: Modbus Error: [Input/Output] ERROR: No response received of the last requests (default: retries+3), CLOSING CONNECTION.
+2025-11-10 08:31:46,833 - modbus_client - ERROR - Modbus error reading register 1238: Modbus Error: [Input/Output] ERROR: No response received of the last requests (default: retries+3), CLOSING CONNECTION.
+2025-11-10 08:31:50,837 - modbus_client - ERROR - Modbus error reading register 1239: Modbus Error: [Input/Output] ERROR: No response received of the last requests (default: retries+3), CLOSING CONNECTION.
+2025-11-10 08:31:54,840 - modbus_client - ERROR - Modbus error reading register 2114: Modbus Error: [Input/Output] ERROR: No response received of the last requests (default: retries+3), CLOSING CONNECTION.
+2025-11-10 08:31:58,845 - modbus_client - ERROR - Modbus error reading register 2120: Modbus Error: [Input/Output] ERROR: No response received of the last requests (default: retries+3), CLOSING CONNECTION.
+2025-11-10 08:32:02,847 - modbus_client - ERROR - Modbus error reading register 2130: Modbus Error: [Input/Output] ERROR: No response received of the last requests (default: retries+3), CLOSING CONNECTION.
+2025-11-10 08:32:06,850 - modbus_client - ERROR - Modbus error reading coil 767: Modbus Error: [Input/Output] ERROR: No response received of the last requests (default: retries+3), CLOSING CONNECTION.
+2025-11-10 08:32:11,105 - modbus_client - ERROR - Modbus error reading register 1238: Modbus Error: [Input/Output] ERROR: No response received of the last requests (default: retries+3), CLOSING CONNECTION.
+2025-11-10 08:32:15,109 - modbus_client - ERROR - Modbus error reading register 1239: Modbus Error: [Input/Output] ERROR: No response received of the last requests (default: retries+3), CLOSING CONNECTION.
+2025-11-10 08:32:19,111 - modbus_client - ERROR - Modbus error reading register 2114: Modbus Error: [Input/Output] ERROR: No response received of the last requests (default: retries+3), CLOSING CONNECTION.
+2025-11-10 08:32:23,114 - modbus_client - ERROR - Modbus error reading register 2120: Modbus Error: [Input/Output] ERROR: No response received of the last requests (default: retries+3), CLOSING CONNECTION.
+2025-11-10 08:32:27,117 - modbus_client - ERROR - Modbus error reading register 2130: Modbus Error: [Input/Output] ERROR: No response received of the last requests (default: retries+3), CLOSING CONNECTION.
+2025-11-10 08:32:31,120 - modbus_client - ERROR - Modbus error reading coil 767: Modbus Error: [Input/Output] ERROR: No response received of the last requests (default: retries+3), CLOSING CONNECTION.
+2025-11-10 08:32:35,375 - modbus_client - ERROR - Modbus error reading register 1238: Modbus Error: [Input/Output] ERROR: No response received of the last requests (default: retries+3), CLOSING CONNECTION.
+2025-11-10 08:32:39,380 - modbus_client - ERROR - Modbus error reading register 1239: Modbus Error: [Input/Output] ERROR: No response received of the last requests (default: retries+3), CLOSING CONNECTION.
+2025-11-10 08:32:43,383 - modbus_client - ERROR - Modbus error reading register 2114: Modbus Error: [Input/Output] ERROR: No response received of the last requests (default: retries+3), CLOSING CONNECTION.
+2025-11-10 08:32:47,386 - modbus_client - ERROR - Modbus error reading register 2120: Modbus Error: [Input/Output] ERROR: No response received of the last requests (default: retries+3), CLOSING CONNECTION.
+2025-11-10 08:32:51,389 - modbus_client - ERROR - Modbus error reading register 2130: Modbus Error: [Input/Output] ERROR: No response received of the last requests (default: retries+3), CLOSING CONNECTION.
+2025-11-10 08:32:55,392 - modbus_client - ERROR - Modbus error reading coil 767: Modbus Error: [Input/Output] ERROR: No response received of the last requests (default: retries+3), CLOSING CONNECTION.
+2025-11-10 08:32:59,647 - modbus_client - ERROR - Modbus error reading register 1238: Modbus Error: [Input/Output] ERROR: No response received of the last requests (default: retries+3), CLOSING CONNECTION.
+2025-11-10 08:33:03,650 - modbus_client - ERROR - Modbus error reading register 1239: Modbus Error: [Input/Output] ERROR: No response received of the last requests (default: retries+3), CLOSING CONNECTION.
+2025-11-10 08:33:07,652 - modbus_client - ERROR - Modbus error reading register 2114: Modbus Error: [Input/Output] ERROR: No response received of the last requests (default: retries+3), CLOSING CONNECTION.
+2025-11-10 08:33:11,656 - modbus_client - ERROR - Modbus error reading register 2120: Modbus Error: [Input/Output] ERROR: No response received of the last requests (default: retries+3), CLOSING CONNECTION.
+2025-11-10 08:33:15,659 - modbus_client - ERROR - Modbus error reading register 2130: Modbus Error: [Input/Output] ERROR: No response received of the last requests (default: retries+3), CLOSING CONNECTION.
+2025-11-10 08:33:19,663 - modbus_client - ERROR - Modbus error reading coil 767: Modbus Error: [Input/Output] ERROR: No response received of the last requests (default: retries+3), CLOSING CONNECTION.
+2025-11-10 08:33:23,917 - modbus_client - ERROR - Modbus error reading register 1238: Modbus Error: [Input/Output] ERROR: No response received of the last requests (default: retries+3), CLOSING CONNECTION.
+2025-11-10 08:33:27,920 - modbus_client - ERROR - Modbus error reading register 1239: Modbus Error: [Input/Output] ERROR: No response received of the last requests (default: retries+3), CLOSING CONNECTION.
+2025-11-10 08:33:31,925 - modbus_client - ERROR - Modbus error reading register 2114: Modbus Error: [Input/Output] ERROR: No response received of the last requests (default: retries+3), CLOSING CONNECTION.
+2025-11-10 08:33:35,927 - modbus_client - ERROR - Modbus error reading register 2120: Modbus Error: [Input/Output] ERROR: No response received of the last requests (default: retries+3), CLOSING CONNECTION.
+2025-11-10 08:33:39,930 - modbus_client - ERROR - Modbus error reading register 2130: Modbus Error: [Input/Output] ERROR: No response received of the last requests (default: retries+3), CLOSING CONNECTION.
+2025-11-10 08:33:43,934 - modbus_client - ERROR - Modbus error reading coil 767: Modbus Error: [Input/Output] ERROR: No response received of the last requests (default: retries+3), CLOSING CONNECTION.
+2025-11-10 08:33:48,190 - modbus_client - ERROR - Modbus error reading register 1238: Modbus Error: [Input/Output] ERROR: No response received of the last requests (default: retries+3), CLOSING CONNECTION.
+2025-11-10 08:33:52,193 - modbus_client - ERROR - Modbus error reading register 1239: Modbus Error: [Input/Output] ERROR: No response received of the last requests (default: retries+3), CLOSING CONNECTION.
+2025-11-10 08:33:56,196 - modbus_client - ERROR - Modbus error reading register 2114: Modbus Error: [Input/Output] ERROR: No response received of the last requests (default: retries+3), CLOSING CONNECTION.
+2025-11-10 08:34:00,200 - modbus_client - ERROR - Modbus error reading register 2120: Modbus Error: [Input/Output] ERROR: No response received of the last requests (default: retries+3), CLOSING CONNECTION.
+2025-11-10 08:34:04,204 - modbus_client - ERROR - Modbus error reading register 2130: Modbus Error: [Input/Output] ERROR: No response received of the last requests (default: retries+3), CLOSING CONNECTION.
+2025-11-10 08:34:08,208 - modbus_client - ERROR - Modbus error reading coil 767: Modbus Error: [Input/Output] ERROR: No response received of the last requests (default: retries+3), CLOSING CONNECTION.
+2025-11-10 08:34:12,462 - modbus_client - ERROR - Modbus error reading register 1238: Modbus Error: [Input/Output] ERROR: No response received of the last requests (default: retries+3), CLOSING CONNECTION.
+2025-11-10 08:34:16,464 - modbus_client - ERROR - Modbus error reading register 1239: Modbus Error: [Input/Output] ERROR: No response received of the last requests (default: retries+3), CLOSING CONNECTION.
+2025-11-10 08:34:20,467 - modbus_client - ERROR - Modbus error reading register 2114: Modbus Error: [Input/Output] ERROR: No response received of the last requests (default: retries+3), CLOSING CONNECTION.
+2025-11-10 08:34:24,470 - modbus_client - ERROR - Modbus error reading register 2120: Modbus Error: [Input/Output] ERROR: No response received of the last requests (default: retries+3), CLOSING CONNECTION.
+2025-11-10 08:34:28,474 - modbus_client - ERROR - Modbus error reading register 2130: Modbus Error: [Input/Output] ERROR: No response received of the last requests (default: retries+3), CLOSING CONNECTION.
+2025-11-10 08:34:32,478 - modbus_client - ERROR - Modbus error reading coil 767: Modbus Error: [Input/Output] ERROR: No response received of the last requests (default: retries+3), CLOSING CONNECTION.
+2025-11-10 08:34:36,734 - modbus_client - ERROR - Modbus error reading register 1238: Modbus Error: [Input/Output] ERROR: No response received of the last requests (default: retries+3), CLOSING CONNECTION.
+2025-11-10 08:34:40,736 - modbus_client - ERROR - Modbus error reading register 1239: Modbus Error: [Input/Output] ERROR: No response received of the last requests (default: retries+3), CLOSING CONNECTION.
+2025-11-10 08:34:44,739 - modbus_client - ERROR - Modbus error reading register 2114: Modbus Error: [Input/Output] ERROR: No response received of the last requests (default: retries+3), CLOSING CONNECTION.
+2025-11-10 08:34:48,743 - modbus_client - ERROR - Modbus error reading register 2120: Modbus Error: [Input/Output] ERROR: No response received of the last requests (default: retries+3), CLOSING CONNECTION.
+2025-11-10 08:34:52,746 - modbus_client - ERROR - Modbus error reading register 2130: Modbus Error: [Input/Output] ERROR: No response received of the last requests (default: retries+3), CLOSING CONNECTION.
+2025-11-10 08:34:56,749 - modbus_client - ERROR - Modbus error reading coil 767: Modbus Error: [Input/Output] ERROR: No response received of the last requests (default: retries+3), CLOSING CONNECTION.
+2025-11-10 08:35:01,005 - modbus_client - ERROR - Modbus error reading register 1238: Modbus Error: [Input/Output] ERROR: No response received of the last requests (default: retries+3), CLOSING CONNECTION.
+2025-11-10 08:35:05,008 - modbus_client - ERROR - Modbus error reading register 1239: Modbus Error: [Input/Output] ERROR: No response received of the last requests (default: retries+3), CLOSING CONNECTION.
+2025-11-10 08:35:09,012 - modbus_client - ERROR - Modbus error reading register 2114: Modbus Error: [Input/Output] ERROR: No response received of the last requests (default: retries+3), CLOSING CONNECTION.
+2025-11-10 08:35:13,015 - modbus_client - ERROR - Modbus error reading register 2120: Modbus Error: [Input/Output] ERROR: No response received of the last requests (default: retries+3), CLOSING CONNECTION.
+2025-11-10 08:35:17,018 - modbus_client - ERROR - Modbus error reading register 2130: Modbus Error: [Input/Output] ERROR: No response received of the last requests (default: retries+3), CLOSING CONNECTION.
+2025-11-10 08:35:21,020 - modbus_client - ERROR - Modbus error reading coil 767: Modbus Error: [Input/Output] ERROR: No response received of the last requests (default: retries+3), CLOSING CONNECTION.
+2025-11-10 08:35:25,276 - modbus_client - ERROR - Modbus error reading register 1238: Modbus Error: [Input/Output] ERROR: No response received of the last requests (default: retries+3), CLOSING CONNECTION.
+2025-11-10 08:35:29,279 - modbus_client - ERROR - Modbus error reading register 1239: Modbus Error: [Input/Output] ERROR: No response received of the last requests (default: retries+3), CLOSING CONNECTION.
+2025-11-10 08:35:33,282 - modbus_client - ERROR - Modbus error reading register 2114: Modbus Error: [Input/Output] ERROR: No response received of the last requests (default: retries+3), CLOSING CONNECTION.
+2025-11-10 08:35:37,286 - modbus_client - ERROR - Modbus error reading register 2120: Modbus Error: [Input/Output] ERROR: No response received of the last requests (default: retries+3), CLOSING CONNECTION.
+2025-11-10 08:35:41,290 - modbus_client - ERROR - Modbus error reading register 2130: Modbus Error: [Input/Output] ERROR: No response received of the last requests (default: retries+3), CLOSING CONNECTION.
+2025-11-10 08:35:45,293 - modbus_client - ERROR - Modbus error reading coil 767: Modbus Error: [Input/Output] ERROR: No response received of the last requests (default: retries+3), CLOSING CONNECTION.
+2025-11-10 08:35:49,549 - modbus_client - ERROR - Modbus error reading register 1238: Modbus Error: [Input/Output] ERROR: No response received of the last requests (default: retries+3), CLOSING CONNECTION.
+2025-11-10 08:35:53,552 - modbus_client - ERROR - Modbus error reading register 1239: Modbus Error: [Input/Output] ERROR: No response received of the last requests (default: retries+3), CLOSING CONNECTION.
+2025-11-10 08:35:57,554 - modbus_client - ERROR - Modbus error reading register 2114: Modbus Error: [Input/Output] ERROR: No response received of the last requests (default: retries+3), CLOSING CONNECTION.
+2025-11-10 08:36:01,557 - modbus_client - ERROR - Modbus error reading register 2120: Modbus Error: [Input/Output] ERROR: No response received of the last requests (default: retries+3), CLOSING CONNECTION.
+2025-11-10 08:36:05,561 - modbus_client - ERROR - Modbus error reading register 2130: Modbus Error: [Input/Output] ERROR: No response received of the last requests (default: retries+3), CLOSING CONNECTION.
+2025-11-10 08:36:09,563 - modbus_client - ERROR - Modbus error reading coil 767: Modbus Error: [Input/Output] ERROR: No response received of the last requests (default: retries+3), CLOSING CONNECTION.
+2025-11-10 08:36:13,818 - modbus_client - ERROR - Modbus error reading register 1238: Modbus Error: [Input/Output] ERROR: No response received of the last requests (default: retries+3), CLOSING CONNECTION.
+2025-11-10 08:36:17,822 - modbus_client - ERROR - Modbus error reading register 1239: Modbus Error: [Input/Output] ERROR: No response received of the last requests (default: retries+3), CLOSING CONNECTION.
+2025-11-10 08:36:21,826 - modbus_client - ERROR - Modbus error reading register 2114: Modbus Error: [Input/Output] ERROR: No response received of the last requests (default: retries+3), CLOSING CONNECTION.
+2025-11-10 08:36:25,828 - modbus_client - ERROR - Modbus error reading register 2120: Modbus Error: [Input/Output] ERROR: No response received of the last requests (default: retries+3), CLOSING CONNECTION.
+2025-11-10 08:36:29,832 - modbus_client - ERROR - Modbus error reading register 2130: Modbus Error: [Input/Output] ERROR: No response received of the last requests (default: retries+3), CLOSING CONNECTION.
+2025-11-10 08:36:33,836 - modbus_client - ERROR - Modbus error reading coil 767: Modbus Error: [Input/Output] ERROR: No response received of the last requests (default: retries+3), CLOSING CONNECTION.
+2025-11-10 08:36:38,090 - modbus_client - ERROR - Modbus error reading register 1238: Modbus Error: [Input/Output] ERROR: No response received of the last requests (default: retries+3), CLOSING CONNECTION.
+2025-11-10 08:36:42,094 - modbus_client - ERROR - Modbus error reading register 1239: Modbus Error: [Input/Output] ERROR: No response received of the last requests (default: retries+3), CLOSING CONNECTION.
+2025-11-10 08:36:46,098 - modbus_client - ERROR - Modbus error reading register 2114: Modbus Error: [Input/Output] ERROR: No response received of the last requests (default: retries+3), CLOSING CONNECTION.
+2025-11-10 08:36:50,101 - modbus_client - ERROR - Modbus error reading register 2120: Modbus Error: [Input/Output] ERROR: No response received of the last requests (default: retries+3), CLOSING CONNECTION.
+2025-11-10 08:36:54,104 - modbus_client - ERROR - Modbus error reading register 2130: Modbus Error: [Input/Output] ERROR: No response received of the last requests (default: retries+3), CLOSING CONNECTION.
+2025-11-10 08:36:58,107 - modbus_client - ERROR - Modbus error reading coil 767: Modbus Error: [Input/Output] ERROR: No response received of the last requests (default: retries+3), CLOSING CONNECTION.
+2025-11-10 08:37:02,362 - modbus_client - ERROR - Modbus error reading register 1238: Modbus Error: [Input/Output] ERROR: No response received of the last requests (default: retries+3), CLOSING CONNECTION.
+2025-11-10 08:37:06,365 - modbus_client - ERROR - Modbus error reading register 1239: Modbus Error: [Input/Output] ERROR: No response received of the last requests (default: retries+3), CLOSING CONNECTION.
+2025-11-10 08:37:10,368 - modbus_client - ERROR - Modbus error reading register 2114: Modbus Error: [Input/Output] ERROR: No response received of the last requests (default: retries+3), CLOSING CONNECTION.
+2025-11-10 08:37:14,372 - modbus_client - ERROR - Modbus error reading register 2120: Modbus Error: [Input/Output] ERROR: No response received of the last requests (default: retries+3), CLOSING CONNECTION.
+2025-11-10 08:37:18,375 - modbus_client - ERROR - Modbus error reading register 2130: Modbus Error: [Input/Output] ERROR: No response received of the last requests (default: retries+3), CLOSING CONNECTION.
+2025-11-10 08:37:22,379 - modbus_client - ERROR - Modbus error reading coil 767: Modbus Error: [Input/Output] ERROR: No response received of the last requests (default: retries+3), CLOSING CONNECTION.
+2025-11-10 08:37:26,634 - modbus_client - ERROR - Modbus error reading register 1238: Modbus Error: [Input/Output] ERROR: No response received of the last requests (default: retries+3), CLOSING CONNECTION.
+2025-11-10 08:37:30,636 - modbus_client - ERROR - Modbus error reading register 1239: Modbus Error: [Input/Output] ERROR: No response received of the last requests (default: retries+3), CLOSING CONNECTION.
+2025-11-10 08:37:34,638 - modbus_client - ERROR - Modbus error reading register 2114: Modbus Error: [Input/Output] ERROR: No response received of the last requests (default: retries+3), CLOSING CONNECTION.
+2025-11-10 08:37:38,642 - modbus_client - ERROR - Modbus error reading register 2120: Modbus Error: [Input/Output] ERROR: No response received of the last requests (default: retries+3), CLOSING CONNECTION.
+2025-11-10 08:37:42,645 - modbus_client - ERROR - Modbus error reading register 2130: Modbus Error: [Input/Output] ERROR: No response received of the last requests (default: retries+3), CLOSING CONNECTION.
+2025-11-10 08:37:46,648 - modbus_client - ERROR - Modbus error reading coil 767: Modbus Error: [Input/Output] ERROR: No response received of the last requests (default: retries+3), CLOSING CONNECTION.
+2025-11-10 08:37:50,902 - modbus_client - ERROR - Modbus error reading register 1238: Modbus Error: [Input/Output] ERROR: No response received of the last requests (default: retries+3), CLOSING CONNECTION.
+2025-11-10 08:37:54,906 - modbus_client - ERROR - Modbus error reading register 1239: Modbus Error: [Input/Output] ERROR: No response received of the last requests (default: retries+3), CLOSING CONNECTION.
+2025-11-10 08:37:58,909 - modbus_client - ERROR - Modbus error reading register 2114: Modbus Error: [Input/Output] ERROR: No response received of the last requests (default: retries+3), CLOSING CONNECTION.
+2025-11-10 08:38:02,912 - modbus_client - ERROR - Modbus error reading register 2120: Modbus Error: [Input/Output] ERROR: No response received of the last requests (default: retries+3), CLOSING CONNECTION.
+2025-11-10 08:38:06,915 - modbus_client - ERROR - Modbus error reading register 2130: Modbus Error: [Input/Output] ERROR: No response received of the last requests (default: retries+3), CLOSING CONNECTION.
+2025-11-10 08:38:10,919 - modbus_client - ERROR - Modbus error reading coil 767: Modbus Error: [Input/Output] ERROR: No response received of the last requests (default: retries+3), CLOSING CONNECTION.
+2025-11-10 08:38:15,174 - modbus_client - ERROR - Modbus error reading register 1238: Modbus Error: [Input/Output] ERROR: No response received of the last requests (default: retries+3), CLOSING CONNECTION.
+2025-11-10 08:38:19,178 - modbus_client - ERROR - Modbus error reading register 1239: Modbus Error: [Input/Output] ERROR: No response received of the last requests (default: retries+3), CLOSING CONNECTION.
+2025-11-10 08:38:23,181 - modbus_client - ERROR - Modbus error reading register 2114: Modbus Error: [Input/Output] ERROR: No response received of the last requests (default: retries+3), CLOSING CONNECTION.
+2025-11-10 08:38:27,184 - modbus_client - ERROR - Modbus error reading register 2120: Modbus Error: [Input/Output] ERROR: No response received of the last requests (default: retries+3), CLOSING CONNECTION.
+2025-11-10 08:38:31,188 - modbus_client - ERROR - Modbus error reading register 2130: Modbus Error: [Input/Output] ERROR: No response received of the last requests (default: retries+3), CLOSING CONNECTION.
+2025-11-10 08:38:35,190 - modbus_client - ERROR - Modbus error reading coil 767: Modbus Error: [Input/Output] ERROR: No response received of the last requests (default: retries+3), CLOSING CONNECTION.
+2025-11-10 08:38:39,444 - modbus_client - ERROR - Modbus error reading register 1238: Modbus Error: [Input/Output] ERROR: No response received of the last requests (default: retries+3), CLOSING CONNECTION.
+2025-11-10 08:38:43,447 - modbus_client - ERROR - Modbus error reading register 1239: Modbus Error: [Input/Output] ERROR: No response received of the last requests (default: retries+3), CLOSING CONNECTION.
+2025-11-10 08:38:47,451 - modbus_client - ERROR - Modbus error reading register 2114: Modbus Error: [Input/Output] ERROR: No response received of the last requests (default: retries+3), CLOSING CONNECTION.
+2025-11-10 08:38:51,455 - modbus_client - ERROR - Modbus error reading register 2120: Modbus Error: [Input/Output] ERROR: No response received of the last requests (default: retries+3), CLOSING CONNECTION.
+2025-11-10 08:38:55,457 - modbus_client - ERROR - Modbus error reading register 2130: Modbus Error: [Input/Output] ERROR: No response received of the last requests (default: retries+3), CLOSING CONNECTION.
+2025-11-10 08:38:59,461 - modbus_client - ERROR - Modbus error reading coil 767: Modbus Error: [Input/Output] ERROR: No response received of the last requests (default: retries+3), CLOSING CONNECTION.
+2025-11-10 08:39:03,717 - modbus_client - ERROR - Modbus error reading register 1238: Modbus Error: [Input/Output] ERROR: No response received of the last requests (default: retries+3), CLOSING CONNECTION.
+2025-11-10 08:39:07,720 - modbus_client - ERROR - Modbus error reading register 1239: Modbus Error: [Input/Output] ERROR: No response received of the last requests (default: retries+3), CLOSING CONNECTION.
+2025-11-10 08:39:11,722 - modbus_client - ERROR - Modbus error reading register 2114: Modbus Error: [Input/Output] ERROR: No response received of the last requests (default: retries+3), CLOSING CONNECTION.
+2025-11-10 08:39:15,725 - modbus_client - ERROR - Modbus error reading register 2120: Modbus Error: [Input/Output] ERROR: No response received of the last requests (default: retries+3), CLOSING CONNECTION.
+2025-11-10 08:39:19,729 - modbus_client - ERROR - Modbus error reading register 2130: Modbus Error: [Input/Output] ERROR: No response received of the last requests (default: retries+3), CLOSING CONNECTION.
+2025-11-10 08:39:23,732 - modbus_client - ERROR - Modbus error reading coil 767: Modbus Error: [Input/Output] ERROR: No response received of the last requests (default: retries+3), CLOSING CONNECTION.
+2025-11-10 08:39:27,986 - modbus_client - ERROR - Modbus error reading register 1238: Modbus Error: [Input/Output] ERROR: No response received of the last requests (default: retries+3), CLOSING CONNECTION.
+2025-11-10 08:39:31,989 - modbus_client - ERROR - Modbus error reading register 1239: Modbus Error: [Input/Output] ERROR: No response received of the last requests (default: retries+3), CLOSING CONNECTION.
+2025-11-10 08:39:35,993 - modbus_client - ERROR - Modbus error reading register 2114: Modbus Error: [Input/Output] ERROR: No response received of the last requests (default: retries+3), CLOSING CONNECTION.
+2025-11-10 08:39:39,996 - modbus_client - ERROR - Modbus error reading register 2120: Modbus Error: [Input/Output] ERROR: No response received of the last requests (default: retries+3), CLOSING CONNECTION.
+2025-11-10 08:39:43,999 - modbus_client - ERROR - Modbus error reading register 2130: Modbus Error: [Input/Output] ERROR: No response received of the last requests (default: retries+3), CLOSING CONNECTION.
+2025-11-10 08:39:48,002 - modbus_client - ERROR - Modbus error reading coil 767: Modbus Error: [Input/Output] ERROR: No response received of the last requests (default: retries+3), CLOSING CONNECTION.
+2025-11-10 08:39:52,257 - modbus_client - ERROR - Modbus error reading register 1238: Modbus Error: [Input/Output] ERROR: No response received of the last requests (default: retries+3), CLOSING CONNECTION.
+2025-11-10 08:39:56,259 - modbus_client - ERROR - Modbus error reading register 1239: Modbus Error: [Input/Output] ERROR: No response received of the last requests (default: retries+3), CLOSING CONNECTION.
+2025-11-10 08:40:00,263 - modbus_client - ERROR - Modbus error reading register 2114: Modbus Error: [Input/Output] ERROR: No response received of the last requests (default: retries+3), CLOSING CONNECTION.
+2025-11-10 08:40:04,266 - modbus_client - ERROR - Modbus error reading register 2120: Modbus Error: [Input/Output] ERROR: No response received of the last requests (default: retries+3), CLOSING CONNECTION.
+2025-11-10 08:40:08,268 - modbus_client - ERROR - Modbus error reading register 2130: Modbus Error: [Input/Output] ERROR: No response received of the last requests (default: retries+3), CLOSING CONNECTION.
+2025-11-10 08:40:12,270 - modbus_client - ERROR - Modbus error reading coil 767: Modbus Error: [Input/Output] ERROR: No response received of the last requests (default: retries+3), CLOSING CONNECTION.
+2025-11-10 08:40:16,527 - modbus_client - ERROR - Modbus error reading register 1238: Modbus Error: [Input/Output] ERROR: No response received of the last requests (default: retries+3), CLOSING CONNECTION.
+2025-11-10 08:40:20,529 - modbus_client - ERROR - Modbus error reading register 1239: Modbus Error: [Input/Output] ERROR: No response received of the last requests (default: retries+3), CLOSING CONNECTION.
+2025-11-10 08:40:24,531 - modbus_client - ERROR - Modbus error reading register 2114: Modbus Error: [Input/Output] ERROR: No response received of the last requests (default: retries+3), CLOSING CONNECTION.
+2025-11-10 08:40:28,534 - modbus_client - ERROR - Modbus error reading register 2120: Modbus Error: [Input/Output] ERROR: No response received of the last requests (default: retries+3), CLOSING CONNECTION.
+2025-11-10 08:40:32,537 - modbus_client - ERROR - Modbus error reading register 2130: Modbus Error: [Input/Output] ERROR: No response received of the last requests (default: retries+3), CLOSING CONNECTION.
+2025-11-10 08:40:36,540 - modbus_client - ERROR - Modbus error reading coil 767: Modbus Error: [Input/Output] ERROR: No response received of the last requests (default: retries+3), CLOSING CONNECTION.
+2025-11-10 08:40:40,795 - modbus_client - ERROR - Modbus error reading register 1238: Modbus Error: [Input/Output] ERROR: No response received of the last requests (default: retries+3), CLOSING CONNECTION.
+2025-11-10 08:40:44,799 - modbus_client - ERROR - Modbus error reading register 1239: Modbus Error: [Input/Output] ERROR: No response received of the last requests (default: retries+3), CLOSING CONNECTION.
+2025-11-10 08:40:48,803 - modbus_client - ERROR - Modbus error reading register 2114: Modbus Error: [Input/Output] ERROR: No response received of the last requests (default: retries+3), CLOSING CONNECTION.
+2025-11-10 08:40:52,806 - modbus_client - ERROR - Modbus error reading register 2120: Modbus Error: [Input/Output] ERROR: No response received of the last requests (default: retries+3), CLOSING CONNECTION.
+2025-11-10 08:40:56,809 - modbus_client - ERROR - Modbus error reading register 2130: Modbus Error: [Input/Output] ERROR: No response received of the last requests (default: retries+3), CLOSING CONNECTION.
+2025-11-10 08:41:00,811 - modbus_client - ERROR - Modbus error reading coil 767: Modbus Error: [Input/Output] ERROR: No response received of the last requests (default: retries+3), CLOSING CONNECTION.
+2025-11-10 08:41:05,066 - modbus_client - ERROR - Modbus error reading register 1238: Modbus Error: [Input/Output] ERROR: No response received of the last requests (default: retries+3), CLOSING CONNECTION.
+2025-11-10 08:41:09,070 - modbus_client - ERROR - Modbus error reading register 1239: Modbus Error: [Input/Output] ERROR: No response received of the last requests (default: retries+3), CLOSING CONNECTION.
+2025-11-10 08:41:13,074 - modbus_client - ERROR - Modbus error reading register 2114: Modbus Error: [Input/Output] ERROR: No response received of the last requests (default: retries+3), CLOSING CONNECTION.
+2025-11-10 08:41:17,077 - modbus_client - ERROR - Modbus error reading register 2120: Modbus Error: [Input/Output] ERROR: No response received of the last requests (default: retries+3), CLOSING CONNECTION.
+2025-11-10 08:41:21,080 - modbus_client - ERROR - Modbus error reading register 2130: Modbus Error: [Input/Output] ERROR: No response received of the last requests (default: retries+3), CLOSING CONNECTION.
+2025-11-10 08:41:25,083 - modbus_client - ERROR - Modbus error reading coil 767: Modbus Error: [Input/Output] ERROR: No response received of the last requests (default: retries+3), CLOSING CONNECTION.
+2025-11-10 08:41:29,338 - modbus_client - ERROR - Modbus error reading register 1238: Modbus Error: [Input/Output] ERROR: No response received of the last requests (default: retries+3), CLOSING CONNECTION.
+2025-11-10 08:41:33,341 - modbus_client - ERROR - Modbus error reading register 1239: Modbus Error: [Input/Output] ERROR: No response received of the last requests (default: retries+3), CLOSING CONNECTION.
+2025-11-10 08:41:37,344 - modbus_client - ERROR - Modbus error reading register 2114: Modbus Error: [Input/Output] ERROR: No response received of the last requests (default: retries+3), CLOSING CONNECTION.
+2025-11-10 08:41:41,346 - modbus_client - ERROR - Modbus error reading register 2120: Modbus Error: [Input/Output] ERROR: No response received of the last requests (default: retries+3), CLOSING CONNECTION.
+2025-11-10 08:41:45,349 - modbus_client - ERROR - Modbus error reading register 2130: Modbus Error: [Input/Output] ERROR: No response received of the last requests (default: retries+3), CLOSING CONNECTION.
+2025-11-10 08:41:49,352 - modbus_client - ERROR - Modbus error reading coil 767: Modbus Error: [Input/Output] ERROR: No response received of the last requests (default: retries+3), CLOSING CONNECTION.
+2025-11-10 08:41:53,607 - modbus_client - ERROR - Modbus error reading register 1238: Modbus Error: [Input/Output] ERROR: No response received of the last requests (default: retries+3), CLOSING CONNECTION.
+2025-11-10 08:41:57,611 - modbus_client - ERROR - Modbus error reading register 1239: Modbus Error: [Input/Output] ERROR: No response received of the last requests (default: retries+3), CLOSING CONNECTION.
+2025-11-10 08:42:01,613 - modbus_client - ERROR - Modbus error reading register 2114: Modbus Error: [Input/Output] ERROR: No response received of the last requests (default: retries+3), CLOSING CONNECTION.
+2025-11-10 08:42:05,617 - modbus_client - ERROR - Modbus error reading register 2120: Modbus Error: [Input/Output] ERROR: No response received of the last requests (default: retries+3), CLOSING CONNECTION.
+2025-11-10 08:42:09,621 - modbus_client - ERROR - Modbus error reading register 2130: Modbus Error: [Input/Output] ERROR: No response received of the last requests (default: retries+3), CLOSING CONNECTION.
+2025-11-10 08:42:13,624 - modbus_client - ERROR - Modbus error reading coil 767: Modbus Error: [Input/Output] ERROR: No response received of the last requests (default: retries+3), CLOSING CONNECTION.
+2025-11-10 08:42:17,878 - modbus_client - ERROR - Modbus error reading register 1238: Modbus Error: [Input/Output] ERROR: No response received of the last requests (default: retries+3), CLOSING CONNECTION.
+2025-11-10 08:42:21,882 - modbus_client - ERROR - Modbus error reading register 1239: Modbus Error: [Input/Output] ERROR: No response received of the last requests (default: retries+3), CLOSING CONNECTION.
+2025-11-10 08:42:25,885 - modbus_client - ERROR - Modbus error reading register 2114: Modbus Error: [Input/Output] ERROR: No response received of the last requests (default: retries+3), CLOSING CONNECTION.
+2025-11-10 08:42:29,888 - modbus_client - ERROR - Modbus error reading register 2120: Modbus Error: [Input/Output] ERROR: No response received of the last requests (default: retries+3), CLOSING CONNECTION.
+2025-11-10 08:42:33,893 - modbus_client - ERROR - Modbus error reading register 2130: Modbus Error: [Input/Output] ERROR: No response received of the last requests (default: retries+3), CLOSING CONNECTION.
+2025-11-10 08:42:37,895 - modbus_client - ERROR - Modbus error reading coil 767: Modbus Error: [Input/Output] ERROR: No response received of the last requests (default: retries+3), CLOSING CONNECTION.
+2025-11-10 08:42:42,149 - modbus_client - ERROR - Modbus error reading register 1238: Modbus Error: [Input/Output] ERROR: No response received of the last requests (default: retries+3), CLOSING CONNECTION.
+2025-11-10 08:42:46,152 - modbus_client - ERROR - Modbus error reading register 1239: Modbus Error: [Input/Output] ERROR: No response received of the last requests (default: retries+3), CLOSING CONNECTION.
+2025-11-10 08:42:50,155 - modbus_client - ERROR - Modbus error reading register 2114: Modbus Error: [Input/Output] ERROR: No response received of the last requests (default: retries+3), CLOSING CONNECTION.
+2025-11-10 08:42:54,159 - modbus_client - ERROR - Modbus error reading register 2120: Modbus Error: [Input/Output] ERROR: No response received of the last requests (default: retries+3), CLOSING CONNECTION.
+2025-11-10 08:42:58,161 - modbus_client - ERROR - Modbus error reading register 2130: Modbus Error: [Input/Output] ERROR: No response received of the last requests (default: retries+3), CLOSING CONNECTION.
+2025-11-10 08:43:02,164 - modbus_client - ERROR - Modbus error reading coil 767: Modbus Error: [Input/Output] ERROR: No response received of the last requests (default: retries+3), CLOSING CONNECTION.
+2025-11-10 08:43:06,419 - modbus_client - ERROR - Modbus error reading register 1238: Modbus Error: [Input/Output] ERROR: No response received of the last requests (default: retries+3), CLOSING CONNECTION.
+2025-11-10 08:43:10,421 - modbus_client - ERROR - Modbus error reading register 1239: Modbus Error: [Input/Output] ERROR: No response received of the last requests (default: retries+3), CLOSING CONNECTION.
+2025-11-10 08:43:14,424 - modbus_client - ERROR - Modbus error reading register 2114: Modbus Error: [Input/Output] ERROR: No response received of the last requests (default: retries+3), CLOSING CONNECTION.
+2025-11-10 08:43:18,427 - modbus_client - ERROR - Modbus error reading register 2120: Modbus Error: [Input/Output] ERROR: No response received of the last requests (default: retries+3), CLOSING CONNECTION.
+2025-11-10 08:43:22,430 - modbus_client - ERROR - Modbus error reading register 2130: Modbus Error: [Input/Output] ERROR: No response received of the last requests (default: retries+3), CLOSING CONNECTION.
+2025-11-10 08:43:26,433 - modbus_client - ERROR - Modbus error reading coil 767: Modbus Error: [Input/Output] ERROR: No response received of the last requests (default: retries+3), CLOSING CONNECTION.
+2025-11-10 08:43:30,688 - modbus_client - ERROR - Modbus error reading register 1238: Modbus Error: [Input/Output] ERROR: No response received of the last requests (default: retries+3), CLOSING CONNECTION.
+2025-11-10 08:43:34,691 - modbus_client - ERROR - Modbus error reading register 1239: Modbus Error: [Input/Output] ERROR: No response received of the last requests (default: retries+3), CLOSING CONNECTION.
+2025-11-10 08:43:38,695 - modbus_client - ERROR - Modbus error reading register 2114: Modbus Error: [Input/Output] ERROR: No response received of the last requests (default: retries+3), CLOSING CONNECTION.
+2025-11-10 08:43:42,697 - modbus_client - ERROR - Modbus error reading register 2120: Modbus Error: [Input/Output] ERROR: No response received of the last requests (default: retries+3), CLOSING CONNECTION.
+2025-11-10 08:43:46,699 - modbus_client - ERROR - Modbus error reading register 2130: Modbus Error: [Input/Output] ERROR: No response received of the last requests (default: retries+3), CLOSING CONNECTION.
+2025-11-10 08:43:50,701 - modbus_client - ERROR - Modbus error reading coil 767: Modbus Error: [Input/Output] ERROR: No response received of the last requests (default: retries+3), CLOSING CONNECTION.
+2025-11-10 08:43:54,957 - modbus_client - ERROR - Modbus error reading register 1238: Modbus Error: [Input/Output] ERROR: No response received of the last requests (default: retries+3), CLOSING CONNECTION.
+2025-11-10 08:43:58,960 - modbus_client - ERROR - Modbus error reading register 1239: Modbus Error: [Input/Output] ERROR: No response received of the last requests (default: retries+3), CLOSING CONNECTION.
+2025-11-10 08:44:02,963 - modbus_client - ERROR - Modbus error reading register 2114: Modbus Error: [Input/Output] ERROR: No response received of the last requests (default: retries+3), CLOSING CONNECTION.
+2025-11-10 08:44:06,965 - modbus_client - ERROR - Modbus error reading register 2120: Modbus Error: [Input/Output] ERROR: No response received of the last requests (default: retries+3), CLOSING CONNECTION.
+2025-11-10 08:44:10,971 - modbus_client - ERROR - Modbus error reading register 2130: Modbus Error: [Input/Output] ERROR: No response received of the last requests (default: retries+3), CLOSING CONNECTION.
+2025-11-10 08:44:14,973 - modbus_client - ERROR - Modbus error reading coil 767: Modbus Error: [Input/Output] ERROR: No response received of the last requests (default: retries+3), CLOSING CONNECTION.
+2025-11-10 08:44:19,227 - modbus_client - ERROR - Modbus error reading register 1238: Modbus Error: [Input/Output] ERROR: No response received of the last requests (default: retries+3), CLOSING CONNECTION.
+2025-11-10 08:44:23,230 - modbus_client - ERROR - Modbus error reading register 1239: Modbus Error: [Input/Output] ERROR: No response received of the last requests (default: retries+3), CLOSING CONNECTION.
+2025-11-10 08:44:27,235 - modbus_client - ERROR - Modbus error reading register 2114: Modbus Error: [Input/Output] ERROR: No response received of the last requests (default: retries+3), CLOSING CONNECTION.
+2025-11-10 08:44:31,237 - modbus_client - ERROR - Modbus error reading register 2120: Modbus Error: [Input/Output] ERROR: No response received of the last requests (default: retries+3), CLOSING CONNECTION.
+2025-11-10 08:44:35,241 - modbus_client - ERROR - Modbus error reading register 2130: Modbus Error: [Input/Output] ERROR: No response received of the last requests (default: retries+3), CLOSING CONNECTION.
+2025-11-10 08:44:39,244 - modbus_client - ERROR - Modbus error reading coil 767: Modbus Error: [Input/Output] ERROR: No response received of the last requests (default: retries+3), CLOSING CONNECTION.
+2025-11-10 08:44:43,498 - modbus_client - ERROR - Modbus error reading register 1238: Modbus Error: [Input/Output] ERROR: No response received of the last requests (default: retries+3), CLOSING CONNECTION.
+2025-11-10 08:44:47,500 - modbus_client - ERROR - Modbus error reading register 1239: Modbus Error: [Input/Output] ERROR: No response received of the last requests (default: retries+3), CLOSING CONNECTION.
+2025-11-10 08:44:51,504 - modbus_client - ERROR - Modbus error reading register 2114: Modbus Error: [Input/Output] ERROR: No response received of the last requests (default: retries+3), CLOSING CONNECTION.
+2025-11-10 08:44:55,507 - modbus_client - ERROR - Modbus error reading register 2120: Modbus Error: [Input/Output] ERROR: No response received of the last requests (default: retries+3), CLOSING CONNECTION.
+2025-11-10 08:44:59,510 - modbus_client - ERROR - Modbus error reading register 2130: Modbus Error: [Input/Output] ERROR: No response received of the last requests (default: retries+3), CLOSING CONNECTION.
+2025-11-10 08:45:03,512 - modbus_client - ERROR - Modbus error reading coil 767: Modbus Error: [Input/Output] ERROR: No response received of the last requests (default: retries+3), CLOSING CONNECTION.
+2025-11-10 08:45:07,766 - modbus_client - ERROR - Modbus error reading register 1238: Modbus Error: [Input/Output] ERROR: No response received of the last requests (default: retries+3), CLOSING CONNECTION.
+2025-11-10 08:45:11,768 - modbus_client - ERROR - Modbus error reading register 1239: Modbus Error: [Input/Output] ERROR: No response received of the last requests (default: retries+3), CLOSING CONNECTION.
+2025-11-10 08:45:15,772 - modbus_client - ERROR - Modbus error reading register 2114: Modbus Error: [Input/Output] ERROR: No response received of the last requests (default: retries+3), CLOSING CONNECTION.
+2025-11-10 08:45:19,776 - modbus_client - ERROR - Modbus error reading register 2120: Modbus Error: [Input/Output] ERROR: No response received of the last requests (default: retries+3), CLOSING CONNECTION.
+2025-11-10 08:45:23,778 - modbus_client - ERROR - Modbus error reading register 2130: Modbus Error: [Input/Output] ERROR: No response received of the last requests (default: retries+3), CLOSING CONNECTION.
+2025-11-10 08:45:27,782 - modbus_client - ERROR - Modbus error reading coil 767: Modbus Error: [Input/Output] ERROR: No response received of the last requests (default: retries+3), CLOSING CONNECTION.
+2025-11-10 08:45:32,035 - modbus_client - ERROR - Modbus error reading register 1238: Modbus Error: [Input/Output] ERROR: No response received of the last requests (default: retries+3), CLOSING CONNECTION.
+2025-11-10 08:45:36,040 - modbus_client - ERROR - Modbus error reading register 1239: Modbus Error: [Input/Output] ERROR: No response received of the last requests (default: retries+3), CLOSING CONNECTION.
+2025-11-10 08:45:40,043 - modbus_client - ERROR - Modbus error reading register 2114: Modbus Error: [Input/Output] ERROR: No response received of the last requests (default: retries+3), CLOSING CONNECTION.
+2025-11-10 08:45:44,046 - modbus_client - ERROR - Modbus error reading register 2120: Modbus Error: [Input/Output] ERROR: No response received of the last requests (default: retries+3), CLOSING CONNECTION.
+2025-11-10 08:45:48,047 - modbus_client - ERROR - Modbus error reading register 2130: Modbus Error: [Input/Output] ERROR: No response received of the last requests (default: retries+3), CLOSING CONNECTION.
+2025-11-10 08:45:52,049 - modbus_client - ERROR - Modbus error reading coil 767: Modbus Error: [Input/Output] ERROR: No response received of the last requests (default: retries+3), CLOSING CONNECTION.
+2025-11-10 08:45:56,304 - modbus_client - ERROR - Modbus error reading register 1238: Modbus Error: [Input/Output] ERROR: No response received of the last requests (default: retries+3), CLOSING CONNECTION.
+2025-11-10 08:46:00,308 - modbus_client - ERROR - Modbus error reading register 1239: Modbus Error: [Input/Output] ERROR: No response received of the last requests (default: retries+3), CLOSING CONNECTION.
+2025-11-10 08:46:04,312 - modbus_client - ERROR - Modbus error reading register 2114: Modbus Error: [Input/Output] ERROR: No response received of the last requests (default: retries+3), CLOSING CONNECTION.
+2025-11-10 08:46:08,314 - modbus_client - ERROR - Modbus error reading register 2120: Modbus Error: [Input/Output] ERROR: No response received of the last requests (default: retries+3), CLOSING CONNECTION.
+2025-11-10 08:46:12,318 - modbus_client - ERROR - Modbus error reading register 2130: Modbus Error: [Input/Output] ERROR: No response received of the last requests (default: retries+3), CLOSING CONNECTION.
+2025-11-10 08:46:16,321 - modbus_client - ERROR - Modbus error reading coil 767: Modbus Error: [Input/Output] ERROR: No response received of the last requests (default: retries+3), CLOSING CONNECTION.
+2025-11-10 08:46:20,576 - modbus_client - ERROR - Modbus error reading register 1238: Modbus Error: [Input/Output] ERROR: No response received of the last requests (default: retries+3), CLOSING CONNECTION.
+2025-11-10 08:46:24,579 - modbus_client - ERROR - Modbus error reading register 1239: Modbus Error: [Input/Output] ERROR: No response received of the last requests (default: retries+3), CLOSING CONNECTION.
+2025-11-10 08:46:28,582 - modbus_client - ERROR - Modbus error reading register 2114: Modbus Error: [Input/Output] ERROR: No response received of the last requests (default: retries+3), CLOSING CONNECTION.
+2025-11-10 08:46:32,587 - modbus_client - ERROR - Modbus error reading register 2120: Modbus Error: [Input/Output] ERROR: No response received of the last requests (default: retries+3), CLOSING CONNECTION.
+2025-11-10 08:46:36,591 - modbus_client - ERROR - Modbus error reading register 2130: Modbus Error: [Input/Output] ERROR: No response received of the last requests (default: retries+3), CLOSING CONNECTION.
+2025-11-10 08:46:40,595 - modbus_client - ERROR - Modbus error reading coil 767: Modbus Error: [Input/Output] ERROR: No response received of the last requests (default: retries+3), CLOSING CONNECTION.
+2025-11-10 08:46:44,850 - modbus_client - ERROR - Modbus error reading register 1238: Modbus Error: [Input/Output] ERROR: No response received of the last requests (default: retries+3), CLOSING CONNECTION.
+2025-11-10 08:46:48,854 - modbus_client - ERROR - Modbus error reading register 1239: Modbus Error: [Input/Output] ERROR: No response received of the last requests (default: retries+3), CLOSING CONNECTION.
+2025-11-10 08:46:52,858 - modbus_client - ERROR - Modbus error reading register 2114: Modbus Error: [Input/Output] ERROR: No response received of the last requests (default: retries+3), CLOSING CONNECTION.
+2025-11-10 08:46:56,862 - modbus_client - ERROR - Modbus error reading register 2120: Modbus Error: [Input/Output] ERROR: No response received of the last requests (default: retries+3), CLOSING CONNECTION.
+2025-11-10 08:47:00,866 - modbus_client - ERROR - Modbus error reading register 2130: Modbus Error: [Input/Output] ERROR: No response received of the last requests (default: retries+3), CLOSING CONNECTION.
+2025-11-10 08:47:04,870 - modbus_client - ERROR - Modbus error reading coil 767: Modbus Error: [Input/Output] ERROR: No response received of the last requests (default: retries+3), CLOSING CONNECTION.
+2025-11-10 08:47:09,124 - modbus_client - ERROR - Modbus error reading register 1238: Modbus Error: [Input/Output] ERROR: No response received of the last requests (default: retries+3), CLOSING CONNECTION.
+2025-11-10 08:47:13,127 - modbus_client - ERROR - Modbus error reading register 1239: Modbus Error: [Input/Output] ERROR: No response received of the last requests (default: retries+3), CLOSING CONNECTION.
+2025-11-10 08:47:17,131 - modbus_client - ERROR - Modbus error reading register 2114: Modbus Error: [Input/Output] ERROR: No response received of the last requests (default: retries+3), CLOSING CONNECTION.
+2025-11-10 08:47:21,134 - modbus_client - ERROR - Modbus error reading register 2120: Modbus Error: [Input/Output] ERROR: No response received of the last requests (default: retries+3), CLOSING CONNECTION.
+2025-11-10 08:47:25,138 - modbus_client - ERROR - Modbus error reading register 2130: Modbus Error: [Input/Output] ERROR: No response received of the last requests (default: retries+3), CLOSING CONNECTION.
+2025-11-10 08:47:29,140 - modbus_client - ERROR - Modbus error reading coil 767: Modbus Error: [Input/Output] ERROR: No response received of the last requests (default: retries+3), CLOSING CONNECTION.
+2025-11-10 08:47:33,395 - modbus_client - ERROR - Modbus error reading register 1238: Modbus Error: [Input/Output] ERROR: No response received of the last requests (default: retries+3), CLOSING CONNECTION.
+2025-11-10 08:47:37,398 - modbus_client - ERROR - Modbus error reading register 1239: Modbus Error: [Input/Output] ERROR: No response received of the last requests (default: retries+3), CLOSING CONNECTION.
+2025-11-10 08:47:41,400 - modbus_client - ERROR - Modbus error reading register 2114: Modbus Error: [Input/Output] ERROR: No response received of the last requests (default: retries+3), CLOSING CONNECTION.
+2025-11-10 08:47:45,403 - modbus_client - ERROR - Modbus error reading register 2120: Modbus Error: [Input/Output] ERROR: No response received of the last requests (default: retries+3), CLOSING CONNECTION.
+2025-11-10 08:47:49,406 - modbus_client - ERROR - Modbus error reading register 2130: Modbus Error: [Input/Output] ERROR: No response received of the last requests (default: retries+3), CLOSING CONNECTION.
+2025-11-10 08:47:53,409 - modbus_client - ERROR - Modbus error reading coil 767: Modbus Error: [Input/Output] ERROR: No response received of the last requests (default: retries+3), CLOSING CONNECTION.
+2025-11-10 08:47:57,665 - modbus_client - ERROR - Modbus error reading register 1238: Modbus Error: [Input/Output] ERROR: No response received of the last requests (default: retries+3), CLOSING CONNECTION.
+2025-11-10 08:48:01,669 - modbus_client - ERROR - Modbus error reading register 1239: Modbus Error: [Input/Output] ERROR: No response received of the last requests (default: retries+3), CLOSING CONNECTION.
+2025-11-10 08:48:05,670 - modbus_client - ERROR - Modbus error reading register 2114: Modbus Error: [Input/Output] ERROR: No response received of the last requests (default: retries+3), CLOSING CONNECTION.
+2025-11-10 08:48:09,671 - modbus_client - ERROR - Modbus error reading register 2120: Modbus Error: [Input/Output] ERROR: No response received of the last requests (default: retries+3), CLOSING CONNECTION.
+2025-11-10 08:48:13,674 - modbus_client - ERROR - Modbus error reading register 2130: Modbus Error: [Input/Output] ERROR: No response received of the last requests (default: retries+3), CLOSING CONNECTION.
+2025-11-10 08:48:17,677 - modbus_client - ERROR - Modbus error reading coil 767: Modbus Error: [Input/Output] ERROR: No response received of the last requests (default: retries+3), CLOSING CONNECTION.
+2025-11-10 08:48:21,933 - modbus_client - ERROR - Modbus error reading register 1238: Modbus Error: [Input/Output] ERROR: No response received of the last requests (default: retries+3), CLOSING CONNECTION.
+2025-11-10 08:48:25,936 - modbus_client - ERROR - Modbus error reading register 1239: Modbus Error: [Input/Output] ERROR: No response received of the last requests (default: retries+3), CLOSING CONNECTION.
+2025-11-10 08:48:29,939 - modbus_client - ERROR - Modbus error reading register 2114: Modbus Error: [Input/Output] ERROR: No response received of the last requests (default: retries+3), CLOSING CONNECTION.
+2025-11-10 08:48:33,941 - modbus_client - ERROR - Modbus error reading register 2120: Modbus Error: [Input/Output] ERROR: No response received of the last requests (default: retries+3), CLOSING CONNECTION.
+2025-11-10 08:48:37,943 - modbus_client - ERROR - Modbus error reading register 2130: Modbus Error: [Input/Output] ERROR: No response received of the last requests (default: retries+3), CLOSING CONNECTION.
+2025-11-10 08:48:41,946 - modbus_client - ERROR - Modbus error reading coil 767: Modbus Error: [Input/Output] ERROR: No response received of the last requests (default: retries+3), CLOSING CONNECTION.
+2025-11-10 08:48:46,200 - modbus_client - ERROR - Modbus error reading register 1238: Modbus Error: [Input/Output] ERROR: No response received of the last requests (default: retries+3), CLOSING CONNECTION.
+2025-11-10 08:48:50,206 - modbus_client - ERROR - Modbus error reading register 1239: Modbus Error: [Input/Output] ERROR: No response received of the last requests (default: retries+3), CLOSING CONNECTION.
+2025-11-10 08:48:54,210 - modbus_client - ERROR - Modbus error reading register 2114: Modbus Error: [Input/Output] ERROR: No response received of the last requests (default: retries+3), CLOSING CONNECTION.
+2025-11-10 08:48:58,213 - modbus_client - ERROR - Modbus error reading register 2120: Modbus Error: [Input/Output] ERROR: No response received of the last requests (default: retries+3), CLOSING CONNECTION.
+2025-11-10 08:49:02,216 - modbus_client - ERROR - Modbus error reading register 2130: Modbus Error: [Input/Output] ERROR: No response received of the last requests (default: retries+3), CLOSING CONNECTION.
+2025-11-10 08:49:06,219 - modbus_client - ERROR - Modbus error reading coil 767: Modbus Error: [Input/Output] ERROR: No response received of the last requests (default: retries+3), CLOSING CONNECTION.
+2025-11-10 08:49:10,474 - modbus_client - ERROR - Modbus error reading register 1238: Modbus Error: [Input/Output] ERROR: No response received of the last requests (default: retries+3), CLOSING CONNECTION.
+2025-11-10 08:49:14,477 - modbus_client - ERROR - Modbus error reading register 1239: Modbus Error: [Input/Output] ERROR: No response received of the last requests (default: retries+3), CLOSING CONNECTION.
+2025-11-10 08:49:18,480 - modbus_client - ERROR - Modbus error reading register 2114: Modbus Error: [Input/Output] ERROR: No response received of the last requests (default: retries+3), CLOSING CONNECTION.
+2025-11-10 08:49:22,485 - modbus_client - ERROR - Modbus error reading register 2120: Modbus Error: [Input/Output] ERROR: No response received of the last requests (default: retries+3), CLOSING CONNECTION.
+2025-11-10 08:49:26,488 - modbus_client - ERROR - Modbus error reading register 2130: Modbus Error: [Input/Output] ERROR: No response received of the last requests (default: retries+3), CLOSING CONNECTION.
+2025-11-10 08:49:30,491 - modbus_client - ERROR - Modbus error reading coil 767: Modbus Error: [Input/Output] ERROR: No response received of the last requests (default: retries+3), CLOSING CONNECTION.
+2025-11-10 08:49:34,745 - modbus_client - ERROR - Modbus error reading register 1238: Modbus Error: [Input/Output] ERROR: No response received of the last requests (default: retries+3), CLOSING CONNECTION.
+2025-11-10 08:49:38,747 - modbus_client - ERROR - Modbus error reading register 1239: Modbus Error: [Input/Output] ERROR: No response received of the last requests (default: retries+3), CLOSING CONNECTION.
+2025-11-10 08:49:42,749 - modbus_client - ERROR - Modbus error reading register 2114: Modbus Error: [Input/Output] ERROR: No response received of the last requests (default: retries+3), CLOSING CONNECTION.
+2025-11-10 08:49:46,752 - modbus_client - ERROR - Modbus error reading register 2120: Modbus Error: [Input/Output] ERROR: No response received of the last requests (default: retries+3), CLOSING CONNECTION.
+2025-11-10 08:49:50,755 - modbus_client - ERROR - Modbus error reading register 2130: Modbus Error: [Input/Output] ERROR: No response received of the last requests (default: retries+3), CLOSING CONNECTION.
+2025-11-10 08:49:54,757 - modbus_client - ERROR - Modbus error reading coil 767: Modbus Error: [Input/Output] ERROR: No response received of the last requests (default: retries+3), CLOSING CONNECTION.
+2025-11-10 08:49:59,012 - modbus_client - ERROR - Modbus error reading register 1238: Modbus Error: [Input/Output] ERROR: No response received of the last requests (default: retries+3), CLOSING CONNECTION.
+2025-11-10 08:50:03,015 - modbus_client - ERROR - Modbus error reading register 1239: Modbus Error: [Input/Output] ERROR: No response received of the last requests (default: retries+3), CLOSING CONNECTION.
+2025-11-10 08:50:07,019 - modbus_client - ERROR - Modbus error reading register 2114: Modbus Error: [Input/Output] ERROR: No response received of the last requests (default: retries+3), CLOSING CONNECTION.
+2025-11-10 08:50:11,021 - modbus_client - ERROR - Modbus error reading register 2120: Modbus Error: [Input/Output] ERROR: No response received of the last requests (default: retries+3), CLOSING CONNECTION.
+2025-11-10 08:50:15,023 - modbus_client - ERROR - Modbus error reading register 2130: Modbus Error: [Input/Output] ERROR: No response received of the last requests (default: retries+3), CLOSING CONNECTION.
+2025-11-10 08:50:19,027 - modbus_client - ERROR - Modbus error reading coil 767: Modbus Error: [Input/Output] ERROR: No response received of the last requests (default: retries+3), CLOSING CONNECTION.
+2025-11-10 08:50:23,281 - modbus_client - ERROR - Modbus error reading register 1238: Modbus Error: [Input/Output] ERROR: No response received of the last requests (default: retries+3), CLOSING CONNECTION.
+2025-11-10 08:50:27,284 - modbus_client - ERROR - Modbus error reading register 1239: Modbus Error: [Input/Output] ERROR: No response received of the last requests (default: retries+3), CLOSING CONNECTION.
+2025-11-10 08:50:31,287 - modbus_client - ERROR - Modbus error reading register 2114: Modbus Error: [Input/Output] ERROR: No response received of the last requests (default: retries+3), CLOSING CONNECTION.
+2025-11-10 08:50:35,290 - modbus_client - ERROR - Modbus error reading register 2120: Modbus Error: [Input/Output] ERROR: No response received of the last requests (default: retries+3), CLOSING CONNECTION.
+2025-11-10 08:50:39,293 - modbus_client - ERROR - Modbus error reading register 2130: Modbus Error: [Input/Output] ERROR: No response received of the last requests (default: retries+3), CLOSING CONNECTION.
+2025-11-10 08:50:43,295 - modbus_client - ERROR - Modbus error reading coil 767: Modbus Error: [Input/Output] ERROR: No response received of the last requests (default: retries+3), CLOSING CONNECTION.
+2025-11-10 08:50:47,549 - modbus_client - ERROR - Modbus error reading register 1238: Modbus Error: [Input/Output] ERROR: No response received of the last requests (default: retries+3), CLOSING CONNECTION.
+2025-11-10 08:50:51,551 - modbus_client - ERROR - Modbus error reading register 1239: Modbus Error: [Input/Output] ERROR: No response received of the last requests (default: retries+3), CLOSING CONNECTION.
+2025-11-10 08:50:55,554 - modbus_client - ERROR - Modbus error reading register 2114: Modbus Error: [Input/Output] ERROR: No response received of the last requests (default: retries+3), CLOSING CONNECTION.

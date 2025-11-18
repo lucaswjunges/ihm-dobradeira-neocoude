@@ -1,0 +1,712 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>IHM NEOCOUDE-HD-15 v8</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            min-height: 100vh;
+            padding: 20px;
+            color: #fff;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        /* Header */
+        .header {
+            background: rgba(0,0,0,0.3);
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .header h1 {
+            font-size: 28px;
+            font-weight: 600;
+        }
+
+        .status-badges {
+            display: flex;
+            gap: 15px;
+        }
+
+        .badge {
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 13px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .badge.offline { background: #e74c3c; }
+        .badge.online { background: #27ae60; }
+        .badge-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #fff;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.3; }
+        }
+
+        /* Dashboard Grid */
+        .dashboard {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+
+        .card {
+            background: rgba(255,255,255,0.95);
+            border-radius: 15px;
+            padding: 25px;
+            color: #2c3e50;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+        }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid #ecf0f1;
+        }
+
+        .card-header h2 {
+            font-size: 18px;
+            font-weight: 600;
+            color: #2c3e50;
+        }
+
+        .card-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+        }
+
+        /* Encoder Display */
+        .encoder-display {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 12px;
+            padding: 30px;
+            text-align: center;
+            color: white;
+            margin-bottom: 15px;
+        }
+
+        .encoder-value {
+            font-size: 56px;
+            font-weight: 700;
+            letter-spacing: 2px;
+            margin: 10px 0;
+        }
+
+        .encoder-label {
+            font-size: 14px;
+            opacity: 0.9;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        /* Angle Cards */
+        .angle-group {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .angle-item {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 20px;
+            border-left: 4px solid #3498db;
+        }
+
+        .angle-item.angle-1 { border-left-color: #e74c3c; }
+        .angle-item.angle-2 { border-left-color: #f39c12; }
+        .angle-item.angle-3 { border-left-color: #27ae60; }
+
+        .angle-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+
+        .angle-title {
+            font-weight: 600;
+            font-size: 16px;
+            color: #2c3e50;
+        }
+
+        .angle-value {
+            font-size: 24px;
+            font-weight: 700;
+            color: #3498db;
+        }
+
+        .angle-input-group {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .angle-slider {
+            flex: 1;
+            height: 8px;
+            border-radius: 5px;
+            outline: none;
+            -webkit-appearance: none;
+            background: linear-gradient(to right, #3498db 0%, #3498db var(--value), #ddd var(--value), #ddd 100%);
+        }
+
+        .angle-slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: #3498db;
+            cursor: pointer;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+        }
+
+        .angle-slider::-moz-range-thumb {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: #3498db;
+            cursor: pointer;
+            border: none;
+        }
+
+        .angle-input {
+            width: 80px;
+            padding: 10px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            text-align: center;
+            color: #2c3e50;
+        }
+
+        .angle-input:focus {
+            outline: none;
+            border-color: #3498db;
+        }
+
+        .btn-save {
+            padding: 10px 20px;
+            background: #3498db;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .btn-save:hover {
+            background: #2980b9;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(52, 152, 219, 0.3);
+        }
+
+        .btn-save:active {
+            transform: translateY(0);
+        }
+
+        /* Quick Actions */
+        .quick-actions {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+        }
+
+        .action-btn {
+            padding: 15px;
+            border: none;
+            border-radius: 10px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-size: 14px;
+        }
+
+        .action-btn.primary {
+            background: #3498db;
+            color: white;
+        }
+
+        .action-btn.success {
+            background: #27ae60;
+            color: white;
+        }
+
+        .action-btn.warning {
+            background: #f39c12;
+            color: white;
+        }
+
+        .action-btn.danger {
+            background: #e74c3c;
+            color: white;
+        }
+
+        .action-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+
+        /* Status Indicators */
+        .status-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+        }
+
+        .status-item {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .status-led {
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            background: #95a5a6;
+        }
+
+        .status-led.active {
+            background: #27ae60;
+            box-shadow: 0 0 15px rgba(39, 174, 96, 0.6);
+            animation: pulse 2s infinite;
+        }
+
+        .status-label {
+            font-weight: 600;
+            font-size: 13px;
+            color: #2c3e50;
+        }
+
+        /* Feedback Toast */
+        .toast {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            background: #2c3e50;
+            color: white;
+            padding: 15px 25px;
+            border-radius: 10px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.3);
+            transform: translateY(150px);
+            opacity: 0;
+            transition: all 0.3s;
+            z-index: 1000;
+        }
+
+        .toast.show {
+            transform: translateY(0);
+            opacity: 1;
+        }
+
+        .toast.success { background: #27ae60; }
+        .toast.error { background: #e74c3c; }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .dashboard {
+                grid-template-columns: 1fr;
+            }
+
+            .status-badges {
+                flex-direction: column;
+                gap: 8px;
+            }
+
+            .header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 15px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <div>
+                <h1>🏭 IHM NEOCOUDE-HD-15</h1>
+                <p style="opacity: 0.8; margin-top: 5px;">Interface Moderna v8</p>
+            </div>
+            <div class="status-badges">
+                <div class="badge" id="wsStatus">
+                    <span class="badge-dot"></span>
+                    <span>WebSocket</span>
+                </div>
+                <div class="badge" id="clpStatus">
+                    <span class="badge-dot"></span>
+                    <span>CLP</span>
+                </div>
+                <div class="badge" id="modeStatus" style="background: #9b59b6;">
+                    <span>🔄</span>
+                    <span id="modeText">MANUAL</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Dashboard -->
+        <div class="dashboard">
+            <!-- Encoder Card -->
+            <div class="card">
+                <div class="card-header">
+                    <h2>📐 Posição Angular</h2>
+                    <div class="card-icon" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white;">
+                        🔄
+                    </div>
+                </div>
+                <div class="encoder-display">
+                    <div class="encoder-label">Encoder Atual</div>
+                    <div class="encoder-value" id="encoderValue">0000°</div>
+                    <div class="encoder-label">Deslocamento Angular</div>
+                </div>
+            </div>
+
+            <!-- Angles Card -->
+            <div class="card" style="grid-column: span 1;">
+                <div class="card-header">
+                    <h2>⚙️ Ângulos Configurados</h2>
+                    <div class="card-icon" style="background: #3498db; color: white;">
+                        📊
+                    </div>
+                </div>
+                <div class="angle-group">
+                    <!-- Angle 1 -->
+                    <div class="angle-item angle-1">
+                        <div class="angle-header">
+                            <span class="angle-title">Ângulo 1 (K1)</span>
+                            <span class="angle-value" id="angle1Display">0°</span>
+                        </div>
+                        <div class="angle-input-group">
+                            <input type="range" class="angle-slider" id="slider1" min="0" max="360" value="0">
+                            <input type="number" class="angle-input" id="input1" min="0" max="360" value="0">
+                            <button class="btn-save" onclick="saveAngle(1)">💾</button>
+                        </div>
+                    </div>
+
+                    <!-- Angle 2 -->
+                    <div class="angle-item angle-2">
+                        <div class="angle-header">
+                            <span class="angle-title">Ângulo 2 (K2)</span>
+                            <span class="angle-value" id="angle2Display">0°</span>
+                        </div>
+                        <div class="angle-input-group">
+                            <input type="range" class="angle-slider" id="slider2" min="0" max="360" value="0">
+                            <input type="number" class="angle-input" id="input2" min="0" max="360" value="0">
+                            <button class="btn-save" onclick="saveAngle(2)">💾</button>
+                        </div>
+                    </div>
+
+                    <!-- Angle 3 -->
+                    <div class="angle-item angle-3">
+                        <div class="angle-header">
+                            <span class="angle-title">Ângulo 3 (K3)</span>
+                            <span class="angle-value" id="angle3Display">0°</span>
+                        </div>
+                        <div class="angle-input-group">
+                            <input type="range" class="angle-slider" id="slider3" min="0" max="360" value="0">
+                            <input type="number" class="angle-input" id="input3" min="0" max="360" value="0">
+                            <button class="btn-save" onclick="saveAngle(3)">💾</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Quick Actions Card -->
+            <div class="card">
+                <div class="card-header">
+                    <h2>⚡ Ações Rápidas</h2>
+                    <div class="card-icon" style="background: #f39c12; color: white;">
+                        🎛️
+                    </div>
+                </div>
+                <div class="quick-actions">
+                    <button class="action-btn primary" onclick="sendKey(160)">K1 - Dobra 1</button>
+                    <button class="action-btn primary" onclick="sendKey(161)">K2 - Dobra 2</button>
+                    <button class="action-btn primary" onclick="sendKey(162)">K3 - Dobra 3</button>
+                    <button class="action-btn success" onclick="sendKey(220)">S1 - Modo</button>
+                    <button class="action-btn success" onclick="sendKey(221)">S2 - Reset</button>
+                    <button class="action-btn warning" onclick="sendKey(241)">🔒 Lock</button>
+                    <button class="action-btn danger" onclick="sendKey(188)">⚠️ ESC</button>
+                    <button class="action-btn primary" onclick="sendKey(37)">✓ ENTER</button>
+                </div>
+            </div>
+
+            <!-- Status Card -->
+            <div class="card">
+                <div class="card-header">
+                    <h2>📊 Status do Sistema</h2>
+                    <div class="card-icon" style="background: #27ae60; color: white;">
+                        ✓
+                    </div>
+                </div>
+                <div class="status-grid">
+                    <div class="status-item">
+                        <div class="status-led" id="ledK1"></div>
+                        <span class="status-label">Dobra 1 (K1)</span>
+                    </div>
+                    <div class="status-item">
+                        <div class="status-led" id="ledK2"></div>
+                        <span class="status-label">Dobra 2 (K2)</span>
+                    </div>
+                    <div class="status-item">
+                        <div class="status-led" id="ledK3"></div>
+                        <span class="status-label">Dobra 3 (K3)</span>
+                    </div>
+                    <div class="status-item">
+                        <div class="status-led active"></div>
+                        <span class="status-label">Sistema OK</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast -->
+    <div class="toast" id="toast"></div>
+
+    <script>
+        const WS_URL = 'ws://localhost:8086';
+        let ws = null;
+        let data = {
+            encoder: 0,
+            angle1: 0,
+            angle2: 0,
+            angle3: 0,
+            connected: false,
+            modo_auto: null  // null = desconhecido, true = AUTO, false = MANUAL
+        };
+
+        // Editing state - previne updates durante edição
+        let editingAngle = {
+            1: false,
+            2: false,
+            3: false
+        };
+        let editTimeout = {};
+
+        // Sync slider and input
+        for (let i = 1; i <= 3; i++) {
+            const slider = document.getElementById(`slider${i}`);
+            const input = document.getElementById(`input${i}`);
+
+            slider.addEventListener('input', (e) => {
+                const value = e.target.value;
+                input.value = value;
+                updateSliderGradient(i, value);
+
+                // Marcar como editando
+                editingAngle[i] = true;
+                clearTimeout(editTimeout[i]);
+                editTimeout[i] = setTimeout(() => {
+                    editingAngle[i] = false;
+                }, 3000); // 3 segundos sem mexer = permite update
+            });
+
+            input.addEventListener('input', (e) => {
+                const value = Math.min(360, Math.max(0, e.target.value));
+                input.value = value;
+                slider.value = value;
+                updateSliderGradient(i, value);
+
+                // Marcar como editando
+                editingAngle[i] = true;
+                clearTimeout(editTimeout[i]);
+                editTimeout[i] = setTimeout(() => {
+                    editingAngle[i] = false;
+                }, 3000);
+            });
+
+            // Focar no input também marca como editando
+            input.addEventListener('focus', () => {
+                editingAngle[i] = true;
+            });
+
+            input.addEventListener('blur', () => {
+                clearTimeout(editTimeout[i]);
+                editTimeout[i] = setTimeout(() => {
+                    editingAngle[i] = false;
+                }, 1000);
+            });
+        }
+
+        function updateSliderGradient(num, value) {
+            const percent = (value / 360) * 100;
+            const slider = document.getElementById(`slider${num}`);
+            slider.style.setProperty('--value', `${percent}%`);
+        }
+
+        function saveAngle(num) {
+            const value = parseInt(document.getElementById(`input${num}`).value);
+
+            if (isNaN(value) || value < 0 || value > 360) {
+                showToast('Valor inválido (0-360)', 'error');
+                return;
+            }
+
+            if (ws && ws.readyState === WebSocket.OPEN) {
+                ws.send(JSON.stringify({
+                    action: 'write_angle',
+                    tela: num + 3, // Tela 4/5/6
+                    value: value
+                }));
+                showToast(`✓ Salvando ${value}°... aguarde`, 'success');
+
+                // Desbloquear edição após salvar
+                clearTimeout(editTimeout[num]);
+                editingAngle[num] = false;
+
+                // Aguardar 500ms para o CLP confirmar
+                setTimeout(() => {
+                    showToast(`✓ Ângulo ${num} = ${value}° confirmado`, 'success');
+                }, 500);
+            } else {
+                showToast('WebSocket desconectado!', 'error');
+            }
+        }
+
+        function sendKey(code) {
+            if (ws && ws.readyState === WebSocket.OPEN) {
+                ws.send(JSON.stringify({
+                    action: 'press_key',
+                    key_code: code
+                }));
+                showToast(`✓ Tecla ${code} enviada`, 'success');
+            } else {
+                showToast('WebSocket desconectado!', 'error');
+            }
+        }
+
+        function updateDisplay() {
+            // Encoder
+            document.getElementById('encoderValue').textContent =
+                String(data.encoder).padStart(4, '0') + '°';
+
+            // Angles - NÃO atualizar se estiver editando
+            for (let i = 1; i <= 3; i++) {
+                const angle = data[`angle${i}`] || 0;
+
+                // Sempre atualiza o display (valor lido do CLP)
+                document.getElementById(`angle${i}Display`).textContent = angle + '°';
+
+                // Só atualiza slider/input se NÃO estiver editando
+                if (!editingAngle[i]) {
+                    document.getElementById(`slider${i}`).value = angle;
+                    document.getElementById(`input${i}`).value = angle;
+                    updateSliderGradient(i, angle);
+                }
+            }
+
+            // Status badges
+            const wsStatus = document.getElementById('wsStatus');
+            const clpStatus = document.getElementById('clpStatus');
+            const modeStatus = document.getElementById('modeStatus');
+            const modeText = document.getElementById('modeText');
+
+            if (ws && ws.readyState === WebSocket.OPEN) {
+                wsStatus.classList.remove('offline');
+                wsStatus.classList.add('online');
+            } else {
+                wsStatus.classList.remove('online');
+                wsStatus.classList.add('offline');
+            }
+
+            if (data.connected) {
+                clpStatus.classList.remove('offline');
+                clpStatus.classList.add('online');
+            } else {
+                clpStatus.classList.remove('online');
+                clpStatus.classList.add('offline');
+            }
+
+            // Atualizar modo AUTO/MANUAL
+            if (data.modo_auto === true) {
+                modeText.textContent = 'AUTO';
+                modeStatus.style.background = '#27ae60';  // Verde
+            } else if (data.modo_auto === false) {
+                modeText.textContent = 'MANUAL';
+                modeStatus.style.background = '#3498db';  // Azul
+            } else {
+                modeText.textContent = 'DESCONHECIDO';
+                modeStatus.style.background = '#95a5a6';  // Cinza
+            }
+        }
+
+        function showToast(msg, type = 'success') {
+            const toast = document.getElementById('toast');
+            toast.textContent = msg;
+            toast.className = `toast ${type} show`;
+            setTimeout(() => toast.classList.remove('show'), 3000);
+        }
+
+        function connect() {
+            ws = new WebSocket(WS_URL);
+
+            ws.onopen = () => {
+                showToast('✓ Conectado ao servidor', 'success');
+                updateDisplay();
+            };
+
+            ws.onmessage = (e) => {
+                const msg = JSON.parse(e.data);
+                if (msg.action === 'update' && msg.data) {
+                    data = msg.data;
+                    updateDisplay();
+                }
+            };
+
+            ws.onclose = () => {
+                showToast('Reconectando...', 'error');
+                updateDisplay();
+                setTimeout(connect, 2000);
+            };
+
+            ws.onerror = (err) => {
+                console.error('WebSocket error:', err);
+            };
+        }
+
+        // Start
+        connect();
+        updateDisplay();
+    </script>
+</body>
+</html>

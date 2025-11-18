@@ -108,6 +108,11 @@ async def poll_clp_data():
             # DESABILITADO: Registro não validado ainda
             velocidade_classe = 0
 
+            # Ler modo AUTO/MANUAL
+            # Bit 02FF (767 dec) - descoberto no ladder ROT1.lad
+            # TRUE = AUTO, FALSE = MANUAL
+            modo_auto = modbus.read_coil(767) if modbus.connected else None
+
             # Montar dados
             data = {
                 'action': 'update',
@@ -119,6 +124,7 @@ async def poll_clp_data():
                     'inputs': inputs,
                     'outputs': outputs,
                     'velocidade_classe': velocidade_classe,
+                    'modo_auto': modo_auto,  # True = AUTO, False = MANUAL
                     'connected': modbus.connected
                 },
                 'timestamp': datetime.now().isoformat()
@@ -175,7 +181,12 @@ async def handle_client_message(websocket, message: str):
             # Se o código não está no mapa, usar endereço diretamente
             if key_code in key_map:
                 button_name = key_map[key_code]
-                success = modbus.press_key(button_name)
+
+                # S1 e S2 precisam de hold_time maior (300ms) para o ladder detectar
+                if button_name in ['S1', 'S2']:
+                    success = modbus.press_key(button_name, hold_time=0.3)
+                else:
+                    success = modbus.press_key(button_name)
             else:
                 # Enviar pulso diretamente no endereço
                 success = modbus.write_coil(key_code, True)

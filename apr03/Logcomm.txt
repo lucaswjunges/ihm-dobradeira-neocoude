@@ -1,0 +1,49 @@
+Abriu canal serial
+PEDE_BLOCO
+tx: 5a e1 7c 08 0c 99 5b 
+rx: 5a 80 7c 08 0c 20 20 32 39 2f 30 37 2f 32 30 30 36 f0 5b 
+
+PEDE_VAR_INT
+tx: 5a 21 7c 00 5d 5b 
+rx: 5a 00 7c 00 31 37 7a 5b 
+
+PEDE_VAR_INT
+tx: 5a 21 7c 02 5f 5b 
+rx: 5a 00 7c 02 35 32 79 5b 
+
+PEDE_VAR_INT
+tx: 5a 21 7c 04 59 5b 
+rx: 5a 00 7c 04 37 32 7d 5b 
+
+PEDE_BLOCO
+tx: 5a e1 7c d8 08 4d 5b 
+rx: 5a 80 7c d8 08 4d 50 43 34 30 30 34 20 52 5b 
+
+PEDE_BLOCO
+tx: 5a e1 7c d0 08 45 5b 
+rx: 5a 80 7c d0 08 61 70 72 30 33 00 00 00 44 5b 
+
+PEDE_BLOCO
+tx: 5a e1 7c c0 02 5f 5b 
+rx: 5a 80 7c c0 02 43 8d f0 5b 
+
+PEDE_BLOCO
+tx: 5a e1 7c c2 02 5d 5b 
+rx: 5a 80 7c c2 02 ff ff 3c 5b 
+
+PEDE_BLOCO
+tx: 5a e1 7c c4 02 50 0b 5b 
+rx: 5a 80 7c c4 02 ff ff 3a 5b 
+
+PEDE_BLOCO
+tx: 5a e1 7c 00 08 95 5b 
+rx: 5a 80 7c 00 08 31 37 35 32 37 32 56 41 e7 5b 
+
+PEDE_BLOCO
+tx: 5a e1 7c 08 08 9d 5b 
+rx: 5a 80 7c 08 08 20 20 32 39 2f 30 37 2f f0 5b 
+
+PEDE_BLOCO
+tx: 5a e1 7c 10 04 89 5b 
+rx: 5a 80 7c 10 04 32 30 30 36 ec 5b 
+

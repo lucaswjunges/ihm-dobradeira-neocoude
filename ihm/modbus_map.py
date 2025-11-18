@@ -103,11 +103,41 @@ BEND_ANGLES = {
 }
 
 # ==========================================
+# ÂNGULOS MODBUS INPUT BUFFER (32-bit) - GRAVÁVEL
+# ==========================================
+# ✅ VALIDADO 18/Nov/2025 - Área 0x0A00 descoberta em clp_MODIFICADO_IHM_WEB.sup
+# IHM WEB deve gravar AQUI (não em 0x0500 nem 0x0840)
+# ROT5.lad linhas 7-12 copia automaticamente para área shadow via triggers
+#
+# FLUXO:
+#   1. IHM grava em 0x0A00/0x0A02 (MSW/LSW)
+#   2. IHM aciona trigger 0x0390 (coil bit)
+#   3. ROT5 detecta trigger e executa: MOV 0x0A00→0x0842, MOV 0x0A02→0x0840
+#   4. Principal.lad lê de 0x0840/0x0842 (valores sincronizados)
+
+BEND_ANGLES_MODBUS_INPUT = {
+    # Dobra 1 - WRITE-ONLY (gravação pela IHM Web)
+    'BEND_1_INPUT_MSW': 0x0A00,  # 2560 - MSW Dobra 1 (Modbus Input)
+    'BEND_1_INPUT_LSW': 0x0A02,  # 2562 - LSW Dobra 1 (Modbus Input)
+    'BEND_1_TRIGGER':   0x0390,  # 912  - Trigger para ROT5 copiar Dobra 1
+
+    # Dobra 2 - WRITE-ONLY
+    'BEND_2_INPUT_MSW': 0x0A04,  # 2564 - MSW Dobra 2 (Modbus Input)
+    'BEND_2_INPUT_LSW': 0x0A06,  # 2566 - LSW Dobra 2 (Modbus Input)
+    'BEND_2_TRIGGER':   0x0391,  # 913  - Trigger para ROT5 copiar Dobra 2
+
+    # Dobra 3 - WRITE-ONLY
+    'BEND_3_INPUT_MSW': 0x0A08,  # 2568 - MSW Dobra 3 (Modbus Input)
+    'BEND_3_INPUT_LSW': 0x0A0A,  # 2570 - LSW Dobra 3 (Modbus Input)
+    'BEND_3_TRIGGER':   0x0392,  # 914  - Trigger para ROT5 copiar Dobra 3
+}
+
+# ==========================================
 # ÂNGULOS SHADOW (32-bit) - ÁREA PROTEGIDA
 # ==========================================
 # ⚠️ NÃO USAR PARA ESCRITA - Somente leitura!
-# Valores sobrescritos por ROT4/ROT5 no ladder a cada scan
-# Byte baixo forçado para 0x99 (153) - Ver ANALISE_BYTE_099_LADDER.md
+# Valores copiados por ROT5 de 0x0A00 → 0x0840 via triggers
+# Byte baixo forçado para 0x99 (153) em algumas condições
 #
 # IMPORTANTE: Estes são os endereços que o LADDER LÊ (PRINCIPAL.lad):
 #   - Line00008: SUB 0858 = 0842 - 0840  (Dobra 1)
@@ -120,8 +150,8 @@ BEND_ANGLES_SHADOW = {
     'BEND_1_LEFT_MSW':  0x0842,  # 2114 - Shadow Dobra 1 (MSW - protegido)
 
     # Dobra 2 - READ-ONLY
-    'BEND_2_LEFT_LSW':  0x0846,  # 2118 - Shadow Dobra 2 (LSW - protegido)
-    'BEND_2_LEFT_MSW':  0x0848,  # 2120 - Shadow Dobra 2 (MSW - protegido)
+    'BEND_2_LEFT_LSW':  0x0846,  # 2120 - Shadow Dobra 2 (LSW - protegido)
+    'BEND_2_LEFT_MSW':  0x0848,  # 2122 - Shadow Dobra 2 (MSW - protegido)
 
     # Dobra 3 - READ-ONLY
     'BEND_3_LEFT_LSW':  0x0850,  # 2128 - Shadow Dobra 3 (LSW - protegido)
