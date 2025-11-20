@@ -36,6 +36,32 @@ KEYBOARD_FUNCTION = {
 }
 
 # ==========================================
+# BOTÕES DE PAINEL FÍSICO (Coils - Function 0x05)
+# ==========================================
+# ✅ CORRIGIDO 20/Nov/2025 - Usa SAÍDAS FÍSICAS S0/S1
+# Análise completa do ladder ROT0.lad revelou sistema DUPLO:
+# - PRIMÁRIO: 0x0180/0x0181 (S0/S1) = Saídas físicas (USAR ESTE!)
+# - SECUNDÁRIO: 0x0190/0x0191 = Flags internas (modo AUTO avançado)
+#
+# IMPORTANTE: Sistema usa LATCH (SETR), motor fica ligado até desligar
+
+PANEL_BUTTONS = {
+    # SAÍDAS FÍSICAS (PRIMÁRIO - usar estes!)
+    'FORWARD':  0x0180,  # 384 dec - S0 (saída física AVANÇAR)
+    'BACKWARD': 0x0181,  # 385 dec - S1 (saída física RECUAR)
+
+    # ESTADOS INTERNOS (SECUNDÁRIO - para modo AUTO avançado)
+    'FORWARD_FLAG':  0x0190,  # 400 dec (flag interna)
+    'BACKWARD_FLAG': 0x0191,  # 401 dec (flag interna)
+
+    # ENTRADAS DIGITAIS (READ-ONLY - para feedback)
+    'FORWARD_INPUT':  0x0102,  # 258 dec - E2: Botão AVANÇAR físico
+    'STOP_INPUT':     0x0103,  # 259 dec - E3: Botão PARADA físico
+    'BACKWARD_INPUT': 0x0104,  # 260 dec - E4: Botão RECUAR físico
+    'SENSOR_INPUT':   0x0105,  # 261 dec - E5: Sensor adicional
+}
+
+# ==========================================
 # LEDs (Coils - Function 0x01)
 # ==========================================
 
@@ -259,26 +285,37 @@ def split_32bit(value: int) -> tuple:
 
 def clp_to_degrees(clp_value: int) -> float:
     """
-    Converte valor CLP (32-bit) para graus com validação.
+    Converte valor CLP (32-bit) para graus com validação e MOD 360.
+
+    ✅ ATUALIZADO 20/Nov/2025 - Aplica MOD 360° para mostrar ângulo atual
+    dentro de uma volta completa (0-360°).
+
+    Exemplo:
+        3058 → 305.8° (3058 MOD 360 = 338.8°)
+        119 → 11.9°
+        3600 → 0.0° (volta completa)
 
     Args:
         clp_value: Valor lido do CLP (multiplicado por 10)
 
     Returns:
-        Ângulo em graus (float), 0.0 se inválido
+        Ângulo em graus MOD 360 (float), 0.0 se inválido
     """
     if clp_value is None:
         return 0.0
 
     degrees = clp_value / 10.0
 
-    # Validação: ângulos devem estar entre 0 e 3600 graus
-    # (considerando possíveis múltiplas voltas)
-    if degrees < 0 or degrees > 10000:
+    # Validação: ângulos devem estar entre 0 e 100000 graus
+    # (considerando possíveis múltiplas voltas acumuladas)
+    if degrees < 0 or degrees > 100000:
         # Valor absurdo, provavelmente lixo de memória
         return 0.0
 
-    return degrees
+    # Aplica MOD 360 para mostrar ângulo atual dentro de uma volta
+    degrees_mod = degrees % 360.0
+
+    return degrees_mod
 
 
 def degrees_to_clp(degrees: float) -> int:

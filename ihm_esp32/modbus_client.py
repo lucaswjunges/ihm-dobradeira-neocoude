@@ -861,6 +861,148 @@ class ModbusClientWrapper:
             return rpm
         return None
 
+    # ==========================================
+    # CONTROLE DE MOTOR - BOTÕES DE PAINEL
+    # ==========================================
+
+    def start_forward(self) -> bool:
+        """
+        AVANÇAR - Ativa saída física S0 (anti-horário).
+
+        ✅ CORRIGIDO 20/Nov/2025 - Usa S0 (0x0180) ao invés de flag interna
+        Sistema usa LATCH (SETR), então motor fica ligado até ser desligado.
+        NÃO precisa de pulso de 100ms!
+
+        Returns:
+            bool: True se sucesso
+
+        Exemplo:
+            >>> client.start_forward()
+            ✅ AVANÇAR: S0 (0x0180) ativado
+            True
+        """
+        if self.stub_mode:
+            print("🟢 [STUB] AVANÇAR ativado (S0 ON)")
+            return True
+
+        try:
+            # Escreve em S0 (saída física)
+            success = self.write_coil(mm.PANEL_BUTTONS['FORWARD'], True)
+            if success:
+                print("✅ AVANÇAR: S0 (0x0180) ativado")
+            else:
+                print("❌ AVANÇAR: Falha ao ativar S0")
+            return success
+        except Exception as e:
+            print(f"❌ Erro em start_forward: {e}")
+            return False
+
+    def start_backward(self) -> bool:
+        """
+        RECUAR - Ativa saída física S1 (horário).
+
+        ✅ CORRIGIDO 20/Nov/2025 - Usa S1 (0x0181) ao invés de flag interna
+        Sistema usa LATCH (SETR), então motor fica ligado até ser desligado.
+        NÃO precisa de pulso de 100ms!
+
+        Returns:
+            bool: True se sucesso
+
+        Exemplo:
+            >>> client.start_backward()
+            ✅ RECUAR: S1 (0x0181) ativado
+            True
+        """
+        if self.stub_mode:
+            print("🟢 [STUB] RECUAR ativado (S1 ON)")
+            return True
+
+        try:
+            # Escreve em S1 (saída física)
+            success = self.write_coil(mm.PANEL_BUTTONS['BACKWARD'], True)
+            if success:
+                print("✅ RECUAR: S1 (0x0181) ativado")
+            else:
+                print("❌ RECUAR: Falha ao ativar S1")
+            return success
+        except Exception as e:
+            print(f"❌ Erro em start_backward: {e}")
+            return False
+
+    def stop_motor(self) -> bool:
+        """
+        PARADA - Desliga ambas as saídas S0 e S1.
+
+        ✅ CORRIGIDO 20/Nov/2025 - Usa S0/S1 (0x0180/0x0181)
+        Garante que motor pare independente da direção.
+
+        Returns:
+            bool: True se sucesso
+
+        Exemplo:
+            >>> client.stop_motor()
+            ✅ PARADA: S0 e S1 desligados
+            True
+        """
+        if self.stub_mode:
+            print("🛑 [STUB] MOTOR parado (S0 e S1 OFF)")
+            return True
+
+        try:
+            # Desliga ambas as saídas
+            s0_off = self.write_coil(mm.PANEL_BUTTONS['FORWARD'], False)
+            s1_off = self.write_coil(mm.PANEL_BUTTONS['BACKWARD'], False)
+
+            if s0_off and s1_off:
+                print("✅ PARADA: S0 e S1 desligados")
+            else:
+                print(f"⚠️ PARADA parcial: S0={s0_off}, S1={s1_off}")
+
+            return s0_off and s1_off
+        except Exception as e:
+            print(f"❌ Erro em stop_motor: {e}")
+            return False
+
+    def read_panel_buttons(self) -> dict:
+        """
+        Lê estado dos botões físicos do painel (E2, E3, E4, E5).
+
+        ✅ CORRIGIDO 20/Nov/2025 - Adiciona E5 (sensor)
+        Útil para feedback visual na IHM.
+
+        Returns:
+            dict: Estado dos botões físicos (True = pressionado)
+
+        Exemplo:
+            >>> buttons = client.read_panel_buttons()
+            >>> print(buttons)
+            {'forward': False, 'stop': False, 'backward': False, 'sensor': False}
+        """
+        if self.stub_mode:
+            return {
+                'forward': False,
+                'stop': False,
+                'backward': False,
+                'sensor': False,
+            }
+
+        try:
+            # Lê entradas digitais dos botões físicos
+            forward_input = self.read_coil(mm.PANEL_BUTTONS['FORWARD_INPUT'])
+            stop_input = self.read_coil(mm.PANEL_BUTTONS['STOP_INPUT'])
+            backward_input = self.read_coil(mm.PANEL_BUTTONS['BACKWARD_INPUT'])
+            sensor_input = self.read_coil(mm.PANEL_BUTTONS['SENSOR_INPUT'])
+
+            return {
+                'forward': forward_input if forward_input is not None else False,
+                'stop': stop_input if stop_input is not None else False,
+                'backward': backward_input if backward_input is not None else False,
+                'sensor': sensor_input if sensor_input is not None else False,
+            }
+        except Exception as e:
+            print(f"❌ Erro lendo botões do painel: {e}")
+            return {'forward': False, 'stop': False, 'backward': False, 'sensor': False}
+
     def close(self):
         """Fecha conexão Modbus"""
         if self.client and self.connected:

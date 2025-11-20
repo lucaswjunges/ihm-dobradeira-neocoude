@@ -245,6 +245,45 @@ class IHMServer:
                         'message': f'Velocidade inválida: {speed}. Use 5, 10 ou 15 RPM.'
                     }))
 
+            elif action == 'motor_control':
+                # Controle de motor via coils descobertos no ladder
+                # ✅ ADICIONADO 20/Nov/2025 - Usa coils 0x0190/0x0191
+                command = data.get('command')
+
+                if command == 'start_forward':
+                    success = self.modbus_client.start_forward()
+                    print(f"{'✓' if success else '✗'} Comando AVANÇAR enviado")
+                    await websocket.send(json.dumps({
+                        'type': 'motor_response',
+                        'command': 'forward',
+                        'success': success
+                    }))
+
+                elif command == 'start_backward':
+                    success = self.modbus_client.start_backward()
+                    print(f"{'✓' if success else '✗'} Comando RECUAR enviado")
+                    await websocket.send(json.dumps({
+                        'type': 'motor_response',
+                        'command': 'backward',
+                        'success': success
+                    }))
+
+                elif command == 'stop':
+                    success = self.modbus_client.stop_motor()
+                    print(f"{'✓' if success else '✗'} Comando PARAR enviado")
+                    await websocket.send(json.dumps({
+                        'type': 'motor_response',
+                        'command': 'stop',
+                        'success': success
+                    }))
+
+                else:
+                    print(f"✗ Comando de motor inválido: {command}")
+                    await websocket.send(json.dumps({
+                        'type': 'error',
+                        'message': f'Comando inválido: {command}'
+                    }))
+
             elif action == 'emergency_stop':
                 # M-001: PARADA DE EMERGÊNCIA (NR-12)
                 print("🚨 EMERGÊNCIA ACIONADA! Desligando tudo...")

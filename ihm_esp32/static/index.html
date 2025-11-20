@@ -495,7 +495,7 @@
 
     <!-- Footer -->
     <div class="footer">
-        Desenvolvido pelo Eng. Lucas William Junges
+        Desenvolvido pelo Eng. <a href="https://www.linkedin.com/in/lucas-william-junges-a95b00143" target="_blank" style="color: #4caf50; text-decoration: none;">Lucas William Junges</a>
     </div>
 
     <script>
@@ -648,14 +648,17 @@
         }
 
         // Controle de motor
+        // ✅ ATUALIZADO 20/Nov/2025 - Usa coils de controle corretos (0x0190/0x0191)
         function startMotor(direction) {
             if (!ws || ws.readyState !== WebSocket.OPEN) return;
 
+            // Envia comando para o servidor usando métodos descobertos no ladder
             ws.send(JSON.stringify({
-                action: 'write_output',
-                output: direction === 'forward' ? 'S0' : 'S1',
-                value: true
+                action: 'motor_control',
+                command: direction === 'forward' ? 'start_forward' : 'start_backward'
             }));
+
+            console.log(`🎮 Comando motor: ${direction === 'forward' ? 'AVANÇAR' : 'RECUAR'}`);
 
             // Feedback visual
             if (direction === 'forward') {
@@ -670,19 +673,13 @@
         function stopMotor() {
             if (!ws || ws.readyState !== WebSocket.OPEN) return;
 
+            // Envia comando STOP que desliga ambos os coils (0x0190 e 0x0191)
             ws.send(JSON.stringify({
-                action: 'write_output',
-                output: 'S0',
-                value: false
+                action: 'motor_control',
+                command: 'stop'
             }));
 
-            setTimeout(() => {
-                ws.send(JSON.stringify({
-                    action: 'write_output',
-                    output: 'S1',
-                    value: false
-                }));
-            }, 50);
+            console.log('🎮 Comando motor: PARAR');
 
             // Remove feedback visual
             document.getElementById('btnForward').classList.remove('active');
