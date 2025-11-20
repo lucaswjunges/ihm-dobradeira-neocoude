@@ -1,0 +1,1 @@
+ sleep 5 echo Servidor reiniciado. PID: $(cat ihm_server.pid) echo  echo Log (primeiras 25 linhas): head -25 ihm_server.log echo  echo Processo rodando: ps aux

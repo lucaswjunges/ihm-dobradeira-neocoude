@@ -1,6 +1,6 @@
 """
 Modbus Client ESP32 - IHM Web Dobradeira
-Vers�o MicroPython adaptada de modbus_client.py
+Versao MicroPython adaptada de modbus_client.py
 """
 import time
 from lib.umodbus.serial import ModbusRTU
@@ -26,28 +26,37 @@ class ModbusClientWrapper:
             self._init_stub()
 
     def _connect_live(self):
-        """Conecta via UART2 (GPIO17/16)"""
+        """Conecta via UART2 (GPIO17/16) e TESTA comunicacao real"""
         try:
             print("Conectando Modbus UART2...")
             self.client = ModbusRTU(uart_id=2, baudrate=57600, data_bits=8, stop_bits=2, parity=None, tx_pin=17, rx_pin=16, ctrl_pin=4)
-            self.connected = True
-            print(" Modbus conectado")
+
+            # CORRECAO: Testa comunicacao real ANTES de setar connected=True
+            print("Testando comunicacao com CLP...")
+            test_result = self.client.read_holding_registers(self.slave_id, 0x04D6, 1)
+
+            if test_result and len(test_result) > 0 and test_result[0] is not None:
+                self.connected = True
+                print(f"OK: Modbus conectado - CLP respondeu: {test_result[0]}")
+            else:
+                self.connected = False
+                print("ERRO: CLP nao responde (timeout)")
         except Exception as e:
-            print(f" Erro Modbus: {e}")
+            print(f"ERRO: Modbus exception: {e}")
             self.connected = False
 
     def _init_stub(self):
         """Inicializa dados simulados"""
         self.connected = True
         self.stub_registers[mm.ENCODER['ANGLE_MSW']] = 0
-        self.stub_registers[mm.ENCODER['ANGLE_LSW']] = 457  # 45.7�
+        self.stub_registers[mm.ENCODER['ANGLE_LSW']] = 457  # 45.7 graus
         self.stub_registers[mm.BEND_ANGLES['BEND_1_SETPOINT']] = 900
         self.stub_registers[mm.BEND_ANGLES['BEND_2_SETPOINT']] = 1200
         self.stub_registers[mm.BEND_ANGLES['BEND_3_SETPOINT']] = 560
-        print(" Modo STUB ativado")
+        print("Modo STUB ativado")
 
     def read_register(self, address):
-        """L� 1 registro 16-bit"""
+        """Le 1 registro 16-bit"""
         if self.stub_mode:
             return self.stub_registers.get(address, 0)
 
@@ -122,7 +131,7 @@ class ModbusClientWrapper:
             return False
 
     def press_key(self, address, hold_ms=100):
-        """Simula press de tecla (ON � delay � OFF)"""
+        """Simula press de tecla (ON -> delay -> OFF)"""
         if self.write_coil(address, True):
             time.sleep_ms(hold_ms)
             return self.write_coil(address, False)

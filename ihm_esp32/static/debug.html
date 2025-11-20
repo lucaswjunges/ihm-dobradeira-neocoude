@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Debug WebSocket</title>
+    <style>
+        body {
+            font-family: monospace;
+            padding: 15px;
+            background: #1a1a1a;
+            color: #0f0;
+            font-size: 12px;
+        }
+        .log { 
+            margin: 5px 0; 
+            padding: 5px;
+            background: #2a2a2a;
+            border-left: 3px solid #0f0;
+        }
+        .error { border-left-color: #f00; color: #f00; }
+        .success { border-left-color: #0f0; }
+        .info { border-left-color: #ff0; color: #ff0; }
+        button {
+            padding: 10px 20px;
+            margin: 10px 5px;
+            font-size: 14px;
+            background: #4caf50;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        #status {
+            font-size: 16px;
+            font-weight: bold;
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 5px;
+        }
+    </style>
+</head>
+<body>
+    <h2>🔍 Debug WebSocket - IHM</h2>
+    <div id="status" style="background: #f44336;">DESCONECTADO</div>
+    
+    <button onclick="testConnection()">Testar Conexão</button>
+    <button onclick="clearLogs()">Limpar Logs</button>
+    
+    <h3>📊 Informações do Cliente:</h3>
+    <div id="info"></div>
+    
+    <h3>📝 Logs de Conexão:</h3>
+    <div id="logs"></div>
+
+    <script>
+        let ws = null;
+        const logsDiv = document.getElementById('logs');
+        const statusDiv = document.getElementById('status');
+        const infoDiv = document.getElementById('info');
+
+        // Mostrar informações do cliente
+        function showInfo() {
+            const hostname = window.location.hostname;
+            const port = window.location.port || '80';
+            const wsUrl = `ws://${hostname}:8765`;
+            
+            infoDiv.innerHTML = `
+                <div class="log info">🌐 Hostname: ${hostname}</div>
+                <div class="log info">🔌 Porta HTTP: ${port}</div>
+                <div class="log info">🔗 WebSocket URL: ${wsUrl}</div>
+                <div class="log info">📱 User Agent: ${navigator.userAgent}</div>
+                <div class="log info">⏰ Data/Hora: ${new Date().toLocaleString('pt-BR')}</div>
+            `;
+        }
+
+        function log(message, type = 'info') {
+            const div = document.createElement('div');
+            div.className = `log ${type}`;
+            div.textContent = `[${new Date().toLocaleTimeString()}] ${message}`;
+            logsDiv.insertBefore(div, logsDiv.firstChild);
+        }
+
+        function updateStatus(connected) {
+            if (connected) {
+                statusDiv.style.background = '#4caf50';
+                statusDiv.textContent = '✅ CONECTADO';
+            } else {
+                statusDiv.style.background = '#f44336';
+                statusDiv.textContent = '❌ DESCONECTADO';
+            }
+        }
+
+        function testConnection() {
+            const hostname = window.location.hostname;
+            const wsUrl = `ws://${hostname}:8765`;
+            
+            log(`Tentando conectar em: ${wsUrl}`, 'info');
+            
+            try {
+                ws = new WebSocket(wsUrl);
+                
+                ws.onopen = () => {
+                    log('✅ WebSocket CONECTADO com sucesso!', 'success');
+                    updateStatus(true);
+                    
+                    // Enviar mensagem de teste
+                    ws.send(JSON.stringify({action: 'ping'}));
+                    log('📤 Enviou ping para servidor', 'info');
+                };
+                
+                ws.onmessage = (event) => {
+                    log(`📥 Recebido: ${event.data}`, 'success');
+                };
+                
+                ws.onerror = (error) => {
+                    log(`❌ ERRO: ${error.message || 'Erro desconhecido'}`, 'error');
+                    log(`Detalhes do erro: ${JSON.stringify(error)}`, 'error');
+                    updateStatus(false);
+                };
+                
+                ws.onclose = (event) => {
+                    log(`🔌 Conexão fechada - Código: ${event.code}, Razão: ${event.reason || 'N/A'}`, 'error');
+                    updateStatus(false);
+                };
+                
+            } catch (e) {
+                log(`❌ EXCEÇÃO: ${e.message}`, 'error');
+                updateStatus(false);
+            }
+        }
+
+        function clearLogs() {
+            logsDiv.innerHTML = '';
+        }
+
+        // Inicializar
+        showInfo();
+        log('🚀 Página carregada. Clique em "Testar Conexão" para iniciar', 'info');
+        
+        // Testar automaticamente após 1 segundo
+        setTimeout(testConnection, 1000);
+    </script>
+</body>
+</html>

@@ -1,0 +1,42 @@
+[Unit]
+Description=IHM Web - Dobradeira NEOCOUDE-HD-15
+Documentation=https://github.com/seu-usuario/ihm_neocoude
+After=network.target hostapd.service dnsmasq.service
+Wants=hostapd.service dnsmasq.service
+
+[Service]
+Type=simple
+User=pi
+Group=pi
+WorkingDirectory=/home/pi/ihm_esp32
+Environment="PATH=/home/pi/ihm_esp32/venv/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
+
+# Comando de inicialização
+# Modo LIVE (conectar ao CLP via /dev/ttyUSB0)
+ExecStart=/home/pi/ihm_esp32/venv/bin/python3 /home/pi/ihm_esp32/main_server.py --port /dev/ttyUSB0
+
+# Para modo STUB (simulação sem CLP), descomente a linha abaixo e comente a de cima:
+# ExecStart=/home/pi/ihm_esp32/venv/bin/python3 /home/pi/ihm_esp32/main_server.py --stub
+
+# Restart automático em caso de falha
+Restart=always
+RestartSec=10
+
+# Logs
+StandardOutput=journal
+StandardError=journal
+
+# Limites de recursos (opcional)
+LimitNOFILE=65536
+Nice=-5
+
+# Timeout para start/stop
+TimeoutStartSec=30
+TimeoutStopSec=30
+
+# Kill mode
+KillMode=mixed
+KillSignal=SIGTERM
+
+[Install]
+WantedBy=multi-user.target

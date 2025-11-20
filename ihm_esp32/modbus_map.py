@@ -90,31 +90,41 @@ ENCODER = {
 # ==========================================
 # ÁREA MODBUS INPUT (32-bit) - ESCRITA IHM WEB
 # ==========================================
-# ✅ VALIDADO 18/Nov/2025 - Área 0x0A00 confirmada no ladder ROT5.lad
-# FLUXO: IHM escreve 0x0A00 → trigger 0x0390 → ROT5 copia → 0x0840 → ladder lê
-# Formato: 32-bit MSW/LSW (ATENÇÃO: MSW primeiro, LSW depois)
+# ✅ VALIDADO 20/Nov/2025 - Endereços testados empiricamente no CLP real
+# FLUXO: IHM escreve em 0x0A00 (base) → ladder lê de 0x0840 (shadow)
+# Formato: 32-bit em 2 registros consecutivos (Big-Endian style)
 # Conversão: value_clp = graus * 10
 #
-# ROT5.lad Lines 7-12:
-#   Quando trigger 0x0390 = ON:
-#     MOV 0x0A00 → 0x0842  (MSW Dobra 1)
-#     MOV 0x0A02 → 0x0840  (LSW Dobra 1)
+# ATENÇÃO: 0x0A02 é para RPM, NÃO para ângulo!
+# Layout da memória:
+#   0x0A00, 0x0A01 = Dobra 1 (MSW, LSW) - 32-bit
+#   0x0A02         = RPM (16-bit)
+#   0x0A04, 0x0A05 = Dobra 2 (MSW, LSW) - 32-bit
+#   0x0A08, 0x0A09 = Dobra 3 (MSW, LSW) - 32-bit
 
 BEND_ANGLES_MODBUS_INPUT = {
-    # Dobra 1 - MSW/LSW + Trigger (coil)
-    'BEND_1_INPUT_MSW': 0x0A00,  # 2560 - Dobra 1 MSW (bits 31-16)
-    'BEND_1_INPUT_LSW': 0x0A02,  # 2562 - Dobra 1 LSW (bits 15-0)
-    'BEND_1_TRIGGER':   0x0390,  # 912  - Trigger Dobra 1 (COIL)
+    # Dobra 1 - 32-bit em 0x0A00-0x0A01
+    'BEND_1_INPUT_BASE': 0x0A00,  # 2560 - Dobra 1 base (escrever 2 registros consecutivos)
+    'BEND_1_TRIGGER':    0x0390,  # 912  - Trigger Dobra 1 (COIL)
 
-    # Dobra 2 - MSW/LSW + Trigger (coil)
-    'BEND_2_INPUT_MSW': 0x0A04,  # 2564 - Dobra 2 MSW (bits 31-16)
-    'BEND_2_INPUT_LSW': 0x0A06,  # 2566 - Dobra 2 LSW (bits 15-0)
-    'BEND_2_TRIGGER':   0x0391,  # 913  - Trigger Dobra 2 (COIL)
+    # Dobra 2 - 32-bit em 0x0A04-0x0A05
+    'BEND_2_INPUT_BASE': 0x0A04,  # 2564 - Dobra 2 base (escrever 2 registros consecutivos)
+    'BEND_2_TRIGGER':    0x0391,  # 913  - Trigger Dobra 2 (COIL)
 
-    # Dobra 3 - MSW/LSW + Trigger (coil)
-    'BEND_3_INPUT_MSW': 0x0A08,  # 2568 - Dobra 3 MSW (bits 31-16)
-    'BEND_3_INPUT_LSW': 0x0A0A,  # 2570 - Dobra 3 LSW (bits 15-0)
-    'BEND_3_TRIGGER':   0x0392,  # 914  - Trigger Dobra 3 (COIL)
+    # Dobra 3 - 32-bit em 0x0A08-0x0A09
+    'BEND_3_INPUT_BASE': 0x0A08,  # 2568 - Dobra 3 base (escrever 2 registros consecutivos)
+    'BEND_3_TRIGGER':    0x0392,  # 914  - Trigger Dobra 3 (COIL)
+}
+
+# ==========================================
+# RPM / VELOCIDADE (16-bit)
+# ==========================================
+# ✅ VALIDADO 20/Nov/2025 - Testado empiricamente
+# Escrever em 0x0A02, ler de 0x06E0
+
+RPM_REGISTERS = {
+    'RPM_WRITE': 0x0A02,  # 2562 - Escrita de RPM (16-bit: 5, 10 ou 15)
+    'RPM_READ':  0x06E0,  # 1760 - Leitura de RPM/tensão do inversor
 }
 
 # ==========================================

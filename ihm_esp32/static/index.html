@@ -237,18 +237,6 @@
             border-top: 1px solid rgba(255,255,255,0.1);
         }
 
-        .footer a {
-            color: #4caf50;
-            text-decoration: none;
-            font-weight: 500;
-            transition: color 0.3s;
-        }
-
-        .footer a:hover {
-            color: #66bb6a;
-            text-decoration: underline;
-        }
-
         /* Modal */
         .modal {
             display: none;
@@ -427,7 +415,7 @@
         <div class="header-status">
             <div class="status-item">
                 <span class="status-dot" id="wsStatus"></span>
-                <span id="wsText">HTTP</span>
+                <span id="wsText">WS</span>
             </div>
             <div class="status-item">
                 <span class="status-dot" id="clpStatus"></span>
@@ -507,76 +495,59 @@
 
     <!-- Footer -->
     <div class="footer">
-        Desenvolvido pelo Eng. <a href="https://www.linkedin.com/in/lucas-william-junges-a95b00143" target="_blank" rel="noopener noreferrer">Lucas William Junges</a>
+        Desenvolvido pelo Eng. Lucas William Junges
     </div>
 
     <script>
         // Estado da aplicação
-        let httpConnected = false;
+        let ws = null;
         let currentBend = null;
         let currentSpeed = 5;
-        let pollingInterval = null;
 
-        // Polling HTTP para obter estado
-        async function pollState() {
-            try {
-                const response = await fetch('/api/state');
-                if (response.ok) {
-                    const data = await response.json();
-                    handleServerMessage(data);
+        // Conectar WebSocket
+        function connectWebSocket() {
+            const wsHost = window.location.hostname;
+            ws = new WebSocket(`ws://${wsHost}:8765`);
 
-                    if (!httpConnected) {
-                        httpConnected = true;
-                        updateStatus('http', true);
+            ws.onopen = () => {
+                console.log('WebSocket conectado');
+                updateStatus('ws', true);
+            };
+
+            ws.onmessage = (event) => {
+                try {
+                    const message = JSON.parse(event.data);
+                    console.log('Mensagem recebida:', message);
+
+                    if (message.type === 'full_state' || message.type === 'state_update') {
+                        handleServerMessage(message.data || {});
+                    } else {
+                        handleServerMessage(message);
                     }
-                } else {
-                    throw new Error('HTTP error: ' + response.status);
+                } catch (e) {
+                    console.error('Erro ao processar WebSocket message:', e, event.data);
                 }
-            } catch (error) {
-                console.error('Erro ao buscar estado:', error);
-                if (httpConnected) {
-                    httpConnected = false;
-                    updateStatus('http', false);
-                }
-            }
-        }
+            };
 
-        // Enviar comando via HTTP POST
-        async function sendCommand(action, data = {}) {
-            try {
-                const response = await fetch('/api/command', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ action, ...data })
-                });
+            ws.onclose = () => {
+                console.log('WebSocket desconectado');
+                updateStatus('ws', false);
+                setTimeout(connectWebSocket, 3000);
+            };
 
-                if (response.ok) {
-                    console.log('Comando enviado:', action);
-                    return true;
-                } else {
-                    console.error('Erro ao enviar comando:', response.status);
-                    return false;
-                }
-            } catch (error) {
-                console.error('Erro de conexão:', error);
-                return false;
-            }
-        }
-
-        // Iniciar polling (500ms)
-        function startPolling() {
-            console.log('Iniciando polling HTTP...');
-            pollState(); // Primeira chamada imediata
-            pollingInterval = setInterval(pollState, 500);
+            ws.onerror = (error) => {
+                console.error('Erro WebSocket:', error);
+                updateStatus('ws', false);
+            };
         }
 
         // Atualizar status
         function updateStatus(type, connected) {
-            if (type === 'http') {
+            if (type === 'ws') {
                 const dot = document.getElementById('wsStatus');
                 const text = document.getElementById('wsText');
                 dot.className = 'status-dot ' + (connected ? 'connected' : '');
-                text.textContent = connected ? 'HTTP' : 'OFF';
+                text.textContent = connected ? 'WS' : 'OFF';
 
                 if (!connected) {
                     document.getElementById('errorOverlay').classList.add('active');
@@ -590,7 +561,7 @@
                 dot.className = 'status-dot ' + (connected ? 'connected' : '');
                 text.textContent = connected ? 'CLP' : 'OFF';
 
-                if (!connected && httpConnected) {
+                if (!connected && ws && ws.readyState === WebSocket.OPEN) {
                     document.getElementById('errorOverlay').classList.add('active');
                     document.getElementById('errorMessage').textContent = 'FALHA CLP';
                 }
@@ -599,32 +570,43 @@
 
         // Processar mensagens do servidor
         function handleServerMessage(data) {
-            // Atualizar encoder
-            if (data.encoder_angle !== undefined) {
-                document.getElementById('encoderValue').textContent = data.encoder_angle.toFixed(1) + '°';
-            }
+            try {
+                // Atualizar encoder
+                if (data.encoder_degrees !== undefined && data.encoder_degrees !== null) {
+                    const el = document.getElementById('encoderValue');
+                    if (el) el.textContent = data.encoder_degrees.toFixed(1) + '°';
+                }
 
-            // Atualizar velocidade
-            if (data.speed_class !== undefined) {
-                currentSpeed = data.speed_class;
-                document.getElementById('speedValue').textContent = data.speed_class + ' RPM';
-                updateSpeedButtons();
-            }
+                // Atualizar velocidade
+                if (data.speed_class !== undefined && data.speed_class !== null) {
+                    currentSpeed = data.speed_class;
+                    const el = document.getElementById('speedValue');
+                    if (el) el.textContent = data.speed_class + ' RPM';
+                    updateSpeedButtons();
+                }
 
-            // Atualizar ângulos
-            if (data.bend_1_angle !== undefined) {
-                document.getElementById('angle1').textContent = data.bend_1_angle.toFixed(1);
-            }
-            if (data.bend_2_angle !== undefined) {
-                document.getElementById('angle2').textContent = data.bend_2_angle.toFixed(1);
-            }
-            if (data.bend_3_angle !== undefined) {
-                document.getElementById('angle3').textContent = data.bend_3_angle.toFixed(1);
-            }
+                // Atualizar ângulos
+                if (data.angles && typeof data.angles === 'object') {
+                    if (data.angles.bend_1_left !== undefined && data.angles.bend_1_left !== null) {
+                        const el = document.getElementById('angle1');
+                        if (el) el.textContent = data.angles.bend_1_left.toFixed(1);
+                    }
+                    if (data.angles.bend_2_left !== undefined && data.angles.bend_2_left !== null) {
+                        const el = document.getElementById('angle2');
+                        if (el) el.textContent = data.angles.bend_2_left.toFixed(1);
+                    }
+                    if (data.angles.bend_3_left !== undefined && data.angles.bend_3_left !== null) {
+                        const el = document.getElementById('angle3');
+                        if (el) el.textContent = data.angles.bend_3_left.toFixed(1);
+                    }
+                }
 
-            // Status CLP
-            if (data.connected !== undefined) {
-                updateStatus('clp', data.connected);
+                // Status CLP
+                if (data.modbus_connected !== undefined) {
+                    updateStatus('clp', data.modbus_connected);
+                }
+            } catch (e) {
+                console.error('Erro ao processar mensagem do servidor:', e, data);
             }
         }
 
@@ -644,8 +626,8 @@
         }
 
         // Salvar ângulo
-        async function saveAngle() {
-            if (!currentBend || !httpConnected) {
+        function saveAngle() {
+            if (!currentBend || !ws || ws.readyState !== WebSocket.OPEN) {
                 return;
             }
 
@@ -655,22 +637,25 @@
                 return;
             }
 
-            await sendCommand('set_angle', {
+            ws.send(JSON.stringify({
+                action: 'write_angle',
                 bend: currentBend,
-                value: value
-            });
+                angle: value
+            }));
 
             document.getElementById(`angle${currentBend}`).textContent = value.toFixed(1);
             closeModal();
         }
 
         // Controle de motor
-        async function startMotor(direction) {
-            if (!httpConnected) return;
+        function startMotor(direction) {
+            if (!ws || ws.readyState !== WebSocket.OPEN) return;
 
-            await sendCommand('start_motor', {
-                direction: direction
-            });
+            ws.send(JSON.stringify({
+                action: 'write_output',
+                output: direction === 'forward' ? 'S0' : 'S1',
+                value: true
+            }));
 
             // Feedback visual
             if (direction === 'forward') {
@@ -682,10 +667,22 @@
             }
         }
 
-        async function stopMotor() {
-            if (!httpConnected) return;
+        function stopMotor() {
+            if (!ws || ws.readyState !== WebSocket.OPEN) return;
 
-            await sendCommand('stop_motor', {});
+            ws.send(JSON.stringify({
+                action: 'write_output',
+                output: 'S0',
+                value: false
+            }));
+
+            setTimeout(() => {
+                ws.send(JSON.stringify({
+                    action: 'write_output',
+                    output: 'S1',
+                    value: false
+                }));
+            }, 50);
 
             // Remove feedback visual
             document.getElementById('btnForward').classList.remove('active');
@@ -693,12 +690,13 @@
         }
 
         // Mudar velocidade
-        async function changeSpeed(speed) {
-            if (!httpConnected) return;
+        function changeSpeed(speed) {
+            if (!ws || ws.readyState !== WebSocket.OPEN) return;
 
-            await sendCommand('set_speed', {
-                class: speed === 5 ? 1 : (speed === 10 ? 2 : 3)
-            });
+            ws.send(JSON.stringify({
+                action: 'write_speed',
+                speed: speed
+            }));
 
             currentSpeed = speed;
             updateSpeedButtons();
@@ -719,7 +717,7 @@
         });
 
         // Iniciar
-        startPolling();
+        connectWebSocket();
         updateSpeedButtons();
     </script>
 </body>

@@ -1,0 +1,74 @@
+============================================================
+IHM WEB - DOBRADEIRA NEOCOUDE-HD-15
+============================================================
+
+Modo: LIVE (CLP real)
+🔌 Tentando conectar em /dev/ttyUSB0...
+✓ Modbus conectado: /dev/ttyUSB0 @ 57600 bps (slave 1)
+
+✓ Servidor iniciado com sucesso
+  WebSocket: ws://localhost:8765
+  HTTP: http://localhost:8080
+
+Abra http://localhost:8080 no navegador do tablet
+Pressione Ctrl+C para encerrar
+
+✓ State Manager iniciado (polling a cada 0.25s)
+🔍 [DEBUG] Tentando ler encoder em 0x04D6/0x04D7
+🔍 [DEBUG] Encoder retornou: 30581
+✓ Encoder lido: 30581 raw, 3058.1°
+🔍 [DEBUG] Tentando ler encoder em 0x04D6/0x04D7
+🔍 [DEBUG] Encoder retornou: 30581
+✓ Encoder lido: 30581 raw, 3058.1°
+🔍 [DEBUG] Tentando ler encoder em 0x04D6/0x04D7
+🔍 [DEBUG] Encoder retornou: 30581
+✓ Encoder lido: 30581 raw, 3058.1°
+🔍 [DEBUG] Tentando ler encoder em 0x04D6/0x04D7
+🔍 [DEBUG] Encoder retornou: 30581
+✓ Encoder lido: 30581 raw, 3058.1°
+🔍 [DEBUG] Tentando ler encoder em 0x04D6/0x04D7
+🔍 [DEBUG] Encoder retornou: 30581
+✓ Encoder lido: 30581 raw, 3058.1°
+🔍 [DEBUG] Tentando ler encoder em 0x04D6/0x04D7
+🔍 [DEBUG] Encoder retornou: 30581
+✓ Encoder lido: 30581 raw, 3058.1°
+🔍 [DEBUG] Tentando ler encoder em 0x04D6/0x04D7
+🔍 [DEBUG] Encoder retornou: 30581
+✓ Encoder lido: 30581 raw, 3058.1°
+🔍 [DEBUG] Tentando ler encoder em 0x04D6/0x04D7
+🔍 [DEBUG] Encoder retornou: 30581
+✓ Encoder lido: 30581 raw, 3058.1°
+🔍 [DEBUG] Tentando ler encoder em 0x04D6/0x04D7
+🔍 [DEBUG] Encoder retornou: 30581
+✓ Encoder lido: 30581 raw, 3058.1°
+🔍 [DEBUG] Tentando ler encoder em 0x04D6/0x04D7
+🔍 [DEBUG] Encoder retornou: 30581
+✓ Encoder lido: 30581 raw, 3058.1°
+🔍 [DEBUG] Tentando ler encoder em 0x04D6/0x04D7
+🔍 [DEBUG] Encoder retornou: 30581
+✓ Encoder lido: 30581 raw, 3058.1°
+✓ Cliente conectado: ('192.168.0.132', 47748)
+🔍 [DEBUG] Estado completo antes de enviar: 26 chaves
+🔍 [DEBUG] modbus_connected no estado: True
+🔍 [DEBUG] connected no estado: True
+🔍 [DEBUG] encoder_raw no estado: 30581
+🔍 [DEBUG] encoder_degrees no estado: 3058.1
+✅ [DEBUG] Estado completo enviado com sucesso!
+🔍 [DEBUG] Tentando ler encoder em 0x04D6/0x04D7
+🔍 [DEBUG] Encoder retornou: 30581
+✓ Encoder lido: 30581 raw, 3058.1°
+🔍 [DEBUG] Tentando ler encoder em 0x04D6/0x04D7
+🔍 [DEBUG] Encoder retornou: 30581
+✓ Encoder lido: 30581 raw, 3058.1°
+🔍 [DEBUG] Tentando ler encoder em 0x04D6/0x04D7
+🔍 [DEBUG] Encoder retornou: 30581
+✓ Encoder lido: 30581 raw, 3058.1°
+🔍 [DEBUG] Tentando ler encoder em 0x04D6/0x04D7
+🔍 [DEBUG] Encoder retornou: 30581
+✓ Encoder lido: 30581 raw, 3058.1°
+🔍 [DEBUG] Tentando ler encoder em 0x04D6/0x04D7
+🔍 [DEBUG] Encoder retornou: 30581
+✓ Encoder lido: 30581 raw, 3058.1°
+🔍 [DEBUG] Tentando ler encoder em 0x04D6/0x04D7
+🔍 [DEBUG] Encoder retornou: 30581
+✓ Encoder lido: 30581 raw, 3058.1°

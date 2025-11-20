@@ -1,0 +1,25 @@
+============================================================
+IHM WEB - DOBRADEIRA NEOCOUDE-HD-15
+============================================================
+
+Traceback (most recent call last):
+  File "/home/lucas-junges/Documents/wco/ihm_esp32/server_ihm.py", line 235, in <module>
+    asyncio.run(main())
+  File "/usr/lib/python3.11/asyncio/runners.py", line 190, in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.11/asyncio/runners.py", line 118, in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.11/asyncio/base_events.py", line 653, in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+  File "/home/lucas-junges/Documents/wco/ihm_esp32/server_ihm.py", line 192, in main
+    modbus_client = ModbusClientWrapper(stub_mode=True, port='/dev/ttyUSB0')
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/lucas-junges/Documents/wco/ihm_esp32/modbus_client.py", line 49, in __init__
+    self._init_stub_data()
+  File "/home/lucas-junges/Documents/wco/ihm_esp32/modbus_client.py", line 84, in _init_stub_data
+    self.stub_registers[mm.BEND_ANGLES['BEND_1_SETPOINT']] = 900   # 90.0°
+                        ^^^^^^^^^^^^^^
+AttributeError: module 'modbus_map' has no attribute 'BEND_ANGLES'

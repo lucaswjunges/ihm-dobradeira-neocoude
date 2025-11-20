@@ -1,0 +1,27 @@
+============================================================
+IHM WEB - DOBRADEIRA NEOCOUDE-HD-15 (THREADED)
+============================================================
+
+🔌 Tentando conectar em /dev/ttyUSB0...
+✓ Modbus conectado: /dev/ttyUSB0 @ 57600 bps (slave 1)
+✓ Thread Modbus iniciada
+✓ HTTP Server: http://0.0.0.0:8080
+✓ WebSocket Server: ws://0.0.0.0:8765
+
+✓ Servidor iniciado com sucesso!
+  Acesse: http://192.168.0.213:8080
+
+Pressione Ctrl+C para parar
+============================================================
+✓ Cliente WebSocket conectado: ('192.168.0.132', 47526)
+✓ Cliente WebSocket conectado: ('192.168.0.132', 59232)
+✓ Cliente WebSocket conectado: ('192.168.0.132', 58632)
+✓ Cliente WebSocket conectado: ('192.168.0.132', 49586)
+✓ Cliente WebSocket conectado: ('192.168.0.132', 49596)
+✎ Gravando Dobra 1: 10.0° → 0x0A00/0x0A02 (MSW=0, LSW=100, 32bit=100)
+  ✗ Erro ao gravar no buffer (MSW=False, LSW=False)
+✎ Gravando Dobra 2: 20.0° → 0x0A04/0x0A06 (MSW=0, LSW=200, 32bit=200)
+  ✗ Erro ao gravar no buffer (MSW=False, LSW=False)
+✎ Gravando Dobra 3: 30.0° → 0x0A08/0x0A0A (MSW=0, LSW=300, 32bit=300)
+  ✗ Erro ao gravar no buffer (MSW=False, LSW=False)
+✓ Cliente WebSocket conectado: ('192.168.0.132', 49956)

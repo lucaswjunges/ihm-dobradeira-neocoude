@@ -1,0 +1,1 @@
+ sleep 5 tail -20 main.log echo  timeout 2 curl -I http://localhost:8080/

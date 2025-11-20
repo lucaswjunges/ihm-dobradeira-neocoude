@@ -35,7 +35,7 @@ class ModbusRTU:
                         parity=parity, stop=stop_bits, tx=tx_pin, rx=rx_pin)
         self.ctrl = Pin(ctrl_pin, Pin.OUT)
         self.ctrl.value(0)  # Modo RX por padr�o
-        self.timeout = 5.0  # Timeout aumentado para 5s (teste escrita)
+        self.timeout = 0.5  # Timeout 500ms - evita travamento se CLP não responder
 
     def _send_frame(self, frame):
         """Envia frame Modbus com CRC"""

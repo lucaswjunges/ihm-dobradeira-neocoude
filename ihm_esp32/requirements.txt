@@ -1,0 +1,16 @@
+# IHM Web - Raspberry Pi 3B+ - Dependências Python
+# Instalar com: pip install -r requirements.txt
+
+# Modbus RTU (última versão estável)
+pymodbus>=3.6.1
+
+# Web server + WebSocket
+aiohttp>=3.9.1
+aiohttp-cors>=0.7.0
+websockets>=12.0
+
+# GPIO (LEDs de status - opcional)
+gpiozero>=2.0
+
+# Comunicação serial (RS485)
+pyserial>=3.5

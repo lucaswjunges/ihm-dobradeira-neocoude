@@ -1,0 +1,136 @@
+============================================================
+IHM WEB - DOBRADEIRA NEOCOUDE-HD-15
+============================================================
+
+Modo: LIVE (CLP real)
+🔌 Tentando conectar em /dev/ttyUSB0...
+✓ Modbus conectado: /dev/ttyUSB0 @ 57600 bps (slave 1)
+
+✓ Servidor iniciado com sucesso
+  WebSocket: ws://localhost:8765
+  HTTP: http://localhost:8080
+
+Abra http://localhost:8080 no navegador do tablet
+Pressione Ctrl+C para encerrar
+
+✓ State Manager iniciado (polling a cada 0.25s)
+🔍 [DEBUG] Tentando ler encoder em 0x04D6/0x04D7
+🔍 [DEBUG] Encoder retornou: 30581
+✓ Encoder lido: 30581 raw, 3058.1°
+🔍 [DEBUG] Tentando ler encoder em 0x04D6/0x04D7
+🔍 [DEBUG] Encoder retornou: 30581
+✓ Encoder lido: 30581 raw, 3058.1°
+🔍 [DEBUG] Tentando ler encoder em 0x04D6/0x04D7
+🔍 [DEBUG] Encoder retornou: 30581
+✓ Encoder lido: 30581 raw, 3058.1°
+🔍 [DEBUG] Tentando ler encoder em 0x04D6/0x04D7
+🔍 [DEBUG] Encoder retornou: 30581
+✓ Encoder lido: 30581 raw, 3058.1°
+🔍 [DEBUG] Tentando ler encoder em 0x04D6/0x04D7
+🔍 [DEBUG] Encoder retornou: 30581
+✓ Encoder lido: 30581 raw, 3058.1°
+🔍 [DEBUG] Tentando ler encoder em 0x04D6/0x04D7
+🔍 [DEBUG] Encoder retornou: 30581
+✓ Encoder lido: 30581 raw, 3058.1°
+🔍 [DEBUG] Tentando ler encoder em 0x04D6/0x04D7
+🔍 [DEBUG] Encoder retornou: 30581
+✓ Encoder lido: 30581 raw, 3058.1°
+🔍 [DEBUG] Tentando ler encoder em 0x04D6/0x04D7
+🔍 [DEBUG] Encoder retornou: 30581
+✓ Encoder lido: 30581 raw, 3058.1°
+🔍 [DEBUG] Tentando ler encoder em 0x04D6/0x04D7
+🔍 [DEBUG] Encoder retornou: 30581
+✓ Encoder lido: 30581 raw, 3058.1°
+🔍 [DEBUG] Tentando ler encoder em 0x04D6/0x04D7
+🔍 [DEBUG] Encoder retornou: 30581
+✓ Encoder lido: 30581 raw, 3058.1°
+🔍 [DEBUG] Tentando ler encoder em 0x04D6/0x04D7
+🔍 [DEBUG] Encoder retornou: 30581
+✓ Encoder lido: 30581 raw, 3058.1°
+🔍 [DEBUG] Tentando ler encoder em 0x04D6/0x04D7
+🔍 [DEBUG] Encoder retornou: 30581
+✓ Encoder lido: 30581 raw, 3058.1°
+🔍 [DEBUG] Tentando ler encoder em 0x04D6/0x04D7
+🔍 [DEBUG] Encoder retornou: 30581
+✓ Encoder lido: 30581 raw, 3058.1°
+🔍 [DEBUG] Tentando ler encoder em 0x04D6/0x04D7
+🔍 [DEBUG] Encoder retornou: 30581
+✓ Encoder lido: 30581 raw, 3058.1°
+🔍 [DEBUG] Tentando ler encoder em 0x04D6/0x04D7
+🔍 [DEBUG] Encoder retornou: 30581
+✓ Encoder lido: 30581 raw, 3058.1°
+🔍 [DEBUG] Tentando ler encoder em 0x04D6/0x04D7
+🔍 [DEBUG] Encoder retornou: 30581
+✓ Encoder lido: 30581 raw, 3058.1°
+🔍 [DEBUG] Tentando ler encoder em 0x04D6/0x04D7
+🔍 [DEBUG] Encoder retornou: 30581
+✓ Encoder lido: 30581 raw, 3058.1°
+🔍 [DEBUG] Tentando ler encoder em 0x04D6/0x04D7
+🔍 [DEBUG] Encoder retornou: 30581
+✓ Encoder lido: 30581 raw, 3058.1°
+🔍 [DEBUG] Tentando ler encoder em 0x04D6/0x04D7
+🔍 [DEBUG] Encoder retornou: 30581
+✓ Encoder lido: 30581 raw, 3058.1°
+🔍 [DEBUG] Tentando ler encoder em 0x04D6/0x04D7
+🔍 [DEBUG] Encoder retornou: 30581
+✓ Encoder lido: 30581 raw, 3058.1°
+🔍 [DEBUG] read_register: Lendo 0x0842 (slave=1)
+✗ [DEBUG] read_register 0x0842: result.isError()=True
+🔍 [DEBUG] read_register: Lendo 0x0840 (slave=1)
+✗ [DEBUG] read_register 0x0840: result.isError()=True
+🔍 [DEBUG] read_register: Lendo 0x0848 (slave=1)
+✗ [DEBUG] read_register 0x0848: result.isError()=True
+🔍 [DEBUG] read_register: Lendo 0x0846 (slave=1)
+✗ [DEBUG] read_register 0x0846: result.isError()=True
+🔍 [DEBUG] read_register: Lendo 0x0852 (slave=1)
+✗ [DEBUG] read_register 0x0852: result.isError()=True
+🔍 [DEBUG] read_register: Lendo 0x0850 (slave=1)
+✗ [DEBUG] read_register 0x0850: result.isError()=True
+🔍 [DEBUG] Tentando ler encoder em 0x04D6/0x04D7
+🔍 [DEBUG] Encoder retornou: 30581
+✓ Encoder lido: 30581 raw, 3058.1°
+🔍 [DEBUG] Tentando ler encoder em 0x04D6/0x04D7
+🔍 [DEBUG] Encoder retornou: 30581
+✓ Encoder lido: 30581 raw, 3058.1°
+🔍 [DEBUG] Tentando ler encoder em 0x04D6/0x04D7
+🔍 [DEBUG] Encoder retornou: 30581
+✓ Encoder lido: 30581 raw, 3058.1°
+🔍 [DEBUG] Tentando ler encoder em 0x04D6/0x04D7
+🔍 [DEBUG] Encoder retornou: 30581
+✓ Encoder lido: 30581 raw, 3058.1°
+🔍 [DEBUG] Tentando ler encoder em 0x04D6/0x04D7
+🔍 [DEBUG] Encoder retornou: 30581
+✓ Encoder lido: 30581 raw, 3058.1°
+🔍 [DEBUG] Tentando ler encoder em 0x04D6/0x04D7
+🔍 [DEBUG] Encoder retornou: 30581
+✓ Encoder lido: 30581 raw, 3058.1°
+🔍 [DEBUG] Tentando ler encoder em 0x04D6/0x04D7
+🔍 [DEBUG] Encoder retornou: 30581
+✓ Encoder lido: 30581 raw, 3058.1°
+🔍 [DEBUG] Tentando ler encoder em 0x04D6/0x04D7
+🔍 [DEBUG] Encoder retornou: 30581
+✓ Encoder lido: 30581 raw, 3058.1°
+🔍 [DEBUG] Tentando ler encoder em 0x04D6/0x04D7
+🔍 [DEBUG] Encoder retornou: 30581
+✓ Encoder lido: 30581 raw, 3058.1°
+🔍 [DEBUG] Tentando ler encoder em 0x04D6/0x04D7
+🔍 [DEBUG] Encoder retornou: 30581
+✓ Encoder lido: 30581 raw, 3058.1°
+🔍 [DEBUG] Tentando ler encoder em 0x04D6/0x04D7
+🔍 [DEBUG] Encoder retornou: 30581
+✓ Encoder lido: 30581 raw, 3058.1°
+🔍 [DEBUG] Tentando ler encoder em 0x04D6/0x04D7
+🔍 [DEBUG] Encoder retornou: 30581
+✓ Encoder lido: 30581 raw, 3058.1°
+🔍 [DEBUG] Tentando ler encoder em 0x04D6/0x04D7
+🔍 [DEBUG] Encoder retornou: 30581
+✓ Encoder lido: 30581 raw, 3058.1°
+🔍 [DEBUG] Tentando ler encoder em 0x04D6/0x04D7
+🔍 [DEBUG] Encoder retornou: 30581
+✓ Encoder lido: 30581 raw, 3058.1°
+🔍 [DEBUG] Tentando ler encoder em 0x04D6/0x04D7
+🔍 [DEBUG] Encoder retornou: 30581
+✓ Encoder lido: 30581 raw, 3058.1°
+🔍 [DEBUG] Tentando ler encoder em 0x04D6/0x04D7
+🔍 [DEBUG] Encoder retornou: None
+✗ Encoder retornou None!

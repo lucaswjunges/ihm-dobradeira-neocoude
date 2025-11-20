@@ -1,0 +1,1 @@
+ sleep 5 echo Servidor Simplificado Iniciado\! echo PID: $(cat server_simple.pid) echo  cat server_simple.log echo  echo Portas: sudo ss -tlnp
