@@ -564,6 +564,9 @@
                 if (!connected && ws && ws.readyState === WebSocket.OPEN) {
                     document.getElementById('errorOverlay').classList.add('active');
                     document.getElementById('errorMessage').textContent = 'FALHA CLP';
+                } else if (connected && ws && ws.readyState === WebSocket.OPEN) {
+                    // Remove overlay quando CLP reconecta
+                    document.getElementById('errorOverlay').classList.remove('active');
                 }
             }
         }

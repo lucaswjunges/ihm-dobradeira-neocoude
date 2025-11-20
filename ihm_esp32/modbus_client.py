@@ -21,11 +21,11 @@ class ModbusClientWrapper:
     Wrapper para pyModbus com modo stub e tratamento robusto de erros
     """
     
-    def __init__(self, stub_mode: bool = False, port: str = '/dev/ttyUSB0', 
+    def __init__(self, stub_mode: bool = False, port: str = '/dev/ttyUSB0',
                  baudrate: int = 57600, slave_id: int = 1):
         """
         Inicializa cliente Modbus
-        
+
         Args:
             stub_mode: True para modo simulado (sem CLP)
             port: Porta serial (ex: /dev/ttyUSB0)
@@ -38,11 +38,21 @@ class ModbusClientWrapper:
         self.slave_id = slave_id
         self.client = None
         self.connected = False
-        
+
+        # Contador de erros consecutivos para detecção de desconexão
+        self.consecutive_errors = 0
+        self.max_errors_before_disconnect = 5  # Só desconecta após 5 erros seguidos
+
+        # Reconexão automática
+        self.reconnect_attempts = 0
+        self.max_reconnect_attempts = 3
+        self.last_reconnect_attempt = 0
+        self.reconnect_interval = 5.0  # Tenta reconectar a cada 5 segundos
+
         # Estado simulado para modo stub
         self.stub_coils = {}  # Coils/bits
         self.stub_registers = {}  # Registros 16-bit
-        
+
         if not stub_mode:
             self._connect_live()
         else:
@@ -72,6 +82,87 @@ class ModbusClientWrapper:
             print(f"✗ Erro ao conectar Modbus: {e}")
             self.connected = False
             
+    def _handle_communication_error(self, error_msg: str):
+        """
+        Gerencia erros de comunicação com contador de erros consecutivos.
+        Só marca como desconectado após múltiplos erros seguidos.
+
+        Args:
+            error_msg: Mensagem de erro para logging
+        """
+        self.consecutive_errors += 1
+
+        if self.consecutive_errors >= self.max_errors_before_disconnect:
+            if self.connected:  # Só loga na primeira vez que desconecta
+                print(f"✗ [DESCONEXÃO DETECTADA] {self.consecutive_errors} erros consecutivos")
+                print(f"  Último erro: {error_msg}")
+                self.connected = False
+        # Não loga erros individuais para não poluir o console
+
+    def _try_reconnect(self):
+        """
+        Tenta reconectar ao CLP quando desconectado.
+        Usa throttling para não sobrecarregar o sistema.
+
+        Returns:
+            True se reconectou com sucesso, False caso contrário
+        """
+        import time
+
+        current_time = time.time()
+
+        # Throttling: só tenta reconectar após intervalo mínimo
+        if current_time - self.last_reconnect_attempt < self.reconnect_interval:
+            return False
+
+        self.last_reconnect_attempt = current_time
+        self.reconnect_attempts += 1
+
+        if self.reconnect_attempts > self.max_reconnect_attempts:
+            # Após max tentativas, aumenta o intervalo para não ficar tentando eternamente
+            self.reconnect_interval = min(30.0, self.reconnect_interval * 1.5)
+            self.reconnect_attempts = 0
+
+        print(f"🔄 Tentando reconectar ao CLP (tentativa {self.reconnect_attempts}/{self.max_reconnect_attempts})...")
+
+        try:
+            # Fecha conexão antiga se existir
+            if self.client:
+                try:
+                    self.client.close()
+                except:
+                    pass
+
+            # Tenta nova conexão
+            self.client = ModbusSerialClient(
+                port=self.port,
+                baudrate=self.baudrate,
+                parity='N',
+                stopbits=1,
+                bytesize=8,
+                timeout=1
+            )
+            self.client.slave_id = self.slave_id
+
+            if self.client.connect():
+                # Testa leitura para confirmar que CLP está respondendo
+                # Usa COILS porque INPUT REGISTERS pode não existir no endereço 0
+                result = self.client.read_coils(address=0, count=8, slave=self.slave_id)
+                if not result.isError():
+                    print(f"✅ RECONECTADO com sucesso ao CLP!")
+                    self.connected = True
+                    self.consecutive_errors = 0
+                    self.reconnect_attempts = 0
+                    self.reconnect_interval = 5.0  # Reset intervalo
+                    return True
+                else:
+                    print(f"✗ CLP não respondeu ao teste de leitura: {result}")
+
+        except Exception as e:
+            print(f"✗ Falha ao reconectar: {e}")
+
+        return False
+
     def _init_stub_data(self):
         """Inicializa dados simulados para modo stub"""
         self.connected = True
@@ -128,7 +219,10 @@ class ModbusClientWrapper:
             return self.stub_coils.get(address, False)
 
         if not self.connected:
-            return None
+            # Tenta reconectar automaticamente
+            self._try_reconnect()
+            if not self.connected:
+                return None
 
         try:
             # pymodbus usa endereçamento correto diretamente
@@ -141,14 +235,18 @@ class ModbusClientWrapper:
 
             result = self.client.read_coils(address=base_address, count=8)
             if result.isError():
+                self._handle_communication_error(f"Erro ao ler coil 0x{address:04X}")
                 return None
+
+            # Sucesso - reseta contador de erros
+            self.consecutive_errors = 0
 
             # BUGFIX: result.count está sempre 0 no pymodbus 3.11.3
             # Mas result.bits contém os dados corretos
             # Extrair o bit correto
             return result.bits[bit_offset]
         except Exception as e:
-            print(f"✗ Erro lendo coil 0x{address:04X}: {e}")
+            self._handle_communication_error(f"Exceção ao ler coil 0x{address:04X}: {e}")
             return None
             
     def read_register(self, address: int) -> Optional[int]:
@@ -165,21 +263,25 @@ class ModbusClientWrapper:
             return self.stub_registers.get(address, 0)
 
         if not self.connected:
-            print(f"✗ [DEBUG] read_register 0x{address:04X}: NÃO CONECTADO (self.connected=False)")
-            return None
+            # Tenta reconectar automaticamente
+            self._try_reconnect()
+            if not self.connected:
+                return None
 
         try:
             # pymodbus 3.x: NÃO precisa subtrair 1, slave_id já configurado no objeto client
             # CORREÇÃO 20/Nov/2025: CLP usa INPUT REGISTERS (FC 0x04), não HOLDING (FC 0x03)
             result = self.client.read_input_registers(address=address, count=1)
             if result.isError():
+                self._handle_communication_error(f"Erro ao ler registro 0x{address:04X}")
                 return None
+
+            # Sucesso - reseta contador de erros
+            self.consecutive_errors = 0
             value = result.registers[0]
             return value
         except Exception as e:
-            print(f"✗ Erro lendo registro 0x{address:04X}: {e}")
-            import traceback
-            traceback.print_exc()
+            self._handle_communication_error(f"Exceção ao ler registro 0x{address:04X}: {e}")
             return None
             
     def read_32bit(self, msw_address: int, lsw_address: int) -> Optional[int]:
@@ -199,20 +301,27 @@ class ModbusClientWrapper:
             return mm.read_32bit(msw, lsw)
 
         if not self.connected:
-            return None
+            # Tenta reconectar automaticamente
+            self._try_reconnect()
+            if not self.connected:
+                return None
 
         try:
             # OTIMIZADO: Ler 2 registros consecutivos de uma vez (mais eficiente e funciona melhor)
             # CORREÇÃO 20/Nov/2025: CLP usa INPUT REGISTERS (FC 0x04), não HOLDING (FC 0x03)
             result = self.client.read_input_registers(address=msw_address, count=2)
             if result.isError():
+                self._handle_communication_error(f"Erro ao ler 32-bit 0x{msw_address:04X}")
                 return None
+
+            # Sucesso - reseta contador de erros
+            self.consecutive_errors = 0
 
             msw = result.registers[0]
             lsw = result.registers[1]
             return mm.read_32bit(msw, lsw)
         except Exception as e:
-            print(f"✗ Erro lendo 32-bit 0x{msw_address:04X}/0x{lsw_address:04X}: {e}")
+            self._handle_communication_error(f"Exceção ao ler 32-bit 0x{msw_address:04X}: {e}")
             return None
         
     def write_coil(self, address: int, value: bool) -> bool:
