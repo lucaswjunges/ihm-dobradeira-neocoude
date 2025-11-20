@@ -170,7 +170,8 @@ class ModbusClientWrapper:
 
         try:
             # pymodbus 3.x: NÃO precisa subtrair 1, slave_id já configurado no objeto client
-            result = self.client.read_holding_registers(address=address, count=1)
+            # CORREÇÃO 20/Nov/2025: CLP usa INPUT REGISTERS (FC 0x04), não HOLDING (FC 0x03)
+            result = self.client.read_input_registers(address=address, count=1)
             if result.isError():
                 return None
             value = result.registers[0]
@@ -202,7 +203,8 @@ class ModbusClientWrapper:
 
         try:
             # OTIMIZADO: Ler 2 registros consecutivos de uma vez (mais eficiente e funciona melhor)
-            result = self.client.read_holding_registers(address=msw_address, count=2)
+            # CORREÇÃO 20/Nov/2025: CLP usa INPUT REGISTERS (FC 0x04), não HOLDING (FC 0x03)
+            result = self.client.read_input_registers(address=msw_address, count=2)
             if result.isError():
                 return None
 
