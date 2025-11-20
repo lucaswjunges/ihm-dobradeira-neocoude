@@ -435,16 +435,19 @@ class IHMServer:
     def stop(self):
         """Encerra servidor"""
         print("\nEncerrando servidor...")
-        
+
         if self.state_manager:
             self.state_manager.stop_polling()
-            
+            # BUGFIX: Aguardar um pouco para poll atual terminar (evita race condition)
+            import time
+            time.sleep(0.5)
+
         if self.modbus_client:
             self.modbus_client.close()
-            
+
         for task in self.tasks:
             task.cancel()
-            
+
         print("✓ Servidor encerrado")
 
 

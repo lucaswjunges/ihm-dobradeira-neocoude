@@ -263,8 +263,10 @@ def read_32bit(msw: int, lsw: int) -> int:
         lsw: Least Significant Word (16-bit)
 
     Returns:
-        Valor 32-bit combinado
+        Valor 32-bit combinado, ou None se parâmetros inválidos
     """
+    if msw is None or lsw is None:
+        return None
     return (msw << 16) | lsw
 
 
