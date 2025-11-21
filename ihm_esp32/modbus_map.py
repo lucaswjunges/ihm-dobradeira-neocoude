@@ -145,12 +145,26 @@ BEND_ANGLES_MODBUS_INPUT = {
 # ==========================================
 # RPM / VELOCIDADE (16-bit)
 # ==========================================
-# ✅ VALIDADO 20/Nov/2025 - Testado empiricamente
+# ✅ VALIDADO 20/Nov/2025 - Valores confirmados via ladder ROT2
 # Escrever em 0x0A02, ler de 0x06E0
+#
+# CONVERSÃO RPM → Valor do registro (já em hexadecimal):
+#   5 RPM  → 0x0527 = 1319 decimal
+#  10 RPM  → 0x1055 = 4181 decimal
+#  15 RPM  → 0x1583 = 5507 decimal
+#
+# RELAÇÃO: Quanto MAIOR o valor, MAIOR o RPM (relação direta)
 
 RPM_REGISTERS = {
-    'RPM_WRITE': 0x0A02,  # 2562 - Escrita de RPM (16-bit: 5, 10 ou 15)
+    'RPM_WRITE': 0x0A02,  # 2562 - Escrita de RPM
     'RPM_READ':  0x06E0,  # 1760 - Leitura de RPM/tensão do inversor
+}
+
+# Constantes de conversão RPM (valores do ladder ROT2)
+RPM_VALUES = {
+    5:  0x0527,  # 1319 decimal - Classe 1 (5 RPM)
+    10: 0x1055,  # 4181 decimal - Classe 2 (10 RPM)
+    15: 0x1583,  # 5507 decimal - Classe 3 (15 RPM)
 }
 
 # ==========================================
@@ -382,6 +396,60 @@ SCREEN_TEXTS = {
         'line2': 'ANG: {ANGLE}°   ',
     },
 }
+
+# ==========================================
+# FUNÇÕES DE CONVERSÃO RPM
+# ==========================================
+
+def rpm_to_register(rpm: int) -> int:
+    """
+    Converte RPM (5, 10 ou 15) para valor do registro.
+
+    Args:
+        rpm: Velocidade em RPM (5, 10 ou 15)
+
+    Returns:
+        Valor a escrever no registro 0x06E0
+
+    Raises:
+        ValueError: Se RPM não for 5, 10 ou 15
+
+    Example:
+        >>> rpm_to_register(10)
+        4181  # 0x1055
+    """
+    if rpm not in RPM_VALUES:
+        raise ValueError(f"RPM inválido: {rpm}. Valores permitidos: 5, 10, 15")
+    return RPM_VALUES[rpm]
+
+
+def register_to_rpm(value: int) -> int:
+    """
+    Converte valor do registro para RPM (5, 10 ou 15).
+
+    Args:
+        value: Valor lido do registro 0x06E0
+
+    Returns:
+        RPM correspondente (5, 10 ou 15)
+
+    Example:
+        >>> register_to_rpm(4181)
+        10
+        >>> register_to_rpm(1319)
+        5
+    """
+    # Mapeamento inverso: valor → RPM
+    # Usa tolerância de ±50 para aceitar pequenas variações
+    tolerancia = 50
+
+    for rpm, expected_value in RPM_VALUES.items():
+        if abs(value - expected_value) <= tolerancia:
+            return rpm
+
+    # Se não encontrou correspondência exata, retorna o mais próximo
+    closest_rpm = min(RPM_VALUES.keys(), key=lambda r: abs(RPM_VALUES[r] - value))
+    return closest_rpm
 
 # ==========================================
 # SUMÁRIO DO MAPEAMENTO

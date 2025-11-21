@@ -921,7 +921,7 @@ class ModbusClientWrapper:
         """
         Muda a classe de velocidade da máquina
 
-        ✅ VALIDADO 20/Nov/2025 - Endereços testados empiricamente
+        ✅ VALIDADO 20/Nov/2025 - Conversão via ladder ROT2
         Escreve em 0x0A02, lê de 0x06E0
 
         Args:
@@ -929,6 +929,11 @@ class ModbusClientWrapper:
 
         Returns:
             bool: True se sucesso
+
+        Conversão automática:
+            5 RPM  → escreve 1319 (0x0527)
+            10 RPM → escreve 4181 (0x1055)
+            15 RPM → escreve 5507 (0x1583)
 
         Exemplo:
             >>> client.write_speed_class(5)   # 5 rpm
@@ -940,37 +945,42 @@ class ModbusClientWrapper:
             print(f"✗ Velocidade inválida: {rpm} (deve ser 5, 10 ou 15)")
             return False
 
-        print(f"⚡ Mudando velocidade para {rpm} rpm...")
+        # Converte RPM para valor do registro (ladder ROT2)
+        register_value = mm.rpm_to_register(rpm)
 
-        # VALIDADO: Escrita em 0x0A02 (RPM_WRITE)
-        return self.write_register(mm.RPM_REGISTERS['RPM_WRITE'], rpm)
+        print(f"⚡ Mudando velocidade para {rpm} rpm (escrevendo {register_value} / 0x{register_value:04X})...")
+
+        # VALIDADO: Escrita em 0x0A02 (RPM_WRITE) com conversão
+        return self.write_register(mm.RPM_REGISTERS['RPM_WRITE'], register_value)
 
     def read_speed_class(self) -> Optional[int]:
         """
         Lê a classe de velocidade atual
 
-        ✅ VALIDADO 20/Nov/2025 - Lê de 0x06E0 (inversor)
+        ✅ VALIDADO 20/Nov/2025 - Lê de 0x06E0 (inversor) + conversão via ladder ROT2
 
         Returns:
             int: 5, 10 ou 15 (rpm), ou None se erro
+
+        Conversão:
+            Registro 1319 (0x0527) → 5 RPM
+            Registro 4181 (0x1055) → 10 RPM
+            Registro 5507 (0x1583) → 15 RPM
 
         Exemplo:
             >>> speed = client.read_speed_class()
             >>> print(f"Velocidade: {speed} rpm")
             Velocidade: 10 rpm
         """
-        # VALIDADO: Leitura de 0x06E0 (RPM_READ)
-        rpm = self.read_register(mm.RPM_REGISTERS['RPM_READ'])
+        # Lê valor bruto do registro
+        register_value = self.read_register(mm.RPM_REGISTERS['RPM_READ'])
 
-        # Valida se é um valor esperado
-        if rpm in [5, 10, 15]:
-            return rpm
-        elif rpm is not None:
-            # Se retornou valor diferente, pode ser tensão do inversor
-            # Mapear tensão para RPM (se necessário)
-            print(f"⚠️  Valor inesperado de RPM: {rpm} (esperado 5, 10 ou 15)")
-            return rpm
-        return None
+        if register_value is None:
+            return None
+
+        # Converte valor do registro para RPM usando função de conversão
+        rpm = mm.register_to_rpm(register_value)
+        return rpm
 
     # ==========================================
     # CONTROLE DE MOTOR - BOTÕES DE PAINEL
