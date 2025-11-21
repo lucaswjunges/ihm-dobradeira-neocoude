@@ -988,73 +988,87 @@ class ModbusClientWrapper:
 
     def start_forward(self) -> bool:
         """
-        AVANÇAR - Ativa saída física S0 (anti-horário).
+        AVANÇAR - Ativa saída física S0 (anti-horário), desliga S1.
 
-        ✅ CORRIGIDO 20/Nov/2025 - Usa S0 (0x0180) ao invés de flag interna
+        ✅ CORRIGIDO 21/Nov/2025 - Mutuamente exclusivo com RECUAR
+        Garante que S0 e S1 nunca fiquem ligados simultaneamente (segurança).
         Sistema usa LATCH (SETR), então motor fica ligado até ser desligado.
-        NÃO precisa de pulso de 100ms!
 
         Returns:
             bool: True se sucesso
 
         Exemplo:
             >>> client.start_forward()
-            ✅ AVANÇAR: S0 (0x0180) ativado
+            ✅ AVANÇAR: S0 ON, S1 OFF
             True
         """
         if self.stub_mode:
-            print("🟢 [STUB] AVANÇAR ativado (S0 ON)")
+            print("🟢 [STUB] AVANÇAR ativado (S0 ON, S1 OFF)")
             return True
 
         try:
-            # Escreve em S0 (saída física)
-            success = self.write_coil(mm.PANEL_BUTTONS['FORWARD'], True)
-            if success:
-                print("✅ AVANÇAR: S0 (0x0180) ativado")
+            # 1. Desliga S1 primeiro (segurança - nunca S0+S1 juntos!)
+            s1_off = self.write_coil(mm.PANEL_BUTTONS['BACKWARD'], False)
+
+            # 2. Liga S0
+            s0_on = self.write_coil(mm.PANEL_BUTTONS['FORWARD'], True)
+
+            if s0_on and s1_off:
+                print("✅ AVANÇAR: S0 ON, S1 OFF")
+            elif s0_on:
+                print("⚠️ AVANÇAR: S0 ON mas S1 não desligou")
             else:
                 print("❌ AVANÇAR: Falha ao ativar S0")
-            return success
+
+            return s0_on
         except Exception as e:
             print(f"❌ Erro em start_forward: {e}")
             return False
 
     def start_backward(self) -> bool:
         """
-        RECUAR - Ativa saída física S1 (horário).
+        RECUAR - Ativa saída física S1 (horário), desliga S0.
 
-        ✅ CORRIGIDO 20/Nov/2025 - Usa S1 (0x0181) ao invés de flag interna
+        ✅ CORRIGIDO 21/Nov/2025 - Mutuamente exclusivo com AVANÇAR
+        Garante que S0 e S1 nunca fiquem ligados simultaneamente (segurança).
         Sistema usa LATCH (SETR), então motor fica ligado até ser desligado.
-        NÃO precisa de pulso de 100ms!
 
         Returns:
             bool: True se sucesso
 
         Exemplo:
             >>> client.start_backward()
-            ✅ RECUAR: S1 (0x0181) ativado
+            ✅ RECUAR: S1 ON, S0 OFF
             True
         """
         if self.stub_mode:
-            print("🟢 [STUB] RECUAR ativado (S1 ON)")
+            print("🟢 [STUB] RECUAR ativado (S1 ON, S0 OFF)")
             return True
 
         try:
-            # Escreve em S1 (saída física)
-            success = self.write_coil(mm.PANEL_BUTTONS['BACKWARD'], True)
-            if success:
-                print("✅ RECUAR: S1 (0x0181) ativado")
+            # 1. Desliga S0 primeiro (segurança - nunca S0+S1 juntos!)
+            s0_off = self.write_coil(mm.PANEL_BUTTONS['FORWARD'], False)
+
+            # 2. Liga S1
+            s1_on = self.write_coil(mm.PANEL_BUTTONS['BACKWARD'], True)
+
+            if s1_on and s0_off:
+                print("✅ RECUAR: S1 ON, S0 OFF")
+            elif s1_on:
+                print("⚠️ RECUAR: S1 ON mas S0 não desligou")
             else:
                 print("❌ RECUAR: Falha ao ativar S1")
-            return success
+
+            return s1_on
         except Exception as e:
             print(f"❌ Erro em start_backward: {e}")
             return False
 
     def stop_motor(self) -> bool:
         """
-        PARADA - Desliga ambas as saídas S0 e S1.
+        PARADA - Desliga ambas as saídas S0 e S1 físicos.
 
-        ✅ CORRIGIDO 20/Nov/2025 - Usa S0/S1 (0x0180/0x0181)
+        ✅ CORRIGIDO 21/Nov/2025 - Offset Modbus descoberto (+1)
         Garante que motor pare independente da direção.
 
         Returns:
@@ -1062,7 +1076,7 @@ class ModbusClientWrapper:
 
         Exemplo:
             >>> client.stop_motor()
-            ✅ PARADA: S0 e S1 desligados
+            ✅ PARADA: S0 e S1 físicos desligados
             True
         """
         if self.stub_mode:
@@ -1070,12 +1084,12 @@ class ModbusClientWrapper:
             return True
 
         try:
-            # Desliga ambas as saídas
+            # Desliga ambas as saídas físicas S0 e S1
             s0_off = self.write_coil(mm.PANEL_BUTTONS['FORWARD'], False)
             s1_off = self.write_coil(mm.PANEL_BUTTONS['BACKWARD'], False)
 
             if s0_off and s1_off:
-                print("✅ PARADA: S0 e S1 desligados")
+                print("✅ PARADA: S0 e S1 físicos desligados")
             else:
                 print(f"⚠️ PARADA parcial: S0={s0_off}, S1={s1_off}")
 

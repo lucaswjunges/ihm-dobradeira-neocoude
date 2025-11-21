@@ -38,17 +38,24 @@ KEYBOARD_FUNCTION = {
 # ==========================================
 # BOTÕES DE PAINEL FÍSICO (Coils - Function 0x05)
 # ==========================================
-# ✅ CORRIGIDO 20/Nov/2025 - Usa SAÍDAS FÍSICAS S0/S1
-# Análise completa do ladder ROT0.lad revelou sistema DUPLO:
-# - PRIMÁRIO: 0x0180/0x0181 (S0/S1) = Saídas físicas (USAR ESTE!)
-# - SECUNDÁRIO: 0x0190/0x0191 = Flags internas (modo AUTO avançado)
+# ✅ CORRIGIDO 21/Nov/2025 - OFFSET MODBUS DESCOBERTO!
+# Testes revelaram: ENDEREÇO_MODBUS = SAÍDA_FÍSICA_CLP + 1
+#
+# Evidência experimental (multímetro):
+#   - Modbus 385 → acende S0 físico ✅
+#   - Modbus 386 → acende S1 físico ✅
+#   - Modbus 387 → acende S2 físico ✅
+#
+# Motivo: CLP ATOS usa endereçamento PLC/IEC (base-1) para COILS
+# Mas internamente S0=0x0180, S1=0x0181, etc.
 #
 # IMPORTANTE: Sistema usa LATCH (SETR), motor fica ligado até desligar
 
 PANEL_BUTTONS = {
     # SAÍDAS FÍSICAS (PRIMÁRIO - usar estes!)
-    'FORWARD':  0x0180,  # 384 dec - S0 (saída física AVANÇAR)
-    'BACKWARD': 0x0181,  # 385 dec - S1 (saída física RECUAR)
+    # ATENÇÃO: Endereços Modbus = Endereço CLP + 1 (offset descoberto!)
+    'FORWARD':  0x0181,  # 385 dec - Acende S0 físico (AVANÇAR)
+    'BACKWARD': 0x0182,  # 386 dec - Acende S1 físico (RECUAR)
 
     # ESTADOS INTERNOS (SECUNDÁRIO - para modo AUTO avançado)
     'FORWARD_FLAG':  0x0190,  # 400 dec (flag interna)
