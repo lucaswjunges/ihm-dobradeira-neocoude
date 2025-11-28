@@ -987,112 +987,103 @@ class ModbusClientWrapper:
 
     def start_forward(self) -> bool:
         """
-        AVANÇAR - Ativa saída física S0 (anti-horário), desliga S1.
+        AVANÇAR - Seta flag 0x0385 no CLP (CCW).
 
-        ✅ CORRIGIDO 21/Nov/2025 - Mutuamente exclusivo com RECUAR
-        Garante que S0 e S1 nunca fiquem ligados simultaneamente (segurança).
-        Sistema usa LATCH (SETR), então motor fica ligado até ser desligado.
+        ✅ ATUALIZADO 28/Nov/2025 - Usa flags dedicados do ladder
+        Antes de ativar FORWARD, desativa BACKWARD.
+
+        Endereços:
+          FORWARD:  0x0385 (901) -> ON
+          BACKWARD: 0x0386 (902) -> OFF
 
         Returns:
             bool: True se sucesso
-
-        Exemplo:
-            >>> client.start_forward()
-            ✅ AVANÇAR: S0 ON, S1 OFF
-            True
         """
         if self.stub_mode:
-            print("🟢 [STUB] AVANÇAR ativado (S0 ON, S1 OFF)")
+            print("🟢 [STUB] AVANÇAR ativado (0x0385=ON)")
             return True
 
         try:
-            # 1. Desliga S1 primeiro (segurança - nunca S0+S1 juntos!)
-            s1_off = self.write_coil(mm.PANEL_BUTTONS['BACKWARD'], False)
+            # 1. Desativa BACKWARD primeiro
+            self.write_coil(mm.PANEL_BUTTONS['BACKWARD'], False)  # 0x0386 OFF
 
-            # 2. Liga S0
-            s0_on = self.write_coil(mm.PANEL_BUTTONS['FORWARD'], True)
+            # 2. Ativa FORWARD
+            success = self.write_coil(mm.PANEL_BUTTONS['FORWARD'], True)  # 0x0385 ON
 
-            if s0_on and s1_off:
-                print("✅ AVANÇAR: S0 ON, S1 OFF")
-            elif s0_on:
-                print("⚠️ AVANÇAR: S0 ON mas S1 não desligou")
+            if success:
+                print("✅ AVANÇAR: 0x0385=ON (0x0386=OFF)")
             else:
-                print("❌ AVANÇAR: Falha ao ativar S0")
+                print("❌ AVANÇAR: Falha ao ativar 0x0385")
 
-            return s0_on
+            return success
         except Exception as e:
             print(f"❌ Erro em start_forward: {e}")
             return False
 
     def start_backward(self) -> bool:
         """
-        RECUAR - Ativa saída física S1 (horário), desliga S0.
+        RECUAR - Seta flag 0x0386 no CLP (CW).
 
-        ✅ CORRIGIDO 21/Nov/2025 - Mutuamente exclusivo com AVANÇAR
-        Garante que S0 e S1 nunca fiquem ligados simultaneamente (segurança).
-        Sistema usa LATCH (SETR), então motor fica ligado até ser desligado.
+        ✅ ATUALIZADO 28/Nov/2025 - Usa flags dedicados do ladder
+        Antes de ativar BACKWARD, desativa FORWARD.
+
+        Endereços:
+          FORWARD:  0x0385 (901) -> OFF
+          BACKWARD: 0x0386 (902) -> ON
 
         Returns:
             bool: True se sucesso
-
-        Exemplo:
-            >>> client.start_backward()
-            ✅ RECUAR: S1 ON, S0 OFF
-            True
         """
         if self.stub_mode:
-            print("🟢 [STUB] RECUAR ativado (S1 ON, S0 OFF)")
+            print("🟢 [STUB] RECUAR ativado (0x0386=ON)")
             return True
 
         try:
-            # 1. Desliga S0 primeiro (segurança - nunca S0+S1 juntos!)
-            s0_off = self.write_coil(mm.PANEL_BUTTONS['FORWARD'], False)
+            # 1. Desativa FORWARD primeiro
+            self.write_coil(mm.PANEL_BUTTONS['FORWARD'], False)  # 0x0385 OFF
 
-            # 2. Liga S1
-            s1_on = self.write_coil(mm.PANEL_BUTTONS['BACKWARD'], True)
+            # 2. Ativa BACKWARD
+            success = self.write_coil(mm.PANEL_BUTTONS['BACKWARD'], True)  # 0x0386 ON
 
-            if s1_on and s0_off:
-                print("✅ RECUAR: S1 ON, S0 OFF")
-            elif s1_on:
-                print("⚠️ RECUAR: S1 ON mas S0 não desligou")
+            if success:
+                print("✅ RECUAR: 0x0386=ON (0x0385=OFF)")
             else:
-                print("❌ RECUAR: Falha ao ativar S1")
+                print("❌ RECUAR: Falha ao ativar 0x0386")
 
-            return s1_on
+            return success
         except Exception as e:
             print(f"❌ Erro em start_backward: {e}")
             return False
 
     def stop_motor(self) -> bool:
         """
-        PARADA - Desliga ambas as saídas S0 e S1 físicos.
+        PARADA - Desativa flags 0x0385 e 0x0386 no CLP.
 
-        ✅ CORRIGIDO 21/Nov/2025 - Offset Modbus descoberto (+1)
-        Garante que motor pare independente da direção.
+        ✅ ATUALIZADO 28/Nov/2025 - Apenas desativa FORWARD e BACKWARD
+        Não usa flag próprio, apenas desliga os dois comandos de movimento.
+
+        Endereços:
+          FORWARD:  0x0385 (901) -> OFF
+          BACKWARD: 0x0386 (902) -> OFF
 
         Returns:
             bool: True se sucesso
-
-        Exemplo:
-            >>> client.stop_motor()
-            ✅ PARADA: S0 e S1 físicos desligados
-            True
         """
         if self.stub_mode:
-            print("🛑 [STUB] MOTOR parado (S0 e S1 OFF)")
+            print("🛑 [STUB] MOTOR parado (0x0385=OFF, 0x0386=OFF)")
             return True
 
         try:
-            # Desliga ambas as saídas físicas S0 e S1
-            s0_off = self.write_coil(mm.PANEL_BUTTONS['FORWARD'], False)
-            s1_off = self.write_coil(mm.PANEL_BUTTONS['BACKWARD'], False)
+            # Desativa ambos os comandos de movimento
+            fwd_off = self.write_coil(mm.PANEL_BUTTONS['FORWARD'], False)   # 0x0385 OFF
+            bwd_off = self.write_coil(mm.PANEL_BUTTONS['BACKWARD'], False)  # 0x0386 OFF
 
-            if s0_off and s1_off:
-                print("✅ PARADA: S0 e S1 físicos desligados")
+            if fwd_off and bwd_off:
+                print("✅ PARADA: 0x0385=OFF, 0x0386=OFF")
             else:
-                print(f"⚠️ PARADA parcial: S0={s0_off}, S1={s1_off}")
+                print(f"⚠️ PARADA parcial: 0x0385={'OFF' if fwd_off else 'ERRO'}, 0x0386={'OFF' if bwd_off else 'ERRO'}")
 
-            return s0_off and s1_off
+            return fwd_off and bwd_off
         except Exception as e:
             print(f"❌ Erro em stop_motor: {e}")
             return False

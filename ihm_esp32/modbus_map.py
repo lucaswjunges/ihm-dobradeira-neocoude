@@ -276,6 +276,25 @@ LEDS = {
 }
 
 # ==========================================
+# BOTOES DE PAINEL (Comandos via IHM Web)
+# ==========================================
+# Flags setados pela IHM para controlar o motor
+# Quando um é ativado, os outros dois devem ser desativados
+
+PANEL_BUTTONS = {
+    # Comandos de saída (IHM -> CLP)
+    'FORWARD':  0x0385,  # 901 - Comando AVANÇAR (CCW)
+    'BACKWARD': 0x0386,  # 902 - Comando RECUAR (CW)
+    # PARAR = apenas desativa FORWARD e BACKWARD (não tem flag próprio)
+
+    # Entradas físicas (leitura - para feedback)
+    'FORWARD_INPUT':  0x0102,  # 258 - E2 Pedal Avanço
+    'STOP_INPUT':     0x0103,  # 259 - E3 Pedal Parada
+    'BACKWARD_INPUT': 0x0104,  # 260 - E4 Pedal Recuo
+    'SENSOR_INPUT':   0x0105,  # 261 - E5 Sensor Segurança
+}
+
+# ==========================================
 # ESTADOS CRITICOS
 # ==========================================
 
