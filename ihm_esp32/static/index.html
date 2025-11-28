@@ -16,35 +16,37 @@
 
         html, body {
             height: 100%;
-            overflow: hidden;
+            overflow-x: hidden;
             font-family: 'Segoe UI', Roboto, Arial, sans-serif;
         }
 
         body {
-            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
             color: #fff;
-            display: flex;
-            flex-direction: column;
+            min-height: 100vh;
         }
 
-        /* Header compacto */
+        /* Header */
         .header {
-            background: rgba(0,0,0,0.3);
-            padding: 8px 15px;
+            background: rgba(0,0,0,0.4);
+            padding: 10px 15px;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            border-bottom: 2px solid rgba(255,255,255,0.2);
+            border-bottom: 2px solid rgba(255,255,255,0.1);
+            position: sticky;
+            top: 0;
+            z-index: 100;
         }
 
         .header-title {
             font-size: 16px;
-            font-weight: 600;
+            font-weight: 700;
         }
 
         .header-status {
             display: flex;
-            gap: 15px;
+            gap: 12px;
             font-size: 11px;
         }
 
@@ -55,111 +57,247 @@
         }
 
         .status-dot {
-            width: 8px;
-            height: 8px;
+            width: 10px;
+            height: 10px;
             border-radius: 50%;
-            background: #f44336;
-            box-shadow: 0 0 8px currentColor;
+            background: #e74c3c;
+            box-shadow: 0 0 10px currentColor;
+            transition: all 0.3s;
         }
 
         .status-dot.connected {
-            background: #4caf50;
+            background: #2ecc71;
         }
 
-        /* Container principal com grid */
+        /* Container principal */
         .main-container {
-            flex: 1;
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            grid-template-rows: auto 1fr auto;
-            gap: 10px;
-            padding: 10px;
-            overflow: hidden;
+            padding: 15px;
+            max-width: 800px;
+            margin: 0 auto;
         }
 
-        /* Encoder compacto */
-        .encoder-compact {
-            grid-column: 1 / -1;
-            background: rgba(255,255,255,0.1);
-            border-radius: 10px;
-            padding: 10px 15px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
+        /* Card de Estado da Máquina - DESTAQUE */
+        .state-card {
+            background: linear-gradient(135deg, rgba(255,255,255,0.15) 0%, rgba(255,255,255,0.05) 100%);
+            border: 2px solid rgba(255,255,255,0.2);
+            border-radius: 16px;
+            padding: 20px;
+            margin-bottom: 15px;
+            text-align: center;
+            transition: all 0.3s;
         }
 
-        .encoder-label {
-            font-size: 12px;
-            opacity: 0.8;
+        .state-icon {
+            font-size: 48px;
+            margin-bottom: 10px;
         }
 
-        .encoder-value {
-            font-size: 28px;
+        .state-name {
+            font-size: 20px;
             font-weight: 700;
-            color: #4caf50;
-            text-shadow: 0 2px 10px rgba(76,175,80,0.5);
+            margin-bottom: 8px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .state-description {
+            font-size: 14px;
+            opacity: 0.9;
+            line-height: 1.4;
+            background: rgba(0,0,0,0.2);
+            padding: 10px 15px;
+            border-radius: 8px;
+        }
+
+        /* Estados com cores específicas */
+        .state-card.state-idle { border-color: #95a5a6; }
+        .state-card.state-aguarda-direcao { border-color: #f39c12; }
+        .state-card.state-dobrando { border-color: #2ecc71; }
+        .state-card.state-retornando { border-color: #3498db; }
+        .state-card.state-aguarda-proxima { border-color: #9b59b6; }
+        .state-card.state-completo { border-color: #27ae60; }
+        .state-card.state-emergencia { border-color: #e74c3c; background: rgba(231,76,60,0.2); }
+        .state-card.state-manual { border-color: #e67e22; }
+
+        /* Grid de informações */
+        .info-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+            margin-bottom: 15px;
+        }
+
+        .info-card {
+            background: rgba(255,255,255,0.1);
+            border-radius: 12px;
+            padding: 15px;
+            text-align: center;
+        }
+
+        .info-label {
+            font-size: 11px;
+            opacity: 0.7;
+            margin-bottom: 5px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .info-value {
+            font-size: 24px;
+            font-weight: 700;
+        }
+
+        .info-value.encoder {
+            color: #2ecc71;
+            text-shadow: 0 0 15px rgba(46,204,113,0.5);
+        }
+
+        .info-value.counter {
+            color: #3498db;
         }
 
         /* Ângulos em grid compacto */
+        .section-title {
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            opacity: 0.7;
+            margin-bottom: 10px;
+            padding-left: 5px;
+        }
+
         .angles-grid {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
-            gap: 8px;
+            gap: 10px;
+            margin-bottom: 15px;
         }
 
         .angle-card {
-            background: rgba(255,255,255,0.15);
-            border: 2px solid rgba(255,255,255,0.3);
-            border-radius: 10px;
+            background: rgba(255,255,255,0.12);
+            border: 2px solid rgba(255,255,255,0.2);
+            border-radius: 12px;
             padding: 12px 8px;
             text-align: center;
             cursor: pointer;
-            transition: all 0.3s;
+            transition: all 0.2s;
         }
 
         .angle-card:active {
             transform: scale(0.95);
-            background: rgba(255,255,255,0.25);
+            background: rgba(255,255,255,0.2);
+        }
+
+        .angle-card.active {
+            border-color: #2ecc71;
+            box-shadow: 0 0 15px rgba(46,204,113,0.3);
         }
 
         .angle-card-label {
-            font-size: 11px;
-            opacity: 0.8;
+            font-size: 10px;
+            opacity: 0.7;
             margin-bottom: 5px;
         }
 
         .angle-card-value {
-            font-size: 22px;
+            font-size: 20px;
             font-weight: 700;
         }
 
         .angle-card-unit {
-            font-size: 16px;
+            font-size: 14px;
+            opacity: 0.6;
+        }
+
+        /* Dimmer de Velocidade */
+        .dimmer-section {
+            background: rgba(255,255,255,0.1);
+            border-radius: 12px;
+            padding: 15px;
+            margin-bottom: 15px;
+        }
+
+        .dimmer-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+
+        .dimmer-label {
+            font-size: 12px;
+            text-transform: uppercase;
             opacity: 0.7;
         }
 
-        /* Controles em grid */
-        .controls-section {
-            grid-column: 1 / -1;
+        .dimmer-value {
+            font-size: 20px;
+            font-weight: 700;
+            color: #3498db;
+        }
+
+        .dimmer-slider {
+            width: 100%;
+            height: 40px;
+            -webkit-appearance: none;
+            appearance: none;
+            background: linear-gradient(to right, #2ecc71 0%, #f39c12 50%, #e74c3c 100%);
+            border-radius: 20px;
+            outline: none;
+            cursor: pointer;
+        }
+
+        .dimmer-slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 30px;
+            height: 50px;
+            background: #fff;
+            border-radius: 8px;
+            cursor: pointer;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.3);
+        }
+
+        .dimmer-slider::-moz-range-thumb {
+            width: 30px;
+            height: 50px;
+            background: #fff;
+            border-radius: 8px;
+            cursor: pointer;
+            border: none;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.3);
+        }
+
+        .dimmer-marks {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 8px;
+            font-size: 10px;
+            opacity: 0.6;
+        }
+
+        /* Controles de Motor */
+        .controls-grid {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
             gap: 10px;
+            margin-bottom: 15px;
         }
 
         .control-btn {
-            background: rgba(255,255,255,0.2);
-            border: 2px solid rgba(255,255,255,0.3);
+            background: rgba(255,255,255,0.15);
+            border: 2px solid rgba(255,255,255,0.25);
             border-radius: 12px;
             color: #fff;
-            font-size: 14px;
+            font-size: 13px;
             font-weight: 600;
-            padding: 15px;
+            padding: 18px 10px;
             cursor: pointer;
             transition: all 0.2s;
             display: flex;
             flex-direction: column;
             align-items: center;
-            gap: 5px;
+            gap: 6px;
         }
 
         .control-btn:active {
@@ -167,74 +305,116 @@
         }
 
         .control-btn.active {
-            background: #4caf50;
-            border-color: #4caf50;
-            box-shadow: 0 0 15px rgba(76,175,80,0.5);
+            background: #2ecc71;
+            border-color: #2ecc71;
+            box-shadow: 0 0 20px rgba(46,204,113,0.5);
         }
 
         .control-btn.stop {
-            background: rgba(244,67,54,0.3);
-            border-color: rgba(244,67,54,0.5);
+            background: rgba(231,76,60,0.3);
+            border-color: rgba(231,76,60,0.5);
         }
 
         .control-btn.stop:active {
-            background: #f44336;
+            background: #e74c3c;
         }
 
         .control-icon {
-            font-size: 24px;
+            font-size: 28px;
         }
 
-        /* Velocidade horizontal */
-        .velocity-row {
-            grid-column: 1 / -1;
+        /* Switches/Toggles */
+        .toggles-section {
             display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 8px;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-bottom: 15px;
         }
 
-        .velocity-btn {
-            background: rgba(255,255,255,0.15);
-            border: 2px solid rgba(255,255,255,0.3);
-            border-radius: 10px;
-            color: #fff;
+        .toggle-card {
+            background: rgba(255,255,255,0.1);
+            border-radius: 12px;
+            padding: 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .toggle-info {
+            flex: 1;
+        }
+
+        .toggle-label {
+            font-size: 12px;
             font-weight: 600;
-            padding: 12px;
-            cursor: pointer;
-            transition: all 0.2s;
-            text-align: center;
+            margin-bottom: 3px;
         }
 
-        .velocity-btn:active {
-            transform: scale(0.95);
-        }
-
-        .velocity-btn.active {
-            background: #2196f3;
-            border-color: #2196f3;
-            box-shadow: 0 0 12px rgba(33,150,243,0.5);
-        }
-
-        .velocity-value {
-            display: block;
-            font-size: 20px;
-        }
-
-        .velocity-label {
-            display: block;
+        .toggle-description {
             font-size: 10px;
-            opacity: 0.7;
-            margin-top: 2px;
+            opacity: 0.6;
+        }
+
+        .toggle-switch {
+            position: relative;
+            width: 50px;
+            height: 28px;
+            background: rgba(255,255,255,0.2);
+            border-radius: 14px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .toggle-switch.active {
+            background: #2ecc71;
+        }
+
+        .toggle-switch::after {
+            content: '';
+            position: absolute;
+            top: 3px;
+            left: 3px;
+            width: 22px;
+            height: 22px;
+            background: #fff;
+            border-radius: 50%;
+            transition: all 0.3s;
+        }
+
+        .toggle-switch.active::after {
+            left: 25px;
+        }
+
+        /* Botão Reset Contador */
+        .reset-btn {
+            background: rgba(231,76,60,0.2);
+            border: 2px solid rgba(231,76,60,0.4);
+            border-radius: 8px;
+            color: #fff;
+            font-size: 10px;
+            padding: 6px 10px;
+            cursor: pointer;
+            margin-top: 5px;
+            transition: all 0.2s;
+        }
+
+        .reset-btn:active {
+            background: #e74c3c;
         }
 
         /* Footer */
         .footer {
             background: rgba(0,0,0,0.3);
-            padding: 8px;
+            padding: 12px;
             text-align: center;
             font-size: 10px;
             opacity: 0.7;
             border-top: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .footer a {
+            color: #2ecc71;
+            text-decoration: none;
         }
 
         /* Modal */
@@ -245,7 +425,7 @@
             left: 0;
             right: 0;
             bottom: 0;
-            background: rgba(0,0,0,0.8);
+            background: rgba(0,0,0,0.85);
             z-index: 1000;
             align-items: center;
             justify-content: center;
@@ -256,7 +436,7 @@
         }
 
         .modal-content {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
             border-radius: 20px;
             padding: 25px;
             width: 90%;
@@ -265,7 +445,7 @@
         }
 
         .modal-title {
-            font-size: 20px;
+            font-size: 18px;
             font-weight: 700;
             margin-bottom: 20px;
             text-align: center;
@@ -273,11 +453,11 @@
 
         .modal-input {
             width: 100%;
-            background: rgba(255,255,255,0.2);
+            background: rgba(255,255,255,0.15);
             border: 2px solid rgba(255,255,255,0.3);
             border-radius: 12px;
             color: #fff;
-            font-size: 32px;
+            font-size: 28px;
             font-weight: 700;
             padding: 15px;
             text-align: center;
@@ -285,7 +465,7 @@
         }
 
         .modal-input::placeholder {
-            color: rgba(255,255,255,0.5);
+            color: rgba(255,255,255,0.4);
         }
 
         .modal-buttons {
@@ -295,13 +475,13 @@
         }
 
         .modal-btn {
-            background: rgba(255,255,255,0.2);
+            background: rgba(255,255,255,0.15);
             border: 2px solid rgba(255,255,255,0.3);
             border-radius: 12px;
             color: #fff;
-            font-size: 16px;
+            font-size: 15px;
             font-weight: 600;
-            padding: 15px;
+            padding: 14px;
             cursor: pointer;
             transition: all 0.2s;
         }
@@ -311,8 +491,8 @@
         }
 
         .modal-btn.confirm {
-            background: #4caf50;
-            border-color: #4caf50;
+            background: #2ecc71;
+            border-color: #2ecc71;
         }
 
         /* Overlay de erro */
@@ -322,8 +502,9 @@
             left: 0;
             right: 0;
             bottom: 0;
-            background: rgba(244,67,54,0.95);
+            background: rgba(231,76,60,0.95);
             display: none;
+            flex-direction: column;
             align-items: center;
             justify-content: center;
             z-index: 999;
@@ -333,8 +514,13 @@
             display: flex;
         }
 
+        .overlay-icon {
+            font-size: 64px;
+            margin-bottom: 20px;
+        }
+
         .overlay-message {
-            font-size: 48px;
+            font-size: 36px;
             font-weight: 900;
             text-shadow: 0 4px 20px rgba(0,0,0,0.5);
             animation: pulse 1s infinite;
@@ -345,48 +531,46 @@
             50% { opacity: 0.7; }
         }
 
-        /* Responsivo Desktop */
+        /* Responsivo */
         @media (min-width: 768px) {
             .main-container {
-                max-width: 1200px;
-                margin: 0 auto;
-                padding: 20px;
+                padding: 20px 30px;
             }
 
-            .header {
-                padding: 12px 20px;
+            .info-grid {
+                grid-template-columns: repeat(4, 1fr);
             }
 
-            .header-title {
-                font-size: 20px;
+            .state-card {
+                padding: 25px;
             }
 
-            .encoder-value {
-                font-size: 36px;
+            .state-icon {
+                font-size: 56px;
+            }
+
+            .state-name {
+                font-size: 24px;
             }
         }
 
-        /* Landscape mobile */
-        @media (max-height: 500px) and (orientation: landscape) {
-            .header {
-                padding: 5px 10px;
+        @media (max-height: 600px) {
+            .state-card {
+                padding: 12px;
             }
 
-            .encoder-compact {
-                padding: 8px 12px;
+            .state-icon {
+                font-size: 36px;
+                margin-bottom: 5px;
             }
 
-            .encoder-value {
-                font-size: 24px;
+            .state-name {
+                font-size: 16px;
             }
 
-            .control-btn {
-                padding: 10px;
+            .state-description {
                 font-size: 12px;
-            }
-
-            .control-icon {
-                font-size: 20px;
+                padding: 8px 10px;
             }
         }
     </style>
@@ -394,6 +578,7 @@
 <body>
     <!-- Overlay de erro -->
     <div class="overlay" id="errorOverlay">
+        <div class="overlay-icon">⚠️</div>
         <div class="overlay-message" id="errorMessage">DESLIGADO</div>
     </div>
 
@@ -411,7 +596,7 @@
 
     <!-- Header -->
     <div class="header">
-        <div class="header-title">IHM - NEOCOUDE-HD-15</div>
+        <div class="header-title">NEOCOUDE-HD-15</div>
         <div class="header-status">
             <div class="status-item">
                 <span class="status-dot" id="wsStatus"></span>
@@ -426,42 +611,78 @@
 
     <!-- Container Principal -->
     <div class="main-container">
-        <!-- Encoder Compacto -->
-        <div class="encoder-compact">
-            <div>
-                <div class="encoder-label">ENCODER</div>
-                <div class="encoder-value" id="encoderValue">0.0°</div>
-            </div>
-            <div style="text-align: right;">
-                <div class="encoder-label">VELOCIDADE</div>
-                <div style="font-size: 20px; font-weight: 600;" id="speedValue">5 RPM</div>
+        <!-- Card de Estado da Máquina -->
+        <div class="state-card" id="stateCard">
+            <div class="state-icon" id="stateIcon">⏸️</div>
+            <div class="state-name" id="stateName">PARADA</div>
+            <div class="state-description" id="stateDescription">
+                Máquina parada. Pressione o pedal para iniciar uma operação.
             </div>
         </div>
 
-        <!-- Ângulos -->
-        <div class="angles-grid" style="grid-column: 1 / -1;">
-            <div class="angle-card" onclick="editAngle(1)">
+        <!-- Grid de Informações -->
+        <div class="info-grid">
+            <div class="info-card">
+                <div class="info-label">Posição Encoder</div>
+                <div class="info-value encoder" id="encoderValue">0.0°</div>
+            </div>
+            <div class="info-card">
+                <div class="info-label">Dobra Atual</div>
+                <div class="info-value" id="currentBend">1</div>
+            </div>
+            <div class="info-card">
+                <div class="info-label">Ângulo Alvo</div>
+                <div class="info-value" id="targetAngle">0.0°</div>
+            </div>
+            <div class="info-card">
+                <div class="info-label">Peças Produzidas</div>
+                <div class="info-value counter" id="pieceCounter">0</div>
+                <button class="reset-btn" onclick="resetCounter()">ZERAR</button>
+            </div>
+        </div>
+
+        <!-- Ângulos Programados -->
+        <div class="section-title">Ângulos Programados</div>
+        <div class="angles-grid">
+            <div class="angle-card" id="angleCard1" onclick="editAngle(1)">
                 <div class="angle-card-label">DOBRA 1</div>
                 <div class="angle-card-value">
-                    <span id="angle1">0.0</span><span class="angle-card-unit">°</span>
+                    <span id="angle1">90.0</span><span class="angle-card-unit">°</span>
                 </div>
             </div>
-            <div class="angle-card" onclick="editAngle(2)">
+            <div class="angle-card" id="angleCard2" onclick="editAngle(2)">
                 <div class="angle-card-label">DOBRA 2</div>
                 <div class="angle-card-value">
-                    <span id="angle2">0.0</span><span class="angle-card-unit">°</span>
+                    <span id="angle2">90.0</span><span class="angle-card-unit">°</span>
                 </div>
             </div>
-            <div class="angle-card" onclick="editAngle(3)">
+            <div class="angle-card" id="angleCard3" onclick="editAngle(3)">
                 <div class="angle-card-label">DOBRA 3</div>
                 <div class="angle-card-value">
-                    <span id="angle3">0.0</span><span class="angle-card-unit">°</span>
+                    <span id="angle3">90.0</span><span class="angle-card-unit">°</span>
                 </div>
+            </div>
+        </div>
+
+        <!-- Dimmer de Velocidade -->
+        <div class="dimmer-section">
+            <div class="dimmer-header">
+                <span class="dimmer-label">Velocidade do Motor</span>
+                <span class="dimmer-value"><span id="speedValue">5.0</span> RPM</span>
+            </div>
+            <input type="range" class="dimmer-slider" id="speedSlider" min="0" max="19" step="0.5" value="5">
+            <div class="dimmer-marks">
+                <span>0</span>
+                <span>5</span>
+                <span>10</span>
+                <span>15</span>
+                <span>19 RPM</span>
             </div>
         </div>
 
         <!-- Controles de Motor -->
-        <div class="controls-section">
+        <div class="section-title">Controle do Motor</div>
+        <div class="controls-grid">
             <button class="control-btn" id="btnForward" onclick="startMotor('forward')">
                 <div class="control-icon">⬆️</div>
                 <div>AVANÇAR</div>
@@ -476,42 +697,109 @@
             </button>
         </div>
 
-        <!-- Velocidades -->
-        <div class="velocity-row">
-            <button class="velocity-btn" id="vel5" onclick="changeSpeed(5)">
-                <span class="velocity-value">5 RPM</span>
-                <span class="velocity-label">Classe 1</span>
-            </button>
-            <button class="velocity-btn" id="vel10" onclick="changeSpeed(10)">
-                <span class="velocity-value">10 RPM</span>
-                <span class="velocity-label">Classe 2</span>
-            </button>
-            <button class="velocity-btn" id="vel15" onclick="changeSpeed(15)">
-                <span class="velocity-value">15 RPM</span>
-                <span class="velocity-label">Classe 3</span>
-            </button>
+        <!-- Toggles de Configuração -->
+        <div class="section-title">Configurações</div>
+        <div class="toggles-section">
+            <div class="toggle-card">
+                <div class="toggle-info">
+                    <div class="toggle-label">PEDAL SEGURA</div>
+                    <div class="toggle-description">Exige segurar pedal</div>
+                </div>
+                <div class="toggle-switch" id="pedalSeguraToggle" onclick="togglePedalSegura()"></div>
+            </div>
+            <div class="toggle-card">
+                <div class="toggle-info">
+                    <div class="toggle-label">MODO MANUAL</div>
+                    <div class="toggle-description">Controle direto</div>
+                </div>
+                <div class="toggle-switch" id="manualModeToggle" onclick="toggleManualMode()"></div>
+            </div>
         </div>
     </div>
 
     <!-- Footer -->
     <div class="footer">
-        Desenvolvido pelo Eng. <a href="https://www.linkedin.com/in/lucas-william-junges-a95b00143" target="_blank" style="color: #4caf50; text-decoration: none;">Lucas William Junges</a>
+        Desenvolvido por Eng. <a href="https://www.linkedin.com/in/lucas-william-junges-a95b00143" target="_blank">Lucas William Junges</a> | IHM Web v2.0
     </div>
 
     <script>
-        // Estado da aplicação
+        // ========================================
+        // ESTADO DA APLICAÇÃO
+        // ========================================
         let ws = null;
-        let currentBend = null;
-        let currentSpeed = 5;
+        let currentBendEdit = null;
+        let currentSpeed = 5.0;
+        let pedalSeguraEnabled = false;
+        let manualModeEnabled = false;
 
-        // Conectar WebSocket
+        // Mapeamento de estados para descrições amigáveis
+        const STATE_INFO = {
+            'ST_IDLE': {
+                icon: '⏸️',
+                name: 'PARADA',
+                description: 'Máquina parada. Pressione o pedal para iniciar uma operação.',
+                cssClass: 'state-idle'
+            },
+            'ST_AGUARDA_DIRECAO': {
+                icon: '🎯',
+                name: 'AGUARDANDO DIREÇÃO',
+                description: 'Escolha a direção: pressione pedal de avanço ou recuo.',
+                cssClass: 'state-aguarda-direcao'
+            },
+            'ST_DOBRANDO': {
+                icon: '🔄',
+                name: 'DOBRANDO',
+                description: 'Executando dobra. Motor em movimento até atingir o ângulo alvo.',
+                cssClass: 'state-dobrando'
+            },
+            'ST_RETORNANDO': {
+                icon: '↩️',
+                name: 'RETORNANDO',
+                description: 'Retornando para posição zero. Aguarde a conclusão.',
+                cssClass: 'state-retornando'
+            },
+            'ST_AGUARDA_PROXIMA': {
+                icon: '⏳',
+                name: 'PRÓXIMA DOBRA',
+                description: 'Dobra concluída! Pressione o pedal para a próxima dobra.',
+                cssClass: 'state-aguarda-proxima'
+            },
+            'ST_COMPLETO': {
+                icon: '✅',
+                name: 'SEQUÊNCIA COMPLETA',
+                description: 'Todas as 3 dobras foram concluídas com sucesso!',
+                cssClass: 'state-completo'
+            },
+            'ST_EMERGENCIA': {
+                icon: '🚨',
+                name: 'EMERGÊNCIA',
+                description: 'PARADA DE EMERGÊNCIA ATIVA! Resolva o problema e reinicie.',
+                cssClass: 'state-emergencia'
+            },
+            'ST_MANUAL': {
+                icon: '🔧',
+                name: 'MODO MANUAL',
+                description: 'Controle manual ativo. Use os botões para mover o motor.',
+                cssClass: 'state-manual'
+            },
+            'PARADA': {
+                icon: '⏸️',
+                name: 'PARADA',
+                description: 'Máquina parada. Pressione o pedal para iniciar.',
+                cssClass: 'state-idle'
+            }
+        };
+
+        // ========================================
+        // WEBSOCKET
+        // ========================================
         function connectWebSocket() {
-            const wsHost = window.location.hostname;
+            const wsHost = window.location.hostname || 'localhost';
             ws = new WebSocket(`ws://${wsHost}:8765`);
 
             ws.onopen = () => {
                 console.log('WebSocket conectado');
-                updateStatus('ws', true);
+                updateConnectionStatus('ws', true);
             };
 
             ws.onmessage = (event) => {
@@ -520,119 +808,293 @@
                     console.log('Mensagem recebida:', message);
 
                     if (message.type === 'full_state' || message.type === 'state_update') {
-                        handleServerMessage(message.data || {});
+                        handleStateUpdate(message.data || {});
                     } else {
-                        handleServerMessage(message);
+                        handleStateUpdate(message);
                     }
                 } catch (e) {
-                    console.error('Erro ao processar WebSocket message:', e, event.data);
+                    console.error('Erro ao processar mensagem:', e, event.data);
                 }
             };
 
             ws.onclose = () => {
                 console.log('WebSocket desconectado');
-                updateStatus('ws', false);
+                updateConnectionStatus('ws', false);
                 setTimeout(connectWebSocket, 3000);
             };
 
             ws.onerror = (error) => {
                 console.error('Erro WebSocket:', error);
-                updateStatus('ws', false);
+                updateConnectionStatus('ws', false);
             };
         }
 
-        // Atualizar status
-        function updateStatus(type, connected) {
-            if (type === 'ws') {
-                const dot = document.getElementById('wsStatus');
-                const text = document.getElementById('wsText');
-                dot.className = 'status-dot ' + (connected ? 'connected' : '');
-                text.textContent = connected ? 'WS' : 'OFF';
+        // ========================================
+        // ATUALIZAÇÃO DE ESTADO
+        // ========================================
+        function handleStateUpdate(data) {
+            // Status de conexão CLP
+            if (data.modbus_connected !== undefined) {
+                updateConnectionStatus('clp', data.modbus_connected);
+            }
 
-                if (!connected) {
-                    document.getElementById('errorOverlay').classList.add('active');
-                    document.getElementById('errorMessage').textContent = 'DESLIGADO';
-                } else {
-                    document.getElementById('errorOverlay').classList.remove('active');
-                }
-            } else if (type === 'clp') {
-                const dot = document.getElementById('clpStatus');
-                const text = document.getElementById('clpText');
-                dot.className = 'status-dot ' + (connected ? 'connected' : '');
-                text.textContent = connected ? 'CLP' : 'OFF';
+            // Estado da máquina
+            if (data.machine_state_name !== undefined) {
+                updateMachineState(data.machine_state_name, data.machine_state_description, data.machine_state_icon);
+            }
 
-                if (!connected && ws && ws.readyState === WebSocket.OPEN) {
-                    document.getElementById('errorOverlay').classList.add('active');
-                    document.getElementById('errorMessage').textContent = 'FALHA CLP';
-                } else if (connected && ws && ws.readyState === WebSocket.OPEN) {
-                    // Remove overlay quando CLP reconecta
-                    document.getElementById('errorOverlay').classList.remove('active');
+            // Encoder
+            if (data.encoder_degrees !== undefined && data.encoder_degrees !== null) {
+                document.getElementById('encoderValue').textContent = data.encoder_degrees.toFixed(1) + '°';
+            }
+
+            // Dobra atual
+            if (data.dobra_atual !== undefined) {
+                document.getElementById('currentBend').textContent = data.dobra_atual;
+                updateAngleCardHighlight(data.dobra_atual);
+            }
+
+            // Ângulo alvo
+            if (data.target_angle !== undefined) {
+                document.getElementById('targetAngle').textContent = data.target_angle.toFixed(1) + '°';
+            }
+
+            // Contador de peças
+            if (data.contador_pecas !== undefined) {
+                document.getElementById('pieceCounter').textContent = data.contador_pecas;
+            }
+
+            // Velocidade
+            if (data.velocidade_rpm !== undefined) {
+                currentSpeed = data.velocidade_rpm;
+                document.getElementById('speedValue').textContent = data.velocidade_rpm.toFixed(1);
+                document.getElementById('speedSlider').value = data.velocidade_rpm;
+            }
+
+            // Ângulos programados
+            if (data.angles) {
+                if (data.angles.bend_1 !== undefined) {
+                    document.getElementById('angle1').textContent = data.angles.bend_1.toFixed(1);
                 }
+                if (data.angles.bend_2 !== undefined) {
+                    document.getElementById('angle2').textContent = data.angles.bend_2.toFixed(1);
+                }
+                if (data.angles.bend_3 !== undefined) {
+                    document.getElementById('angle3').textContent = data.angles.bend_3.toFixed(1);
+                }
+            }
+
+            // Compatibilidade com formato antigo
+            if (data.bend_1_left !== undefined) {
+                document.getElementById('angle1').textContent = data.bend_1_left.toFixed(1);
+            }
+            if (data.bend_2_left !== undefined) {
+                document.getElementById('angle2').textContent = data.bend_2_left.toFixed(1);
+            }
+            if (data.bend_3_left !== undefined) {
+                document.getElementById('angle3').textContent = data.bend_3_left.toFixed(1);
+            }
+
+            // Control bits (PEDAL_SEGURA, MODO_MANUAL)
+            if (data.control_bits) {
+                if (data.control_bits.PEDAL_SEGURA !== undefined) {
+                    pedalSeguraEnabled = data.control_bits.PEDAL_SEGURA;
+                    updateToggle('pedalSeguraToggle', pedalSeguraEnabled);
+                }
+                if (data.control_bits.MODO_MANUAL !== undefined) {
+                    manualModeEnabled = data.control_bits.MODO_MANUAL;
+                    updateToggle('manualModeToggle', manualModeEnabled);
+                }
+            }
+
+            // Alias direto
+            if (data.pedal_segura !== undefined) {
+                pedalSeguraEnabled = data.pedal_segura;
+                updateToggle('pedalSeguraToggle', pedalSeguraEnabled);
+            }
+            if (data.mode_manual !== undefined) {
+                manualModeEnabled = data.mode_manual;
+                updateToggle('manualModeToggle', manualModeEnabled);
             }
         }
 
-        // Processar mensagens do servidor
-        function handleServerMessage(data) {
-            try {
-                // Atualizar encoder
-                if (data.encoder_degrees !== undefined && data.encoder_degrees !== null) {
-                    const el = document.getElementById('encoderValue');
-                    if (el) el.textContent = data.encoder_degrees.toFixed(1) + '°';
-                }
+        function updateMachineState(stateName, description, icon) {
+            const stateCard = document.getElementById('stateCard');
+            const stateInfo = STATE_INFO[stateName] || STATE_INFO['PARADA'];
 
-                // Atualizar velocidade
-                if (data.speed_class !== undefined && data.speed_class !== null) {
-                    currentSpeed = data.speed_class;
-                    const el = document.getElementById('speedValue');
-                    if (el) el.textContent = data.speed_class + ' RPM';
-                    updateSpeedButtons();
-                }
+            // Remove todas as classes de estado
+            stateCard.className = 'state-card';
+            stateCard.classList.add(stateInfo.cssClass);
 
-                // Atualizar ângulos
-                if (data.angles && typeof data.angles === 'object') {
-                    if (data.angles.bend_1_left !== undefined && data.angles.bend_1_left !== null) {
-                        const el = document.getElementById('angle1');
-                        if (el) el.textContent = data.angles.bend_1_left.toFixed(1);
-                    }
-                    if (data.angles.bend_2_left !== undefined && data.angles.bend_2_left !== null) {
-                        const el = document.getElementById('angle2');
-                        if (el) el.textContent = data.angles.bend_2_left.toFixed(1);
-                    }
-                    if (data.angles.bend_3_left !== undefined && data.angles.bend_3_left !== null) {
-                        const el = document.getElementById('angle3');
-                        if (el) el.textContent = data.angles.bend_3_left.toFixed(1);
-                    }
-                }
+            document.getElementById('stateIcon').textContent = icon || stateInfo.icon;
+            document.getElementById('stateName').textContent = stateInfo.name;
+            document.getElementById('stateDescription').textContent = description || stateInfo.description;
+        }
 
-                // Status CLP
-                if (data.modbus_connected !== undefined) {
-                    updateStatus('clp', data.modbus_connected);
-                }
-            } catch (e) {
-                console.error('Erro ao processar mensagem do servidor:', e, data);
+        function updateAngleCardHighlight(currentBend) {
+            // Remove destaque de todos
+            document.querySelectorAll('.angle-card').forEach(card => {
+                card.classList.remove('active');
+            });
+
+            // Adiciona destaque no atual
+            const currentCard = document.getElementById(`angleCard${currentBend}`);
+            if (currentCard) {
+                currentCard.classList.add('active');
             }
         }
 
-        // Editar ângulo
+        function updateToggle(toggleId, isActive) {
+            const toggle = document.getElementById(toggleId);
+            if (toggle) {
+                toggle.classList.toggle('active', isActive);
+            }
+        }
+
+        function updateConnectionStatus(type, connected) {
+            const dot = document.getElementById(type === 'ws' ? 'wsStatus' : 'clpStatus');
+            const text = document.getElementById(type === 'ws' ? 'wsText' : 'clpText');
+
+            dot.classList.toggle('connected', connected);
+            text.textContent = connected ? (type === 'ws' ? 'WS' : 'CLP') : 'OFF';
+
+            // Overlay de erro
+            const overlay = document.getElementById('errorOverlay');
+            const errorMsg = document.getElementById('errorMessage');
+
+            if (type === 'ws' && !connected) {
+                overlay.classList.add('active');
+                errorMsg.textContent = 'DESCONECTADO';
+            } else if (type === 'clp' && !connected && ws && ws.readyState === WebSocket.OPEN) {
+                overlay.classList.add('active');
+                errorMsg.textContent = 'FALHA CLP';
+            } else if (connected && ws && ws.readyState === WebSocket.OPEN) {
+                overlay.classList.remove('active');
+            }
+        }
+
+        // ========================================
+        // CONTROLES
+        // ========================================
+        function startMotor(direction) {
+            if (!ws || ws.readyState !== WebSocket.OPEN) return;
+
+            ws.send(JSON.stringify({
+                action: 'motor_control',
+                command: direction === 'forward' ? 'start_forward' : 'start_backward'
+            }));
+
+            // Feedback visual
+            document.getElementById('btnForward').classList.toggle('active', direction === 'forward');
+            document.getElementById('btnReverse').classList.toggle('active', direction === 'reverse');
+        }
+
+        function stopMotor() {
+            if (!ws || ws.readyState !== WebSocket.OPEN) return;
+
+            ws.send(JSON.stringify({
+                action: 'motor_control',
+                command: 'stop'
+            }));
+
+            document.getElementById('btnForward').classList.remove('active');
+            document.getElementById('btnReverse').classList.remove('active');
+        }
+
+        // ========================================
+        // VELOCIDADE (DIMMER)
+        // ========================================
+        const speedSlider = document.getElementById('speedSlider');
+        let speedTimeout = null;
+
+        speedSlider.addEventListener('input', (e) => {
+            const speed = parseFloat(e.target.value);
+            document.getElementById('speedValue').textContent = speed.toFixed(1);
+
+            // Debounce: só envia após parar de mover por 200ms
+            clearTimeout(speedTimeout);
+            speedTimeout = setTimeout(() => {
+                sendSpeed(speed);
+            }, 200);
+        });
+
+        function sendSpeed(speed) {
+            if (!ws || ws.readyState !== WebSocket.OPEN) return;
+
+            ws.send(JSON.stringify({
+                action: 'write_speed',
+                speed: speed
+            }));
+
+            console.log(`Velocidade enviada: ${speed} RPM`);
+        }
+
+        // ========================================
+        // TOGGLES
+        // ========================================
+        function togglePedalSegura() {
+            if (!ws || ws.readyState !== WebSocket.OPEN) return;
+
+            pedalSeguraEnabled = !pedalSeguraEnabled;
+            updateToggle('pedalSeguraToggle', pedalSeguraEnabled);
+
+            ws.send(JSON.stringify({
+                action: 'write_pedal_segura',
+                value: pedalSeguraEnabled
+            }));
+
+            console.log(`PEDAL_SEGURA: ${pedalSeguraEnabled ? 'ATIVADO' : 'DESATIVADO'}`);
+        }
+
+        function toggleManualMode() {
+            if (!ws || ws.readyState !== WebSocket.OPEN) return;
+
+            manualModeEnabled = !manualModeEnabled;
+            updateToggle('manualModeToggle', manualModeEnabled);
+
+            ws.send(JSON.stringify({
+                action: 'set_manual_mode',
+                value: manualModeEnabled
+            }));
+
+            console.log(`MODO MANUAL: ${manualModeEnabled ? 'ATIVADO' : 'DESATIVADO'}`);
+        }
+
+        function resetCounter() {
+            if (!ws || ws.readyState !== WebSocket.OPEN) return;
+
+            if (confirm('Zerar contador de peças?')) {
+                ws.send(JSON.stringify({
+                    action: 'reset_counter'
+                }));
+
+                document.getElementById('pieceCounter').textContent = '0';
+                console.log('Contador de peças zerado');
+            }
+        }
+
+        // ========================================
+        // MODAL DE ÂNGULO
+        // ========================================
         function editAngle(bendNumber) {
-            currentBend = bendNumber;
+            currentBendEdit = bendNumber;
             document.getElementById('modalTitle').textContent = `Editar Ângulo - Dobra ${bendNumber}`;
-            document.getElementById('angleInput').value = '';
+
+            // Pega valor atual
+            const currentValue = document.getElementById(`angle${bendNumber}`).textContent;
+            document.getElementById('angleInput').value = currentValue;
+
             document.getElementById('angleModal').classList.add('active');
             setTimeout(() => document.getElementById('angleInput').focus(), 100);
         }
 
-        // Fechar modal
         function closeModal() {
             document.getElementById('angleModal').classList.remove('active');
-            currentBend = null;
+            currentBendEdit = null;
         }
 
-        // Salvar ângulo
         function saveAngle() {
-            if (!currentBend || !ws || ws.readyState !== WebSocket.OPEN) {
-                return;
-            }
+            if (!currentBendEdit || !ws || ws.readyState !== WebSocket.OPEN) return;
 
             const value = parseFloat(document.getElementById('angleInput').value);
             if (isNaN(value) || value < 0 || value > 360) {
@@ -642,83 +1104,23 @@
 
             ws.send(JSON.stringify({
                 action: 'write_angle',
-                bend: currentBend,
+                bend: currentBendEdit,
                 angle: value
             }));
 
-            document.getElementById(`angle${currentBend}`).textContent = value.toFixed(1);
+            document.getElementById(`angle${currentBendEdit}`).textContent = value.toFixed(1);
             closeModal();
         }
 
-        // Controle de motor
-        // ✅ ATUALIZADO 20/Nov/2025 - Usa coils de controle corretos (0x0190/0x0191)
-        function startMotor(direction) {
-            if (!ws || ws.readyState !== WebSocket.OPEN) return;
-
-            // Envia comando para o servidor usando métodos descobertos no ladder
-            ws.send(JSON.stringify({
-                action: 'motor_control',
-                command: direction === 'forward' ? 'start_forward' : 'start_backward'
-            }));
-
-            console.log(`🎮 Comando motor: ${direction === 'forward' ? 'AVANÇAR' : 'RECUAR'}`);
-
-            // Feedback visual
-            if (direction === 'forward') {
-                document.getElementById('btnForward').classList.add('active');
-                document.getElementById('btnReverse').classList.remove('active');
-            } else {
-                document.getElementById('btnReverse').classList.add('active');
-                document.getElementById('btnForward').classList.remove('active');
-            }
-        }
-
-        function stopMotor() {
-            if (!ws || ws.readyState !== WebSocket.OPEN) return;
-
-            // Envia comando STOP que desliga ambos os coils (0x0190 e 0x0191)
-            ws.send(JSON.stringify({
-                action: 'motor_control',
-                command: 'stop'
-            }));
-
-            console.log('🎮 Comando motor: PARAR');
-
-            // Remove feedback visual
-            document.getElementById('btnForward').classList.remove('active');
-            document.getElementById('btnReverse').classList.remove('active');
-        }
-
-        // Mudar velocidade
-        function changeSpeed(speed) {
-            if (!ws || ws.readyState !== WebSocket.OPEN) return;
-
-            ws.send(JSON.stringify({
-                action: 'write_speed',
-                speed: speed
-            }));
-
-            currentSpeed = speed;
-            updateSpeedButtons();
-        }
-
-        // Atualizar botões de velocidade
-        function updateSpeedButtons() {
-            document.getElementById('vel5').classList.toggle('active', currentSpeed === 5);
-            document.getElementById('vel10').classList.toggle('active', currentSpeed === 10);
-            document.getElementById('vel15').classList.toggle('active', currentSpeed === 15);
-        }
-
-        // Event listeners
+        // Enter no input salva
         document.getElementById('angleInput').addEventListener('keypress', (e) => {
-            if (e.key === 'Enter') {
-                saveAngle();
-            }
+            if (e.key === 'Enter') saveAngle();
         });
 
-        // Iniciar
+        // ========================================
+        // INICIALIZAÇÃO
+        // ========================================
         connectWebSocket();
-        updateSpeedButtons();
     </script>
 </body>
 </html>

@@ -1,12 +1,14 @@
 """
-Main Server - Servidor WebSocket IHM Web
-=========================================
+Main Server - Servidor WebSocket IHM Web (Novo Ladder)
+======================================================
 
 Servidor principal que coordena:
 - Modbus client (comunicação com CLP)
-- State manager (estado da máquina)
+- State manager (estado da máquina - 8 estados)
 - WebSocket server (comunicação com tablet)
 - HTTP server (serve index.html)
+
+Referência: PROJETO_LADDER_NOVO.md
 """
 
 import asyncio
@@ -225,24 +227,36 @@ class IHMServer:
                     }))
 
             elif action == 'write_speed':
-                # Alterar velocidade do motor
-                # ATUALIZADO 16/Nov/2025: Usa método validado write_speed_class()
-                speed = data.get('speed')  # 5, 10 ou 15 RPM
+                # Alterar velocidade do motor (dimmer contínuo 0-15 RPM)
+                # ATUALIZADO 27/Nov/2025: Suporte a valores contínuos 0-15 RPM
+                speed = data.get('speed')  # RPM (0.0 a 15.0)
 
-                if speed in [5, 10, 15]:
-                    # Usa método validado que escreve direto em 0x094C (2380)
-                    success = self.modbus_client.write_speed_class(speed)
-                    print(f"{'✓' if success else '✗'} Velocidade: {speed} RPM")
-                    await websocket.send(json.dumps({
-                        'type': 'speed_response',
-                        'speed': speed,
-                        'success': success
-                    }))
-                else:
+                try:
+                    speed = float(speed)
+                    if 0 <= speed <= mm.RPM_MAX:
+                        # Converte RPM para valor do registro usando mm.rpm_to_register()
+                        # CORRIGIDO 27/Nov/2025: Escreve em 0x0A06 (IHM -> Ladder copia para 0x06E0)
+                        # Valores: 5 RPM=527, 10 RPM=1055, 15 RPM=1583, 19 RPM=2000 (max)
+                        register_value = mm.rpm_to_register(speed)
+                        success = self.modbus_client.write_register(mm.INVERTER['VELOCIDADE_WRITE'], register_value)
+                        print(f"{'✓' if success else '✗'} Velocidade: {speed:.1f} RPM (reg={register_value} hex=0x{register_value:04X} -> 0x0A06)")
+                        await websocket.send(json.dumps({
+                            'type': 'speed_response',
+                            'speed': speed,
+                            'register_value': register_value,
+                            'success': success
+                        }))
+                    else:
+                        print(f"✗ Velocidade fora da faixa: {speed}")
+                        await websocket.send(json.dumps({
+                            'type': 'error',
+                            'message': f'Velocidade fora da faixa: {speed}. Use 0 a {mm.RPM_MAX:.0f} RPM.'
+                        }))
+                except (ValueError, TypeError):
                     print(f"✗ Velocidade inválida: {speed}")
                     await websocket.send(json.dumps({
                         'type': 'error',
-                        'message': f'Velocidade inválida: {speed}. Use 5, 10 ou 15 RPM.'
+                        'message': f'Velocidade inválida: {speed}. Use valor numérico 0-15.'
                     }))
 
             elif action == 'motor_control':
@@ -302,7 +316,85 @@ class IHMServer:
                     'success': s0_success and s1_success,
                     'message': 'Parada de emergência executada'
                 }))
-                    
+
+            elif action == 'write_pedal_segura':
+                # Toggle PEDAL_SEGURA (exige segurar pedal para motor girar)
+                # NOVO 27/Nov/2025: Endereço 0x0384 (900 decimal)
+                value = data.get('value')  # True/False
+
+                if value is not None:
+                    success = self.modbus_client.write_coil(mm.CONTROL_BITS['PEDAL_SEGURA'], bool(value))
+                    status = "ATIVADO" if value else "DESATIVADO"
+                    print(f"{'✓' if success else '✗'} PEDAL_SEGURA {status}")
+                    await websocket.send(json.dumps({
+                        'type': 'pedal_segura_response',
+                        'value': value,
+                        'success': success
+                    }))
+                else:
+                    await websocket.send(json.dumps({
+                        'type': 'error',
+                        'message': 'Valor de PEDAL_SEGURA não especificado'
+                    }))
+
+            elif action == 'set_manual_mode':
+                # Ativa/desativa modo manual (estado 7 da máquina de estados)
+                # NOVO 27/Nov/2025: Controla bit MODO_MANUAL (0x0383)
+                value = data.get('value')  # True para ativar manual, False para auto
+
+                if value is not None:
+                    # Escreve no bit de controle MODO_MANUAL
+                    manual_success = self.modbus_client.write_coil(mm.CONTROL_BITS['MODO_MANUAL'], bool(value))
+                    # Também atualiza MODO_AUTO para garantir consistência
+                    auto_success = self.modbus_client.write_coil(mm.CONTROL_BITS['MODO_AUTO'], not bool(value))
+
+                    success = manual_success and auto_success
+                    mode_name = "MANUAL" if value else "AUTOMÁTICO"
+                    print(f"{'✓' if success else '✗'} Modo alterado para {mode_name}")
+
+                    await websocket.send(json.dumps({
+                        'type': 'mode_response',
+                        'manual_mode': value,
+                        'success': success
+                    }))
+                else:
+                    await websocket.send(json.dumps({
+                        'type': 'error',
+                        'message': 'Valor de modo não especificado'
+                    }))
+
+            elif action == 'reset_counter':
+                # Zera contador de peças
+                # NOVO 27/Nov/2025: Endereço 0x0920 (2336 decimal)
+                success = self.modbus_client.write_register(mm.WORK_REGISTERS['CONTADOR_PECAS'], 0)
+                print(f"{'✓' if success else '✗'} Contador de peças zerado")
+
+                await websocket.send(json.dumps({
+                    'type': 'counter_response',
+                    'success': success,
+                    'new_value': 0
+                }))
+
+            elif action == 'set_habilitado':
+                # Habilita/desabilita máquina (bit HABILITADO)
+                # NOVO 27/Nov/2025: Endereço 0x0387
+                value = data.get('value')
+
+                if value is not None:
+                    success = self.modbus_client.write_coil(mm.CONTROL_BITS['HABILITADO'], bool(value))
+                    status = "HABILITADA" if value else "DESABILITADA"
+                    print(f"{'✓' if success else '✗'} Máquina {status}")
+                    await websocket.send(json.dumps({
+                        'type': 'habilitado_response',
+                        'value': value,
+                        'success': success
+                    }))
+                else:
+                    await websocket.send(json.dumps({
+                        'type': 'error',
+                        'message': 'Valor de HABILITADO não especificado'
+                    }))
+
         except json.JSONDecodeError:
             print(f"✗ JSON inválido recebido: {message}")
         except Exception as e:
@@ -347,50 +439,62 @@ class IHMServer:
                 
     async def handle_toggle_mode(self, websocket, data):
         """
-        Handler para toggle de modo (direto em 02FF - bypass S1+E6)
+        Handler para toggle de modo (MODO_AUTO/MODO_MANUAL via CONTROL_BITS)
+        ATUALIZADO 27/Nov/2025: Usa novos endereços 0x0382/0x0383
         """
-        print("🔄 Toggle de modo (direto em 02FF)...")
+        print("🔄 Toggle de modo (via CONTROL_BITS)...")
 
-        # Ler modo atual
-        mode_antes_bit = self.modbus_client.read_real_mode()
-        mode_antes = "AUTO" if mode_antes_bit else "MANUAL" if mode_antes_bit is not None else "UNKNOWN"
+        # Ler modo atual via control_bits
+        modo_manual = self.modbus_client.read_coil(mm.CONTROL_BITS['MODO_MANUAL'])
+        mode_antes = "MANUAL" if modo_manual else "AUTO" if modo_manual is not None else "UNKNOWN"
 
-        # Toggle usando método direto (NÃO simula S1 que está bloqueado)
-        new_mode_bit = not mode_antes_bit if mode_antes_bit is not None else None
-        if new_mode_bit is not None:
-            success = self.modbus_client.change_mode_direct(to_auto=new_mode_bit)
-            if not success:
-                new_mode_bit = None
+        if modo_manual is not None:
+            # Toggle: se estava manual, vai para auto; se estava auto, vai para manual
+            new_manual = not modo_manual
 
-        if new_mode_bit is not None:
-            mode_depois = "AUTO" if new_mode_bit else "MANUAL"
+            # Escreve nos dois bits para garantir consistência
+            success_manual = self.modbus_client.write_coil(mm.CONTROL_BITS['MODO_MANUAL'], new_manual)
+            success_auto = self.modbus_client.write_coil(mm.CONTROL_BITS['MODO_AUTO'], not new_manual)
+            success = success_manual and success_auto
 
-            # Aguardar sincronização
-            await asyncio.sleep(0.3)
+            if success:
+                mode_depois = "MANUAL" if new_manual else "AUTO"
 
-            # Broadcast para TODOS os clientes (formato compatível com state_update)
-            update = {
-                'type': 'state_update',
-                'data': {
-                    'mode_bit_02ff': new_mode_bit,
-                    'mode_text': mode_depois,
-                    'mode_manual': not new_mode_bit
+                # Aguardar sincronização
+                await asyncio.sleep(0.3)
+
+                # Broadcast para TODOS os clientes
+                update = {
+                    'type': 'state_update',
+                    'data': {
+                        'mode_manual': new_manual,
+                        'mode_text': mode_depois,
+                        'control_bits': {
+                            'MODO_MANUAL': new_manual,
+                            'MODO_AUTO': not new_manual
+                        }
+                    }
                 }
-            }
 
-            for client in self.clients:
-                try:
-                    await client.send(json.dumps(update))
-                except:
-                    pass
+                for client in self.clients:
+                    try:
+                        await client.send(json.dumps(update))
+                    except:
+                        pass
 
-            print(f"✅ Modo alterado: {mode_antes} → {mode_depois}")
+                print(f"✅ Modo alterado: {mode_antes} → {mode_depois}")
+            else:
+                await websocket.send(json.dumps({
+                    'type': 'error',
+                    'message': 'Falha ao alternar modo - verifique conexão Modbus'
+                }))
+                print("❌ Falha ao alternar modo")
         else:
             await websocket.send(json.dumps({
                 'type': 'error',
-                'message': 'Falha ao alternar modo - verifique conexão Modbus'
+                'message': 'Falha ao ler modo atual - verifique conexão Modbus'
             }))
-            print("❌ Falha ao alternar modo")
+            print("❌ Falha ao ler modo atual")
 
     async def http_handler(self, request):
         """

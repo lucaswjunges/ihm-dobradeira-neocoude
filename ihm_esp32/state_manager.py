@@ -1,15 +1,12 @@
 #!/usr/bin/env python3
 """
-State Manager - IHM Web Dobradeira
-===================================
+State Manager - IHM Web Dobradeira (Novo Ladder)
+================================================
 
-Gerenciador de estado da máquina com polling automático e inferência de tela.
+Gerenciador de estado da maquina baseado no novo programa ladder
+com maquina de 8 estados distintos.
 
-ESTRATÉGIA HÍBRIDA:
-- LÊ coils (botões, LEDs) via Modbus
-- INFERE estado da tela baseado em lógica
-- ESCREVE em área de supervisão (0x0940-0x0950)
-- Mantém machine_state atualizado para IHM Web
+Referencia: PROJETO_LADDER_NOVO.md
 """
 
 import asyncio
@@ -22,7 +19,7 @@ import modbus_map as mm
 
 class MachineStateManager:
     """
-    Gerenciador de estado da máquina com inferência automática.
+    Gerenciador de estado da maquina com suporte a maquina de estados.
     """
 
     def __init__(self, modbus_client: ModbusClientWrapper, poll_interval: float = 0.25):
@@ -31,124 +28,103 @@ class MachineStateManager:
 
         Args:
             modbus_client: Cliente Modbus (stub ou real)
-            poll_interval: Intervalo de polling em segundos (padrão 250ms)
+            poll_interval: Intervalo de polling em segundos (padrao 250ms)
         """
         self.client = modbus_client
         self.poll_interval = poll_interval
         self.running = False
 
-        # Estado completo da máquina
+        # Estado completo da maquina
         self.machine_state: Dict[str, Any] = {
-            # Encoder / Posição
+            # Encoder / Posicao
             'encoder_raw': 0,
             'encoder_degrees': 0.0,
 
-            # Ângulos programados
+            # Angulos programados
             'angles': {
-                'bend_1_left': 0.0,
-                'bend_2_left': 0.0,
-                'bend_3_left': 0.0,
-                'bend_1_right': 0.0,
-                'bend_2_right': 0.0,
-                'bend_3_right': 0.0,
+                'bend_1': 90.0,
+                'bend_2': 90.0,
+                'bend_3': 90.0,
             },
 
-            # LEDs (estado dos indicadores)
+            # Angulo alvo atual
+            'target_angle': 0.0,
+
+            # Estado da maquina (novo ladder)
+            'machine_state_address': 0x0300,  # Endereco do estado ativo
+            'machine_state_name': 'PARADA',
+            'machine_state_description': 'Maquina parada. Pressione o pedal para iniciar.',
+            'machine_state_color': 'gray',
+            'machine_state_icon': '⏸️',
+
+            # Estados individuais (M000-M007)
+            'states': {
+                'ST_IDLE': False,
+                'ST_AGUARDA_DIRECAO': False,
+                'ST_DOBRANDO': False,
+                'ST_RETORNANDO': False,
+                'ST_AGUARDA_PROXIMA': False,
+                'ST_COMPLETO': False,
+                'ST_EMERGENCIA': False,
+                'ST_MANUAL': False,
+            },
+
+            # Bits de controle (B000-B007)
+            'control_bits': {
+                'DIR_AVANCO': False,
+                'DIR_RECUO': False,
+                'MODO_AUTO': False,
+                'MODO_MANUAL': False,
+                'PEDAL_SEGURA': False,
+                'NA_POSICAO_ZERO': False,
+                'ATINGIU_ANGULO': False,
+                'HABILITADO': False,
+            },
+
+            # Entradas digitais (E0-E7)
+            'inputs': {
+                'E0': False,  # Sensor Zero
+                'E2': False,  # Pedal Avanco
+                'E3': False,  # Pedal Parada
+                'E4': False,  # Pedal Recuo
+                'E5': False,  # Sensor Seguranca
+                'E6': False,  # Botao Emergencia
+            },
+
+            # Saidas digitais (S0-S7)
+            'outputs': {
+                'S0': False,  # Motor Avanco
+                'S1': False,  # Motor Recuo
+                'S2': False,  # Inversor
+                'S4': False,  # LED Dobra 1
+                'S5': False,  # LED Dobra 2
+                'S6': False,  # LED Dobra 3
+            },
+
+            # Registros de trabalho
+            'dobra_atual': 1,
+            'contador_pecas': 0,
+            'velocidade_rpm': 5.0,
+
+            # LEDs (para compatibilidade)
             'leds': {
-                'LED1': False,  # Dobra 1 ativa
-                'LED2': False,  # Dobra 2 ativa
-                'LED3': False,  # Dobra 3 ativa
-                'LED4': False,  # Sentido esquerda
-                'LED5': False,  # Sentido direita
+                'LED1': False,
+                'LED2': False,
+                'LED3': False,
+                'LED4': False,
+                'LED5': False,
             },
-
-            # Botões (estado atual)
-            'buttons': {},
-
-            # I/O Digital
-            'inputs': {},   # E0-E7
-            'outputs': {},  # S0-S7
-
-            # Estados críticos
-            'modbus_enabled': False,
-            'cycle_active': False,
-            'mode_manual': True,
-
-            # Supervisão (inferidos/escritos)
-            'screen_num': 0,         # 0-10
-            'bend_current': 0,       # 1, 2, 3 (0 = nenhuma)
-            'direction': 0,          # 0=Esq, 1=Dir
-            'speed_class': 5,        # 5, 10, 15 rpm
-            'mode_state': 0,         # 0=Manual, 1=Auto
 
             # Metadados
             'connected': False,
-            'modbus_connected': False,  # Para interface HTML
+            'modbus_connected': False,
             'last_update': None,
             'poll_count': 0,
         }
 
-    def infer_screen_number(self) -> int:
-        """
-        Infere número da tela baseado em LEDs e estados.
-
-        Lógica:
-        - Tela 0: Estado inicial (nenhum LED ativo)
-        - Tela 2: Modo AUTO ativo
-        - Tela 4: LED1 ativo (dobra 1)
-        - Tela 5: LED2 ativo (dobra 2)
-        - Tela 6: LED3 ativo (dobra 3)
-
-        Returns:
-            Número da tela (0-10)
-        """
-        leds = self.machine_state.get('leds', {})
-
-        # Prioridade: LEDs de dobra (K1, K2, K3)
-        if leds.get('LED1', False):
-            return 4  # Tela dobra 1
-        elif leds.get('LED2', False):
-            return 5  # Tela dobra 2
-        elif leds.get('LED3', False):
-            return 6  # Tela dobra 3
-
-        # Se modo AUTO (não manual), tela 2
-        if not self.machine_state.get('mode_manual', True):
-            return 2  # Tela modo AUTO
-
-        # Padrão: tela inicial
-        return 0
-
-    def infer_bend_current(self) -> int:
-        """Infere dobra atual (1, 2, 3) baseado em LEDs."""
-        leds = self.machine_state.get('leds', {})
-        if leds.get('LED1', False):
-            return 1
-        elif leds.get('LED2', False):
-            return 2
-        elif leds.get('LED3', False):
-            return 3
-        return 0
-
-    def infer_direction(self) -> int:
-        """Infere direção (0=Esq, 1=Dir) baseado em LEDs."""
-        leds = self.machine_state.get('leds', {})
-        return 1 if leds.get('LED5', False) else 0
-
-    async def infer_speed_class(self) -> int:
-        """
-        Lê classe de velocidade do inversor (0x06E0).
-
-        ✅ VALIDADO 20/Nov/2025 - Lê de 0x06E0 (RPM_READ)
-        """
-        # Executa em thread separada
-        speed = await asyncio.to_thread(self.client.read_speed_class)
-        return speed if speed in [5, 10, 15] else 5
-
     async def read_encoder(self) -> bool:
-        """Lê encoder (32-bit) e atualiza estado."""
+        """Le encoder (32-bit) e atualiza estado."""
         try:
-            # Executa chamada síncrona em thread separada para não bloquear event loop
             raw = await asyncio.to_thread(
                 self.client.read_32bit,
                 mm.ENCODER['ANGLE_MSW'],
@@ -163,165 +139,206 @@ class MachineStateManager:
             print(f"✗ Erro lendo encoder: {e}")
             return False
 
+    async def read_machine_states(self) -> bool:
+        """
+        Le os 8 estados da maquina (M000-M007) e determina qual esta ativo.
+        """
+        try:
+            state_values = {}
+
+            for name, addr in mm.MACHINE_STATES.items():
+                value = await asyncio.to_thread(self.client.read_coil, addr)
+                state_values[addr] = value if value is not None else False
+                self.machine_state['states'][name] = state_values[addr]
+
+            # Determina qual estado esta ativo
+            active_addr = None
+            for addr, value in state_values.items():
+                if value:
+                    active_addr = addr
+                    break
+
+            if active_addr is None:
+                active_addr = mm.MACHINE_STATES['ST_IDLE']
+
+            # Atualiza informacoes do estado ativo
+            state_info = mm.get_state_info(active_addr)
+            self.machine_state['machine_state_address'] = active_addr
+            self.machine_state['machine_state_name'] = state_info['name']
+            self.machine_state['machine_state_description'] = state_info['description']
+            self.machine_state['machine_state_color'] = state_info['color']
+            self.machine_state['machine_state_icon'] = state_info['icon']
+
+            return True
+        except Exception as e:
+            print(f"✗ Erro lendo estados da maquina: {e}")
+            return False
+
+    async def read_control_bits(self) -> bool:
+        """
+        Le os bits de controle (B000-B007).
+        """
+        try:
+            for name, addr in mm.CONTROL_BITS.items():
+                value = await asyncio.to_thread(self.client.read_coil, addr)
+                self.machine_state['control_bits'][name] = value if value is not None else False
+
+            return True
+        except Exception as e:
+            print(f"✗ Erro lendo bits de controle: {e}")
+            return False
+
+    async def read_inputs(self) -> bool:
+        """
+        Le as entradas digitais (E0-E7).
+        """
+        try:
+            for name, addr in mm.DIGITAL_INPUTS.items():
+                value = await asyncio.to_thread(self.client.read_coil, addr)
+                if name in self.machine_state['inputs']:
+                    self.machine_state['inputs'][name] = value if value is not None else False
+
+            return True
+        except Exception as e:
+            print(f"✗ Erro lendo entradas: {e}")
+            return False
+
+    async def read_outputs(self) -> bool:
+        """
+        Le as saidas digitais (S0-S7).
+        """
+        try:
+            for name, addr in mm.DIGITAL_OUTPUTS.items():
+                value = await asyncio.to_thread(self.client.read_coil, addr)
+                if name in self.machine_state['outputs']:
+                    self.machine_state['outputs'][name] = value if value is not None else False
+
+            # Atualiza LEDs baseado nas saidas (para compatibilidade)
+            self.machine_state['leds']['LED1'] = self.machine_state['outputs'].get('S4', False)
+            self.machine_state['leds']['LED2'] = self.machine_state['outputs'].get('S5', False)
+            self.machine_state['leds']['LED3'] = self.machine_state['outputs'].get('S6', False)
+
+            return True
+        except Exception as e:
+            print(f"✗ Erro lendo saidas: {e}")
+            return False
+
+    async def read_work_registers(self) -> bool:
+        """
+        Le os registros de trabalho (dobra atual, contador, velocidade).
+        """
+        try:
+            # Dobra atual (0x0918)
+            dobra = await asyncio.to_thread(
+                self.client.read_register,
+                mm.WORK_REGISTERS['DOBRA_ATUAL']
+            )
+            if dobra is not None:
+                self.machine_state['dobra_atual'] = dobra
+
+            # Contador de pecas (0x0920)
+            pecas = await asyncio.to_thread(
+                self.client.read_register,
+                mm.WORK_REGISTERS['CONTADOR_PECAS']
+            )
+            if pecas is not None:
+                self.machine_state['contador_pecas'] = pecas
+
+            # Velocidade do inversor (0x06E0)
+            vel_raw = await asyncio.to_thread(
+                self.client.read_register,
+                mm.INVERTER['VELOCIDADE_INVERSOR']
+            )
+            if vel_raw is not None:
+                self.machine_state['velocidade_rpm'] = mm.register_to_rpm(vel_raw)
+
+            return True
+        except Exception as e:
+            print(f"✗ Erro lendo registros de trabalho: {e}")
+            return False
+
     async def read_angles(self) -> bool:
         """
-        Lê todos os ângulos programados.
-
-        ATUALIZADO 16/Nov/2025: Usa novo método read_all_bend_angles()
-        validado com 100% de precisão na área 0x0500-0x0504.
+        Le todos os angulos programados.
+        CORRIGIDO 27/Nov/2025: Le de 0x0842+ (onde o ladder copia os valores)
         """
         try:
-            # Executa em thread separada
-            angles = await asyncio.to_thread(self.client.read_all_bend_angles)
-
-            if angles:
-                # Atualiza estado com formato esperado pela interface
-                self.machine_state['angles'] = {
-                    'bend_1_left': angles.get('bend_1', 0.0),
-                    'bend_2_left': angles.get('bend_2', 0.0),
-                    'bend_3_left': angles.get('bend_3', 0.0),
-                }
-                return True
-            return False
-        except Exception as e:
-            print(f"✗ Erro lendo ângulos: {e}")
-            return False
-
-    async def read_leds(self) -> bool:
-        """Lê todos os LEDs."""
-        try:
-            # Executa em thread separada
-            leds = await asyncio.to_thread(self.client.read_leds)
-            if leds:
-                self.machine_state['leds'] = leds
-                return True
-            return False
-        except Exception as e:
-            print(f"✗ Erro lendo LEDs: {e}")
-            return False
-
-    async def read_buttons(self) -> bool:
-        """Lê todos os botões."""
-        try:
-            # Executa em thread separada
-            buttons = await asyncio.to_thread(self.client.read_buttons)
-            if buttons:
-                self.machine_state['buttons'] = buttons
-                return True
-            return False
-        except Exception as e:
-            print(f"✗ Erro lendo botões: {e}")
-            return False
-
-    async def read_critical_states(self) -> bool:
-        """Lê estados críticos."""
-        try:
-            # Executa todas as leituras em threads separadas
-            modbus_enabled = await asyncio.to_thread(
-                self.client.read_coil,
-                mm.CRITICAL_STATES['MODBUS_SLAVE_ENABLED']
+            # Angulo 1 (0x0842)
+            ang1 = await asyncio.to_thread(
+                self.client.read_register,
+                mm.BEND_ANGLES['ANGULO_1_READ']
             )
-            if modbus_enabled is not None:
-                self.machine_state['modbus_enabled'] = modbus_enabled
+            if ang1 is not None:
+                self.machine_state['angles']['bend_1'] = ang1 / 10.0
 
-            cycle_active = await asyncio.to_thread(
-                self.client.read_coil,
-                mm.CRITICAL_STATES['CYCLE_ACTIVE']
+            # Angulo 2 (0x0844)
+            ang2 = await asyncio.to_thread(
+                self.client.read_register,
+                mm.BEND_ANGLES['ANGULO_2_READ']
             )
-            if cycle_active is not None:
-                self.machine_state['cycle_active'] = cycle_active
+            if ang2 is not None:
+                self.machine_state['angles']['bend_2'] = ang2 / 10.0
 
-            # Bit de modo REAL (02FF)
-            mode_bit_02ff = await asyncio.to_thread(
-                self.client.read_coil,
-                mm.CRITICAL_STATES['MODE_BIT_REAL']
+            # Angulo 3 (0x0846)
+            ang3 = await asyncio.to_thread(
+                self.client.read_register,
+                mm.BEND_ANGLES['ANGULO_3_READ']
             )
-            if mode_bit_02ff is not None:
-                self.machine_state['mode_bit_02ff'] = mode_bit_02ff
-                self.machine_state['mode_text'] = "AUTO" if mode_bit_02ff else "MANUAL"
-                # Backward compatibility
-                self.machine_state['mode_manual'] = not mode_bit_02ff
+            if ang3 is not None:
+                self.machine_state['angles']['bend_3'] = ang3 / 10.0
 
-            # Entrada E6 (crítica para mudança de modo)
-            input_e6 = await asyncio.to_thread(self.client.read_coil, 0x0106)  # E6
-            if input_e6 is not None:
-                self.machine_state['input_e6'] = input_e6
-                self.machine_state['mode_change_allowed'] = input_e6
+            # Angulo alvo = angulo da dobra atual
+            dobra = self.machine_state.get('dobra_atual', 1)
+            if dobra == 1:
+                self.machine_state['target_angle'] = self.machine_state['angles']['bend_1']
+            elif dobra == 2:
+                self.machine_state['target_angle'] = self.machine_state['angles']['bend_2']
+            else:
+                self.machine_state['target_angle'] = self.machine_state['angles']['bend_3']
 
             return True
         except Exception as e:
-            print(f"✗ Erro lendo estados críticos: {e}")
-            return False
-
-    async def update_supervision_state(self) -> bool:
-        """
-        Atualiza estados de supervisão (SOMENTE LEITURA).
-
-        MODIFICADO 18/Nov/2025: Removidas todas as escritas em 0x0940-0x094E
-        que causavam timeouts. Agora apenas infere valores localmente.
-        """
-        try:
-            # Infere valores localmente (SEM escrever no CLP)
-            screen_num = self.infer_screen_number()
-            self.machine_state['screen_num'] = screen_num
-
-            bend = self.infer_bend_current()
-            self.machine_state['bend_current'] = bend
-
-            direction = self.infer_direction()
-            self.machine_state['direction'] = direction
-
-            # Velocidade inferida localmente (modo manual = 5 rpm)
-            # DESABILITADO 18/Nov/2025: Registro 0x094C não é confiável
-            speed = await self.infer_speed_class()
-            self.machine_state['speed_class'] = speed
-
-            mode = 0 if self.machine_state.get('mode_manual', True) else 1
-            self.machine_state['mode_state'] = mode
-
-            # ✅ NENHUMA LEITURA/ESCRITA de registros de supervisão
-            return True
-        except Exception as e:
-            print(f"✗ Erro atualizando estados de supervisão: {e}")
+            print(f"✗ Erro lendo angulos: {e}")
             return False
 
     async def poll_once(self) -> bool:
         """
         Executa um ciclo completo de polling.
-
-        MODIFICADO 18/Nov/2025: Removidas escritas bloqueantes em registros de supervisão.
-        Agora opera 100% em modo leitura + inferência local.
         """
         try:
             self.machine_state['poll_count'] += 1
             self.machine_state['last_update'] = datetime.now().isoformat()
             self.machine_state['connected'] = self.client.connected
-            self.machine_state['modbus_connected'] = self.client.connected  # Para interface HTML
+            self.machine_state['modbus_connected'] = self.client.connected
 
-            # Leituras essenciais (rápidas, não bloqueantes com timeout=1s)
+            # Leituras essenciais (a cada ciclo)
             await self.read_encoder()
-            await self.read_leds()
-            await self.read_critical_states()
+            await self.read_machine_states()
+            await self.read_control_bits()
 
-            # Leituras menos frequentes para economizar largura de banda
+            # Leituras de I/O (a cada 2 ciclos)
+            if self.machine_state['poll_count'] % 2 == 0:
+                await self.read_inputs()
+                await self.read_outputs()
+
+            # Leituras menos frequentes (a cada 4 ciclos)
             if self.machine_state['poll_count'] % 4 == 0:
-                await self.read_buttons()
+                await self.read_work_registers()
 
+            # Leitura de angulos (a cada 20 ciclos - sao estaticos)
             if self.machine_state['poll_count'] % 20 == 0:
                 await self.read_angles()
 
-            # Atualiza estados de supervisão (SEM escritas no CLP)
-            await self.update_supervision_state()
             return True
         except Exception as e:
-            print(f"✗ Erro crítico em poll_once: {e}")
+            print(f"✗ Erro critico em poll_once: {e}")
             import traceback
             traceback.print_exc()
-            self.machine_state['modbus_connected'] = False  # Marca como desconectado em erro
+            self.machine_state['modbus_connected'] = False
             return False
 
     async def start_polling(self):
-        """Inicia loop de polling contínuo."""
+        """Inicia loop de polling continuo."""
         self.running = True
         print(f"✓ State Manager iniciado (polling a cada {self.poll_interval}s)")
 
@@ -331,8 +348,7 @@ class MachineStateManager:
             elapsed = time.time() - start_time
             sleep_time = max(0, self.poll_interval - elapsed)
             await asyncio.sleep(sleep_time)
-            # CRÍTICO: Yield control para outros coroutines (HTTP/WebSocket)
-            await asyncio.sleep(0)
+            await asyncio.sleep(0)  # Yield control
 
     def stop_polling(self):
         """Para loop de polling."""
@@ -343,28 +359,39 @@ class MachineStateManager:
         """Retorna estado completo com campos achatados para compatibilidade."""
         state = self.machine_state.copy()
 
-        # Achatar sub-dicionários para compatibilidade com interface
+        # Achatar angulos para compatibilidade
         if 'angles' in state:
-            for key, value in state['angles'].items():
-                state[key] = value
+            state['bend_1_left'] = state['angles'].get('bend_1', 0.0)
+            state['bend_2_left'] = state['angles'].get('bend_2', 0.0)
+            state['bend_3_left'] = state['angles'].get('bend_3', 0.0)
 
-        # Garantir que encoder_angle está exposto (alias para encoder_degrees)
+        # Alias para compatibilidade
         state['encoder_angle'] = state.get('encoder_degrees', 0.0)
+        state['speed_class'] = int(state.get('velocidade_rpm', 5))
+
+        # Flag PEDAL_SEGURA para interface
+        state['pedal_segura'] = state['control_bits'].get('PEDAL_SEGURA', False)
+
+        # Modo (para compatibilidade)
+        state['mode_manual'] = state['states'].get('ST_MANUAL', False)
 
         return state
 
     def get_changes(self, previous_state: Dict[str, Any]) -> Dict[str, Any]:
-        """Retorna apenas mudanças."""
+        """Retorna apenas mudancas."""
         changes = {}
-        for key, value in self.machine_state.items():
+        current = self.get_state()
+
+        for key, value in current.items():
             if key not in previous_state or previous_state[key] != value:
                 changes[key] = value
+
         return changes
 
 
 if __name__ == "__main__":
     async def main():
-        print("=== TESTE STATE MANAGER ===\n")
+        print("=== TESTE STATE MANAGER (NOVO LADDER) ===\n")
         client = ModbusClientWrapper(stub_mode=True)
         manager = MachineStateManager(client, poll_interval=1.0)
 
@@ -375,13 +402,16 @@ if __name__ == "__main__":
             state = manager.get_state()
             print(f"Ciclo {i+1}:")
             print(f"  Encoder: {state['encoder_degrees']:.1f}°")
-            print(f"  Tela inferida: {state['screen_num']}")
-            print(f"  Dobra atual: {state['bend_current']}")
-            print(f"  LEDs: LED1={state['leds']['LED1']}, LED2={state['leds']['LED2']}, LED3={state['leds']['LED3']}")
-            print(f"  Modo: {'MANUAL' if state['mode_manual'] else 'AUTO'}\n")
+            print(f"  Estado: {state['machine_state_icon']} {state['machine_state_name']}")
+            print(f"  Descricao: {state['machine_state_description']}")
+            print(f"  Dobra atual: {state['dobra_atual']}")
+            print(f"  Pecas: {state['contador_pecas']}")
+            print(f"  Velocidade: {state['velocidade_rpm']:.1f} RPM")
+            print(f"  PEDAL_SEGURA: {state['pedal_segura']}")
+            print()
             await asyncio.sleep(0.5)
 
-        print("✅ Teste concluído!")
+        print("✅ Teste concluido!")
         client.close()
 
     asyncio.run(main())

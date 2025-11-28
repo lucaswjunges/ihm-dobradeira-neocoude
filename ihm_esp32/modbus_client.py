@@ -66,7 +66,7 @@ class ModbusClientWrapper:
                 port=self.port,
                 baudrate=self.baudrate,
                 parity='N',
-                stopbits=1,  # VALIDADO: 1 stop bit (testado 18/Nov/2025 no RPi3B+)
+                stopbits=2,  # CORRIGIDO 27/Nov/2025: 2 stop bits necessário
                 bytesize=8,
                 timeout=1  # Timeout adequado para RPi
             )
@@ -138,7 +138,7 @@ class ModbusClientWrapper:
                 port=self.port,
                 baudrate=self.baudrate,
                 parity='N',
-                stopbits=1,
+                stopbits=2,  # CORRIGIDO 27/Nov/2025: 2 stop bits necessário
                 bytesize=8,
                 timeout=1
             )
@@ -147,7 +147,7 @@ class ModbusClientWrapper:
             if self.client.connect():
                 # Testa leitura para confirmar que CLP está respondendo
                 # Usa COILS porque INPUT REGISTERS pode não existir no endereço 0
-                result = self.client.read_coils(address=0, count=8, slave=self.slave_id)
+                result = self.client.read_coils(address=0x00C0, count=8, slave=self.slave_id)
                 if not result.isError():
                     print(f"✅ RECONECTADO com sucesso ao CLP!")
                     self.connected = True
@@ -233,7 +233,7 @@ class ModbusClientWrapper:
             base_address = (address // 8) * 8
             bit_offset = address - base_address
 
-            result = self.client.read_coils(address=base_address, count=8)
+            result = self.client.read_coils(address=base_address, count=8, slave=self.slave_id)
             if result.isError():
                 self._handle_communication_error(f"Erro ao ler coil 0x{address:04X}")
                 return None
@@ -271,7 +271,7 @@ class ModbusClientWrapper:
         try:
             # pymodbus 3.x: NÃO precisa subtrair 1, slave_id já configurado no objeto client
             # CORREÇÃO 20/Nov/2025: CLP usa INPUT REGISTERS (FC 0x04), não HOLDING (FC 0x03)
-            result = self.client.read_input_registers(address=address, count=1)
+            result = self.client.read_input_registers(address=address, count=1, slave=self.slave_id)
             if result.isError():
                 self._handle_communication_error(f"Erro ao ler registro 0x{address:04X}")
                 return None
@@ -309,7 +309,7 @@ class ModbusClientWrapper:
         try:
             # OTIMIZADO: Ler 2 registros consecutivos de uma vez (mais eficiente e funciona melhor)
             # CORREÇÃO 20/Nov/2025: CLP usa INPUT REGISTERS (FC 0x04), não HOLDING (FC 0x03)
-            result = self.client.read_input_registers(address=msw_address, count=2)
+            result = self.client.read_input_registers(address=msw_address, count=2, slave=self.slave_id)
             if result.isError():
                 self._handle_communication_error(f"Erro ao ler 32-bit 0x{msw_address:04X}")
                 return None
@@ -377,10 +377,10 @@ class ModbusClientWrapper:
             return False
 
         try:
-            # pymodbus 3.x coils: PRECISA subtrair 1 (base-0)
-            # slave_id já configurado no objeto client
-            pdu_address = address - 1
-            result = self.client.write_coil(address=pdu_address, value=value)
+            # CORRIGIDO 28/Nov/2025: NÃO subtrair 1!
+            # O pymodbus 3.x usa endereçamento direto (igual read_coil e write_register)
+            # O offset -1 estava causando escrita no endereço errado (0x0381 em vez de 0x0382, etc)
+            result = self.client.write_coil(address=address, value=value, slave=self.slave_id)
             if result.isError():
                 print(f"✗ [DEBUG] write_coil 0x{address:04X}: result.isError()=True")
             return not result.isError()
@@ -410,8 +410,7 @@ class ModbusClientWrapper:
 
         try:
             # pymodbus 3.x: NÃO precisa subtrair 1, usa endereçamento direto
-            # slave_id já configurado no objeto client
-            result = self.client.write_register(address=address, value=value)
+            result = self.client.write_register(address=address, value=value, slave=self.slave_id)
             if result.isError():
                 print(f"✗ [DEBUG] write_register 0x{address:04X}: result.isError()=True")
             return not result.isError()
