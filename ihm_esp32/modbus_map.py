@@ -219,6 +219,25 @@ INVERTER = {
     'VELOCIDADE_WRITE': 0x0A06,     # 2566 - Endereco de escrita (IHM -> Ladder -> 0x06E0)
 }
 
+# Alias para compatibilidade com modbus_client.py
+RPM_REGISTERS = {
+    'RPM_READ': 0x06E0,   # 1760 - Leitura do inversor
+    'RPM_WRITE': 0x0A06,  # 2566 - Escrita (IHM -> Ladder)
+}
+
+# ==========================================
+# AREA DE SUPERVISAO (IHM Web -> CLP)
+# ==========================================
+# Area onde a IHM Web escreve estados inferidos
+# CLP pode ler daqui para sincronizacao
+
+SUPERVISION_AREA = {
+    'SCREEN_NUM':    0x0940,  # 2368 - Numero da tela ativa (0-10)
+    'MODE_STATE':    0x0946,  # 2374 - Modo (0=Manual, 1=Auto)
+    'BEND_NUM':      0x0948,  # 2376 - Numero da dobra atual (1-3)
+    'SPEED_CLASS':   0x094A,  # 2378 - Classe de velocidade (5, 10, 15)
+}
+
 # Valores pre-calculados para RPM
 RPM_VALUES = {
     0:  0,

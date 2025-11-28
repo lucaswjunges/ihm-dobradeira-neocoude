@@ -337,40 +337,7 @@ class ModbusClientWrapper:
         """
         if self.stub_mode:
             self.stub_coils[address] = value
-
-            # Simular ROT5: Copiar de MODBUS_INPUT (0x0A00) para SHADOW (0x0840) quando trigger acionado
-            if value and address in [mm.BEND_ANGLES_MODBUS_INPUT.get('BEND_1_TRIGGER'),
-                                      mm.BEND_ANGLES_MODBUS_INPUT.get('BEND_2_TRIGGER'),
-                                      mm.BEND_ANGLES_MODBUS_INPUT.get('BEND_3_TRIGGER')]:
-                # Mapear trigger para endereços
-                trigger_map = {
-                    mm.BEND_ANGLES_MODBUS_INPUT['BEND_1_TRIGGER']: {
-                        'src_msw': mm.BEND_ANGLES_MODBUS_INPUT['BEND_1_INPUT_MSW'],  # 0x0A00
-                        'src_lsw': mm.BEND_ANGLES_MODBUS_INPUT['BEND_1_INPUT_LSW'],  # 0x0A02
-                        'dst_msw': mm.BEND_ANGLES_SHADOW['BEND_1_LEFT_MSW'],          # 0x0842
-                        'dst_lsw': mm.BEND_ANGLES_SHADOW['BEND_1_LEFT_LSW'],          # 0x0840
-                    },
-                    mm.BEND_ANGLES_MODBUS_INPUT['BEND_2_TRIGGER']: {
-                        'src_msw': mm.BEND_ANGLES_MODBUS_INPUT['BEND_2_INPUT_MSW'],  # 0x0A04
-                        'src_lsw': mm.BEND_ANGLES_MODBUS_INPUT['BEND_2_INPUT_LSW'],  # 0x0A06
-                        'dst_msw': mm.BEND_ANGLES_SHADOW['BEND_2_LEFT_MSW'],          # 0x0848
-                        'dst_lsw': mm.BEND_ANGLES_SHADOW['BEND_2_LEFT_LSW'],          # 0x0846
-                    },
-                    mm.BEND_ANGLES_MODBUS_INPUT['BEND_3_TRIGGER']: {
-                        'src_msw': mm.BEND_ANGLES_MODBUS_INPUT['BEND_3_INPUT_MSW'],  # 0x0A08
-                        'src_lsw': mm.BEND_ANGLES_MODBUS_INPUT['BEND_3_INPUT_LSW'],  # 0x0A0A
-                        'dst_msw': mm.BEND_ANGLES_SHADOW['BEND_3_LEFT_MSW'],          # 0x0852
-                        'dst_lsw': mm.BEND_ANGLES_SHADOW['BEND_3_LEFT_LSW'],          # 0x0850
-                    },
-                }
-
-                if address in trigger_map:
-                    mapping = trigger_map[address]
-                    # Copiar MSW e LSW de INPUT para SHADOW
-                    self.stub_registers[mapping['dst_msw']] = self.stub_registers.get(mapping['src_msw'], 0)
-                    self.stub_registers[mapping['dst_lsw']] = self.stub_registers.get(mapping['src_lsw'], 0)
-                    print(f"  🔄 [STUB] Copiado 0x{mapping['src_msw']:04X}/0x{mapping['src_lsw']:04X} → 0x{mapping['dst_msw']:04X}/0x{mapping['dst_lsw']:04X}")
-
+            # Modo stub: simula escrita bem-sucedida
             return True
 
         if not self.connected:
@@ -792,14 +759,14 @@ class ModbusClientWrapper:
 
     def write_bend_angle(self, bend_number: int, degrees: float) -> bool:
         """
-        Grava ângulo de dobra na área MODBUS INPUT (0x0A00+)
+        Grava ângulo de dobra na área de ESCRITA (0x0A00+)
 
-        ✅ VALIDADO 20/Nov/2025 - Formato 16-bit confirmado com Modbus Poll
+        ✅ CORRIGIDO 28/Nov/2025 - Endereços de escrita corretos
 
         FLUXO:
-          1. IHM grava 16-bit em endereço (0x0A00, 0x0A04 ou 0x0A08)
-          2. Ladder copia automaticamente para área shadow (0x0842, 0x0848, 0x0852)
-          3. Principal.lad lê da área shadow e executa dobra
+          1. IHM grava 16-bit em endereço (0x0A00, 0x0A02 ou 0x0A04)
+          2. Ladder copia automaticamente para área de leitura (0x0842, 0x0844, 0x0846)
+          3. Principal.lad lê da área de leitura e executa dobra
 
         Formato: 16-bit (1 registro apenas)
         - Conversão: value_clp = graus * 10
@@ -822,11 +789,12 @@ class ModbusClientWrapper:
             print(f"✗ Número de dobra inválido: {bend_number} (deve ser 1, 2 ou 3)")
             return False
 
-        # Mapeamento: Endereços base validados (16-bit cada)
+        # Mapeamento: Endereços de ESCRITA (0x0A00, 0x0A02, 0x0A04)
+        # CORRIGIDO 28/Nov/2025: Usar mm.BEND_ANGLES que tem os endereços corretos
         addresses = {
-            1: mm.BEND_ANGLES_MODBUS_INPUT['BEND_1_INPUT_BASE'],    # 0x0A00
-            2: mm.BEND_ANGLES_MODBUS_INPUT['BEND_2_INPUT_BASE'],    # 0x0A04
-            3: mm.BEND_ANGLES_MODBUS_INPUT['BEND_3_INPUT_BASE'],    # 0x0A08
+            1: mm.BEND_ANGLES['ANGULO_1_WRITE'],    # 0x0A00 (2560)
+            2: mm.BEND_ANGLES['ANGULO_2_WRITE'],    # 0x0A02 (2562)
+            3: mm.BEND_ANGLES['ANGULO_3_WRITE'],    # 0x0A04 (2564)
         }
 
         addr = addresses[bend_number]
@@ -852,13 +820,13 @@ class ModbusClientWrapper:
 
     def read_bend_angle(self, bend_number: int) -> Optional[float]:
         """
-        Lê ângulo de dobra da área SHADOW (0x0842, 0x0848, 0x0852)
+        Lê ângulo de dobra da área de LEITURA (0x0842, 0x0844, 0x0846)
 
-        ✅ VALIDADO 20/Nov/2025 - Formato 16-bit confirmado
+        ✅ CORRIGIDO 28/Nov/2025 - Endereços de leitura corretos
 
         FLUXO:
           1. Ladder copia de 0x0A00+ para 0x0842+ automaticamente
-          2. IHM lê de 0x0842+ (área shadow)
+          2. IHM lê de 0x0842+ (área de leitura)
           3. Converte valor CLP para graus (divide por 10)
 
         Formato: 16-bit (1 registro apenas)
@@ -876,11 +844,12 @@ class ModbusClientWrapper:
             >>> print(f"Dobra 1: {angle}°")
             Dobra 1: 90.0°
         """
-        # Mapeamento: 0x0842, 0x0848, 0x0852 (área SHADOW - 16-bit cada)
+        # Mapeamento: Endereços de LEITURA (0x0842, 0x0844, 0x0846)
+        # CORRIGIDO 28/Nov/2025: Usar mm.BEND_ANGLES que tem os endereços corretos
         addresses = {
-            1: mm.BEND_ANGLES_SHADOW['BEND_1_LEFT_MSW'],  # 0x0842
-            2: mm.BEND_ANGLES_SHADOW['BEND_2_LEFT_MSW'],  # 0x0848
-            3: mm.BEND_ANGLES_SHADOW['BEND_3_LEFT_MSW'],  # 0x0852
+            1: mm.BEND_ANGLES['ANGULO_1_READ'],  # 0x0842 (2114)
+            2: mm.BEND_ANGLES['ANGULO_2_READ'],  # 0x0844 (2116)
+            3: mm.BEND_ANGLES['ANGULO_3_READ'],  # 0x0846 (2118)
         }
 
         if bend_number not in addresses:
