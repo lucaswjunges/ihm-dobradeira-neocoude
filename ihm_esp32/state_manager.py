@@ -136,16 +136,45 @@ class MachineStateManager:
         }
 
     async def read_encoder(self) -> bool:
-        """Le encoder (32-bit) e atualiza estado."""
+        """
+        Le encoder (32-bit) e atualiza estado.
+
+        CORRIGIDO 02/Jan/2026: Leitura profissional do encoder
+        - Encoder: 400 pulsos/volta (0-399)
+        - Zerado quando sensor E0 (posição zero) fica ON
+        - Sentido inferido por DIR_AVANCO (0x0380) e DIR_RECUO (0x0381)
+        """
         try:
+            # Ler contador de pulsos (0-65535, mas normalizado para 0-399 por hardware)
             raw = await asyncio.to_thread(
                 self.client.read_32bit,
                 mm.ENCODER['ANGLE_MSW'],
                 mm.ENCODER['ANGLE_LSW']
             )
+
             if raw is not None:
+                # Armazena valor bruto
                 self.machine_state['encoder_raw'] = raw
-                self.machine_state['encoder_degrees'] = mm.clp_to_degrees(raw)
+
+                # Normaliza para 0-399 pulsos (MOD 400)
+                pulsos_normalizados = raw % 400
+
+                # Converte pulsos para graus (0-360°)
+                # 400 pulsos = 360° → 1 pulso = 0.9°
+                graus = (pulsos_normalizados / 400.0) * 360.0
+
+                # Armazena posição em graus
+                self.machine_state['encoder_degrees'] = graus
+                self.machine_state['encoder_pulses'] = pulsos_normalizados
+
+                # Detecta movimento comparando com valor anterior
+                if hasattr(self, '_last_encoder_raw'):
+                    delta = abs(raw - self._last_encoder_raw)
+                    self.machine_state['encoder_moving'] = delta > 0
+                else:
+                    self.machine_state['encoder_moving'] = False
+
+                self._last_encoder_raw = raw
                 return True
             return False
         except Exception as e:
@@ -372,6 +401,11 @@ class MachineStateManager:
     async def poll_once(self) -> bool:
         """
         Executa um ciclo completo de polling.
+
+        CORRIGIDO 02/Jan/2026: Polling otimizado para encoder
+        - Encoder SEMPRE lido (crítico para visualização em tempo real)
+        - I/O e estados a cada ciclo durante movimento
+        - Registros estáticos lidos menos frequentemente
         """
         try:
             self.machine_state['poll_count'] += 1
@@ -379,25 +413,31 @@ class MachineStateManager:
             self.machine_state['connected'] = self.client.connected
             self.machine_state['modbus_connected'] = self.client.connected
 
-            # Leituras essenciais (a cada ciclo)
+            # ==========================================
+            # LEITURAS CRÍTICAS (TODO CICLO)
+            # ==========================================
+            # Encoder: SEMPRE lido para tracking em tempo real
             await self.read_encoder()
+
+            # Estados da máquina: necessário para detectar movimento
             await self.read_machine_states()
+
+            # Bits de controle: direção, pedal, etc
             await self.read_control_bits()
 
-            # DESATIVADO 02/Jan/2026: Auto-calibração removida
-            # if self.machine_state['calibration']['active'] or self.machine_state['poll_count'] % 4 == 0:
-            #     await self.read_calibration()
-
-            # Leituras de I/O (a cada 2 ciclos)
+            # ==========================================
+            # LEITURAS FREQUENTES (A CADA 2 CICLOS)
+            # ==========================================
+            # Durante movimento, precisamos ler I/O com frequência
             if self.machine_state['poll_count'] % 2 == 0:
                 await self.read_inputs()
                 await self.read_outputs()
+                await self.read_work_registers()  # Movido para cá (dobra atual, contador)
 
-            # Leituras menos frequentes (a cada 4 ciclos)
-            if self.machine_state['poll_count'] % 4 == 0:
-                await self.read_work_registers()
-
-            # Leitura de angulos (a cada 20 ciclos - sao estaticos)
+            # ==========================================
+            # LEITURAS ESPORÁDICAS (A CADA 20 CICLOS)
+            # ==========================================
+            # Ângulos são estáticos, não precisam ser lidos sempre
             if self.machine_state['poll_count'] % 20 == 0:
                 await self.read_angles()
 
@@ -410,15 +450,33 @@ class MachineStateManager:
             return False
 
     async def start_polling(self):
-        """Inicia loop de polling continuo."""
+        """
+        Inicia loop de polling continuo com taxa adaptativa.
+
+        CORRIGIDO 02/Jan/2026: Polling adaptativo baseado no estado
+        - DOBRANDO/RETORNANDO: 100ms (10 Hz) - tracking preciso do encoder
+        - IDLE/AGUARDANDO: 250ms (4 Hz) - economia de recursos
+        - Otimizado para resposta em tempo real na IHM
+        """
         self.running = True
-        print(f"✓ State Manager iniciado (polling a cada {self.poll_interval}s)")
+        base_interval = self.poll_interval  # 250ms padrão
+        fast_interval = 0.1  # 100ms durante movimento
+
+        print(f"✓ State Manager iniciado (polling adaptativo: {base_interval*1000:.0f}ms padrão, {fast_interval*1000:.0f}ms em movimento)")
 
         while self.running:
             start_time = time.time()
             await self.poll_once()
             elapsed = time.time() - start_time
-            sleep_time = max(0, self.poll_interval - elapsed)
+
+            # Polling adaptativo: mais rápido durante movimento
+            current_state = self.machine_state.get('machine_state_address', 0x0300)
+            is_moving = current_state in [0x0302, 0x0303]  # ST_DOBRANDO ou ST_RETORNANDO
+
+            # Usa intervalo rápido se em movimento, senão usa padrão
+            target_interval = fast_interval if is_moving else base_interval
+
+            sleep_time = max(0, target_interval - elapsed)
             await asyncio.sleep(sleep_time)
             await asyncio.sleep(0)  # Yield control
 
@@ -428,7 +486,11 @@ class MachineStateManager:
         print("✓ State Manager parado")
 
     def get_state(self) -> Dict[str, Any]:
-        """Retorna estado completo com campos achatados para compatibilidade."""
+        """
+        Retorna estado completo com campos achatados para compatibilidade.
+
+        CORRIGIDO 02/Jan/2026: Adiciona informações do encoder
+        """
         state = self.machine_state.copy()
 
         # Achatar angulos para compatibilidade
@@ -446,6 +508,24 @@ class MachineStateManager:
 
         # Modo (para compatibilidade)
         state['mode_manual'] = state['states'].get('ST_MANUAL', False)
+
+        # Encoder: Informações adicionais para visualização profissional
+        state['encoder_pulses'] = state.get('encoder_pulses', 0)  # Pulsos 0-399
+        state['encoder_moving'] = state.get('encoder_moving', False)  # Flag movimento
+
+        # Sentido de rotação (inferido dos bits de controle)
+        dir_avanco = state.get('control_bits', {}).get('DIR_AVANCO', False)  # CCW
+        dir_recuo = state.get('control_bits', {}).get('DIR_RECUO', False)    # CW
+
+        if dir_avanco:
+            state['encoder_direction'] = 'CCW'  # Anti-horário
+            state['encoder_direction_symbol'] = '⟲'
+        elif dir_recuo:
+            state['encoder_direction'] = 'CW'   # Horário
+            state['encoder_direction_symbol'] = '⟳'
+        else:
+            state['encoder_direction'] = 'STOP'
+            state['encoder_direction_symbol'] = '—'
 
         return state
 

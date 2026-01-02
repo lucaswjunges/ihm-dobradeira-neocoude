@@ -150,6 +150,24 @@
         .info-value.encoder {
             color: #2ecc71;
             text-shadow: 0 0 15px rgba(46,204,113,0.5);
+            transition: all 0.2s ease;
+        }
+
+        .info-value.encoder.moving {
+            animation: encoderPulse 0.6s ease-in-out infinite;
+        }
+
+        @keyframes encoderPulse {
+            0%, 100% {
+                transform: scale(1);
+                color: #2ecc71;
+                text-shadow: 0 0 15px rgba(46,204,113,0.5);
+            }
+            50% {
+                transform: scale(1.05);
+                color: #27ae60;
+                text-shadow: 0 0 25px rgba(46,204,113,0.8);
+            }
         }
 
         .info-value.counter {
@@ -1193,8 +1211,11 @@
         <!-- Grid de Informações -->
         <div class="info-grid">
             <div class="info-card">
-                <div class="info-label">Posição Encoder</div>
+                <div class="info-label">Posição Encoder <span id="encoderDirection" style="font-size: 18px;">—</span></div>
                 <div class="info-value encoder" id="encoderValue">0.0°</div>
+                <div style="font-size: 11px; opacity: 0.6; margin-top: 4px;">
+                    <span id="encoderPulses">0</span> pulsos
+                </div>
             </div>
             <div class="info-card">
                 <div class="info-label">Dobra Atual</div>
@@ -1546,9 +1567,27 @@
                 updateMachineState(data.machine_state_name, data.machine_state_description, data.machine_state_icon);
             }
 
-            // Encoder
+            // Encoder (CORRIGIDO 02/Jan/2026: visualização profissional)
             if (data.encoder_degrees !== undefined && data.encoder_degrees !== null) {
-                document.getElementById('encoderValue').textContent = data.encoder_degrees.toFixed(1) + '°';
+                const encoderEl = document.getElementById('encoderValue');
+                encoderEl.textContent = data.encoder_degrees.toFixed(1) + '°';
+
+                // Animação de pulsação durante movimento
+                if (data.encoder_moving) {
+                    encoderEl.classList.add('moving');
+                } else {
+                    encoderEl.classList.remove('moving');
+                }
+            }
+
+            // Pulsos do encoder (debug)
+            if (data.encoder_pulses !== undefined) {
+                document.getElementById('encoderPulses').textContent = data.encoder_pulses;
+            }
+
+            // Direção de rotação (seta)
+            if (data.encoder_direction_symbol !== undefined) {
+                document.getElementById('encoderDirection').textContent = data.encoder_direction_symbol;
             }
 
             // Dobra atual
