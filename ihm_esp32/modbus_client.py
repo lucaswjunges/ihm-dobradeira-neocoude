@@ -272,8 +272,8 @@ class ModbusClientWrapper:
 
         try:
             # pymodbus 3.x: NÃO precisa subtrair 1, slave_id já configurado no objeto client
-            # CORREÇÃO 20/Nov/2025: CLP usa INPUT REGISTERS (FC 0x04), não HOLDING (FC 0x03)
-            result = self.client.read_input_registers(address=address, count=1, slave=self.slave_id)
+            # CORRIGIDO 02/Jan/2026: ENCODER em 04D6 usa HOLDING REGISTERS (FC 0x03)
+            result = self.client.read_holding_registers(address=address, count=1, slave=self.slave_id)
             if result.isError():
                 self._handle_communication_error(f"Erro ao ler registro 0x{address:04X}")
                 return None

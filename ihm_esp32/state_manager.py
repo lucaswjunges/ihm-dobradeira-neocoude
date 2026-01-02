@@ -139,47 +139,45 @@ class MachineStateManager:
 
     async def read_encoder(self) -> bool:
         """
-        Le encoder (32-bit) DIRETO do CLP - SEM FILTRO.
+        Le encoder (16-bit) DIRETO do CLP em 04D6.
 
-        OTIMIZADO 02/Jan/2026: Leitura direta e rápida
-        - CLP já fornece valor preciso 0-399 pulsos
+        CORRIGIDO 02/Jan/2026: Leitura correta!
+        - Encoder está em 0x04D6 (1238) - APENAS 1 REGISTRO de 16-bit
+        - NÃO é 32-bit! NÃO precisa ler 04D7!
+        - Valor já vem 0-399 pulsos do CLP
         - Conversão direta: (pulsos / 400) × 360 = graus
-        - Taxa: 50ms (20 Hz) - aproveitando Modbus RTU 57600bps
-        - Timeout otimizado para leitura rápida
         """
         try:
-            # Ler contador de pulsos DIRETO (32-bit)
-            # 04D6 (MSW) + 04D7 (LSW) = valor acumulativo
-            raw = await asyncio.to_thread(
-                self.client.read_32bit,
-                mm.ENCODER['ANGLE_MSW'],
-                mm.ENCODER['ANGLE_LSW']
+            # Ler contador de pulsos DIRETO (16-bit, apenas 04D6!)
+            pulsos = await asyncio.to_thread(
+                self.client.read_register,
+                mm.ENCODER['ANGLE_MSW']  # Apenas 04D6, não lê 04D7!
             )
 
-            if raw is not None:
-                # Valor bruto acumulativo (pode ser > 400)
-                self.machine_state['encoder_raw'] = raw
+            if pulsos is not None:
+                # Valor já vem 0-399 do CLP (16-bit)
+                self.machine_state['encoder_raw'] = pulsos
 
-                # Normaliza para 0-399 pulsos (MOD 400)
-                # CLP conta continuamente, precisamos pegar posição dentro da volta
-                pulsos = raw % 400
+                # NÃO precisa MOD 400, CLP já normaliza!
+                # Pulsos já estão 0-399
+                self.machine_state['encoder_pulsos'] = pulsos
 
-                # Conversão DIRETA para graus (sem filtro!)
+                # Conversão DIRETA para graus
                 # 400 pulsos = 360° → pulsos × 0.9 = graus
                 graus = (pulsos / 400.0) * 360.0
 
-                # Atualiza estado (valores limpos, direto do CLP)
+                # Atualiza estado
                 self.machine_state['encoder_degrees'] = graus
                 self.machine_state['encoder_pulses'] = pulsos
 
-                # Detecta movimento (delta > 0)
-                if hasattr(self, '_last_encoder_raw'):
-                    delta = abs(raw - self._last_encoder_raw)
+                # Detecta movimento
+                if hasattr(self, '_last_encoder_pulsos'):
+                    delta = abs(pulsos - self._last_encoder_pulsos)
                     self.machine_state['encoder_moving'] = delta > 0
                 else:
                     self.machine_state['encoder_moving'] = False
 
-                self._last_encoder_raw = raw
+                self._last_encoder_pulsos = pulsos
                 return True
             return False
         except Exception as e:
