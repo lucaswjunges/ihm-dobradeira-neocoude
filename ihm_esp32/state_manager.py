@@ -326,7 +326,9 @@ class MachineStateManager:
     async def read_angles(self) -> bool:
         """
         Le todos os angulos programados.
+
         CORRIGIDO 27/Nov/2025: Le de 0x0842+ (onde o ladder copia os valores)
+        CORRIGIDO 02/Jan/2026: Usa mm.clp_to_degrees() para converter pulsos -> graus
         """
         try:
             # Angulo 1 (0x0842)
@@ -335,7 +337,7 @@ class MachineStateManager:
                 mm.BEND_ANGLES['ANGULO_1_READ']
             )
             if ang1 is not None:
-                self.machine_state['angles']['bend_1'] = ang1 / 10.0
+                self.machine_state['angles']['bend_1'] = mm.clp_to_degrees(ang1)
 
             # Angulo 2 (0x0844)
             ang2 = await asyncio.to_thread(
@@ -343,7 +345,7 @@ class MachineStateManager:
                 mm.BEND_ANGLES['ANGULO_2_READ']
             )
             if ang2 is not None:
-                self.machine_state['angles']['bend_2'] = ang2 / 10.0
+                self.machine_state['angles']['bend_2'] = mm.clp_to_degrees(ang2)
 
             # Angulo 3 (0x0846)
             ang3 = await asyncio.to_thread(
@@ -351,7 +353,7 @@ class MachineStateManager:
                 mm.BEND_ANGLES['ANGULO_3_READ']
             )
             if ang3 is not None:
-                self.machine_state['angles']['bend_3'] = ang3 / 10.0
+                self.machine_state['angles']['bend_3'] = mm.clp_to_degrees(ang3)
 
             # Angulo alvo = angulo da dobra atual
             dobra = self.machine_state.get('dobra_atual', 1)
