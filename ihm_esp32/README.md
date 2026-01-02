@@ -1,99 +1,145 @@
-# Web-Based HMI for Industrial Hydraulic Rebar Bending Machine
+# Industrial HMI for NEOCOUDE-HD-15 Rebar Bending Machine
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Python 3.11+](https://img.shields.io/badge/python-3.11+-blue.svg)](https://www.python.org/downloads/)
-[![Platform: Raspberry Pi](https://img.shields.io/badge/platform-Raspberry%20Pi%203B%2B-red.svg)](https://www.raspberrypi.org/)
-[![Modbus RTU](https://img.shields.io/badge/protocol-Modbus%20RTU-green.svg)](https://modbus.org/)
+[![Platform: Raspberry Pi](https://img.shields.io/badge/platform-Raspberry%20Pi%203B%2B-red.svg)](https://www.raspberrypi.com/)
+[![Status: Production](https://img.shields.io/badge/status-production-green.svg)](https://github.com/lucaswjunges/ihm-dobradeira-neocoude)
 
-> **Industrial Modernization Project**: Complete replacement of a damaged physical HMI panel (€2000+) with a modern, tablet-based web interface for a 2007 NEOCOUDE-HD-15 hydraulic rebar bending machine controlled by an Atos MPC4004 PLC.
+> **Modern web-based Human-Machine Interface (HMI) for industrial automation, replacing a damaged physical control panel with a tablet-accessible solution running on Raspberry Pi 3B+.**
 
 ---
 
 ## 🎯 Project Overview
 
-This project provides a **production-ready industrial HMI** (Human-Machine Interface) system that modernizes a legacy rebar bending machine by:
+This project modernizes a 2007 **NEOCOUDE-HD-15 rebar bending machine** (capacity: 50mm/2" diameter steel bars) by replacing its damaged physical HMI panel (Atos MPC4004) with a **responsive web-based interface** accessible from tablets via WiFi.
 
-- Replacing a damaged €2000+ physical HMI panel with a **web-based solution**
-- Enabling **tablet-based operation** for improved ergonomics
-- Adding **remote monitoring** via WiFi and VPN (Tailscale)
-- Implementing **intelligent auto-calibration** for zero-point detection
-- Providing **real-time production tracking** and maintenance logs
+### Key Features
 
-### Target Machine Specifications
-
-- **Machine**: NEOCOUDE-HD-15 (Trillor, 2007)
-- **Controller**: Atos Expert MPC4004 PLC
-- **Motor**: 15 HP, 1755 RPM @ 380V, 23A
-- **Capacity**: Up to 50mm (2") CA-25 steel, 44mm CA-50 steel
-- **Encoder**: 400 PPR incremental (model 2.018.200)
-- **Communication**: Modbus RTU @ 57600 baud (RS485-B channel)
+- ✅ **Modbus RTU Communication** - RS485 interface to Atos Expert MPC4004 PLC
+- ✅ **WebSocket Real-Time Updates** - Bidirectional communication (Python backend ↔ JavaScript frontend)
+- ✅ **WiFi Dual-Mode Networking** - Simultaneous Access Point + Station mode
+- ✅ **NAT/Policy Routing** - Internet sharing from factory WiFi to mobile clients
+- ✅ **Production-Ready** - Automated boot configuration, error recovery, systemd services
 
 ---
 
-## ✨ Key Features
+## 🛠️ Technical Stack
 
-### 🚀 Real-Time Control
-- **< 50ms latency** from user input to PLC command
-- **4 Hz polling rate** for smooth encoder position tracking
-- **±0.9° precision** (400 PPR encoder resolution)
-- **WebSocket-based** real-time data streaming to web clients
+### Hardware
+- **Controller:** Raspberry Pi 3B+ (ARM Cortex-A53 1.4GHz, 1GB RAM)
+- **PLC:** Atos Expert Series MPC4004 (legacy industrial controller)
+- **Interfaces:**
+  - USB-RS485 converter (FTDI/CH340 chipset)
+  - USB WiFi dongle (RTL8188CUS) for factory network
+  - Built-in WiFi (BCM43438) for Access Point mode
 
-### 🤖 Intelligent Auto-Calibration
-7-step calibration sequence:
-1. Exit sensor zone
-2. Hydraulic warm-up (30s optional)
-3. Sensor mapping
-4. Zero calculation
-5. Ballistic inertia test
-6. Physics modeling
-7. Parameter storage
-
-See [CLAUDE.md](CLAUDE.md) for detailed documentation.
-
----
-
-## 🚀 Quick Start
-
-### Installation
-
-\`\`\`bash
-# Clone repository
-git clone https://github.com/lucaswjunges/ihm-dobradeira-neocoude.git
-cd ihm-dobradeira-neocoude
-
-# Install dependencies
-python3 -m venv venv
-source venv/bin/activate
-pip install -r requirements.txt
-
-# Run server
-python3 main_server.py
-\`\`\`
-
-### Access
-
-Open browser: \`http://localhost:8080\`
+### Software & Frameworks
+- **Backend:** Python 3.11 (asyncio, websockets, pymodbus)
+- **Frontend:** Vanilla JavaScript (ES6+), HTML5, CSS3 (no frameworks - lightweight)
+- **Networking:**
+  - dnsmasq (DNS proxy + DHCP server)
+  - hostapd (WiFi Access Point)
+  - iptables/nftables (NAT/MASQUERADE)
+  - iproute2 (policy-based routing)
+- **System:** systemd services, bash automation scripts
 
 ---
 
-## 📖 Documentation
+## 🚀 Key Technical Achievements
 
-- **[CLAUDE.md](CLAUDE.md)** - Complete technical documentation (English)
-- **[README_PT-BR.md](README_PT-BR.md)** - Documentação em Português
+### 1. WiFi-to-WiFi Internet Sharing (Advanced Networking)
+
+**Challenge:** Raspberry Pi has only one internal WiFi adapter. How to simultaneously:
+- Connect to factory WiFi (Station mode) for internet access
+- Host WiFi Access Point for tablets
+
+**Solution:**
+- USB WiFi dongle (wlan1) in **STA mode** → factory network (192.168.0.0/24)
+- Internal WiFi (wlan0) in **AP mode** → tablets (192.168.50.0/24)
+- **Policy-based routing** with iproute2 (separate routing table for AP traffic)
+- **NAT/MASQUERADE** with iptables for address translation
+
+**Technical Details:** See [INTERNET_SHARING_SETUP.md](INTERNET_SHARING_SETUP.md)
+
+**Performance Metrics:**
+```bash
+$ sudo iptables -L FORWARD -v -n
+7,144 packets (1.2 MB) forwarded: client → internet
+23,272 packets (28 MB) forwarded: internet → client
+```
+
+### 2. Modbus RTU Industrial Protocol
+
+**Challenge:** Communicate with a 2007-era PLC using legacy Modbus RTU protocol over RS485.
+
+**Implementation:**
+- **32-bit register reading:** Paired registers (MSW/LSW) for encoder values
+- **Button simulation:** Force Single Coil (0x05) with 100ms hold time
+- **Error recovery:** Automatic reconnection, timeout handling
+- **Stub mode:** Development without hardware (mock PLC responses)
 
 ---
 
-## 👤 Author
+## 📊 Performance & Scalability
+
+| Metric | Value | Notes |
+|--------|-------|-------|
+| **Boot Time** | ~40s | RPi startup + services initialization |
+| **Modbus Latency** | ~30ms | PLC read/write roundtrip |
+| **WebSocket Latency** | ~300ms | State update propagation |
+| **Button Response** | ~50ms | Click → PLC command |
+| **Concurrent Clients** | 10-15 | Limited by WiFi AP capacity |
+| **Network Throughput** | ~20 Mbps | Factory WiFi bottleneck |
+
+---
+
+## 📚 Documentation
+
+| Document | Description |
+|----------|-------------|
+| [INTERNET_SHARING_SETUP.md](INTERNET_SHARING_SETUP.md) | Advanced networking guide (WiFi NAT/routing) |
+| [COMPARTILHAMENTO_INTERNET.md](COMPARTILHAMENTO_INTERNET.md) | Portuguese documentation |
+| [CLAUDE.md](CLAUDE.md) | Project specifications & context |
+
+---
+
+## 👨‍💻 Author
 
 **Lucas William Junges**  
-Control & Automation Engineer | Industrial AI Specialist  
-🌍 EU Work Authorization (Italian Citizenship)  
-📧 [lucaswjunges@gmail.com](mailto:lucaswjunges@gmail.com)  
-💼 [LinkedIn](https://www.linkedin.com/in/lucas-william-junges-a95b00143)  
-🌐 [Portfolio](https://lucaswjunges.github.io)
+Electrical Engineer | Industrial Automation & Control Systems
+
+[![LinkedIn](https://img.shields.io/badge/LinkedIn-blue?style=flat&logo=linkedin)](https://www.linkedin.com/in/lucaswjunges/)
+[![GitHub](https://img.shields.io/badge/GitHub-black?style=flat&logo=github)](https://github.com/lucaswjunges)
+
+**Industry Experience:**
+- Industrial IoT & HMI Development
+- Embedded Linux on ARM platforms
+- PLC Programming (Ladder Logic, Modbus RTU)
+- Network Engineering (WiFi, NAT, Policy Routing)
+- Real-time control systems
+
+**Contact:** Open to collaboration and job opportunities in Europe.
 
 ---
 
-## 📄 License
+## 📌 Project Status
 
-MIT License - see [LICENSE](LICENSE) file for details.
+| Milestone | Status | Date |
+|-----------|--------|------|
+| Hardware Setup | ✅ Complete | Nov 2025 |
+| Modbus Communication | ✅ Complete | Nov 2025 |
+| Web Interface (Basic) | ✅ Complete | Nov 2025 |
+| WiFi Networking (NAT) | ✅ Complete | Jan 2026 |
+| Production Deployment | ✅ Complete | Jan 2026 |
+| Data Logging | 🔄 In Progress | - |
+| Remote Monitoring | 📋 Planned | - |
+
+---
+
+<p align="center">
+  <strong>⭐ If you find this project useful, please consider starring it on GitHub! ⭐</strong>
+</p>
+
+<p align="center">
+  <sub>Built with ❤️ for the industrial automation community</sub>
+</p>
