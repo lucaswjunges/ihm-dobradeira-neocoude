@@ -1,0 +1,14 @@
+[Unit]
+Description=IHM NAT and Routing Setup for WiFi Sharing
+After=network-online.target wlan0.device wlan1.device dnsmasq.service
+Wants=network-online.target
+
+[Service]
+Type=oneshot
+RemainAfterExit=yes
+ExecStart=/home/lucas-junges/Documents/wco/ihm_esp32/scripts/setup_nat_routing.sh
+StandardOutput=journal
+StandardError=journal
+
+[Install]
+WantedBy=multi-user.target

@@ -160,43 +160,42 @@ class WiFiManager:
             return None
 
     def scan_networks(self) -> List[Dict]:
-        """Escaneia redes WiFi disponíveis pelo dongle"""
+        """Escaneia redes WiFi disponíveis pelo dongle usando nmcli"""
         networks = []
         try:
-            # Primeiro, ativa a interface se necessário
+            # MÉTODO NOVO: Usa nmcli para escanear (mais simples e rápido)
+            # Primeiro força um rescan
             subprocess.run(
-                ['sudo', 'ip', 'link', 'set', self.DONGLE_INTERFACE, 'up'],
-                capture_output=True, timeout=5
+                ['sudo', 'nmcli', 'device', 'wifi', 'rescan', 'ifname', self.DONGLE_INTERFACE],
+                capture_output=True, timeout=10
             )
             time.sleep(1)
 
-            # Escaneia redes
+            # Lista redes disponíveis
             result = subprocess.run(
-                ['sudo', 'iw', 'dev', self.DONGLE_INTERFACE, 'scan'],
-                capture_output=True, text=True, timeout=30
+                ['sudo', 'nmcli', '-t', '-f', 'SSID,SIGNAL,SECURITY', 'device', 'wifi', 'list', 'ifname', self.DONGLE_INTERFACE],
+                capture_output=True, text=True, timeout=10
             )
 
             if result.returncode == 0:
-                current_network = {}
-                for line in result.stdout.split('\n'):
-                    line = line.strip()
-                    if line.startswith('BSS '):
-                        if current_network and 'ssid' in current_network:
-                            networks.append(current_network)
-                        current_network = {'bssid': line.split()[1].replace('(', '').replace(')', '')}
-                    elif line.startswith('SSID:'):
-                        ssid = line.split(':', 1)[1].strip()
-                        if ssid:  # Ignora SSIDs vazios
-                            current_network['ssid'] = ssid
-                    elif 'signal:' in line:
-                        try:
-                            signal = line.split(':')[1].strip().split()[0]
-                            current_network['signal'] = int(float(signal))
-                        except:
-                            pass
+                for line in result.stdout.strip().split('\n'):
+                    if not line:
+                        continue
+                    parts = line.split(':')
+                    if len(parts) >= 2:
+                        ssid = parts[0].strip()
+                        signal = parts[1].strip()
+                        security = parts[2].strip() if len(parts) > 2 else ''
 
-                if current_network and 'ssid' in current_network:
-                    networks.append(current_network)
+                        if ssid:  # Ignora SSIDs vazios
+                            try:
+                                networks.append({
+                                    'ssid': ssid,
+                                    'signal': int(signal) if signal.isdigit() else -100,
+                                    'security': security
+                                })
+                            except:
+                                pass
 
         except subprocess.TimeoutExpired:
             print("[WiFi] Timeout ao escanear redes")
@@ -215,7 +214,7 @@ class WiFiManager:
 
     def connect_to_wifi(self, ssid: str, password: str, save: bool = True) -> Tuple[bool, str]:
         """
-        Conecta o dongle WiFi a uma rede
+        Conecta o dongle WiFi a uma rede usando NetworkManager (nmcli)
 
         Args:
             ssid: Nome da rede WiFi
@@ -229,57 +228,30 @@ class WiFiManager:
             return False, "Dongle WiFi USB não detectado"
 
         try:
-            # Cria arquivo de configuração wpa_supplicant temporário
-            wpa_conf = f'''
-ctrl_interface=DIR=/var/run/wpa_supplicant GROUP=netdev
-update_config=1
-country=BR
+            # MÉTODO NOVO: Usa nmcli (NetworkManager) ao invés de wpa_supplicant manual
+            # Isso evita conflitos com o wpa_supplicant do AP (wlan0)
 
-network={{
-    ssid="{ssid}"
-    psk="{password}"
-    key_mgmt=WPA-PSK
-}}
-'''
-            # Salva configuração temporária
-            conf_file = Path('/tmp/wpa_supplicant_dongle.conf')
-            with open(conf_file, 'w') as f:
-                f.write(wpa_conf)
-
-            # Para wpa_supplicant existente no dongle
-            subprocess.run(
-                ['sudo', 'killall', '-9', 'wpa_supplicant'],
-                capture_output=True, timeout=5
-            )
-            time.sleep(1)
-
-            # Ativa interface
-            subprocess.run(
-                ['sudo', 'ip', 'link', 'set', self.DONGLE_INTERFACE, 'up'],
-                capture_output=True, timeout=5
-            )
-
-            # Inicia wpa_supplicant no dongle
+            # Conecta usando nmcli
             result = subprocess.run(
-                ['sudo', 'wpa_supplicant', '-B', '-i', self.DONGLE_INTERFACE,
-                 '-c', str(conf_file), '-D', 'nl80211,wext'],
-                capture_output=True, text=True, timeout=10
+                ['sudo', 'nmcli', 'device', 'wifi', 'connect', ssid,
+                 'password', password, 'ifname', self.DONGLE_INTERFACE],
+                capture_output=True, text=True, timeout=30
             )
 
             if result.returncode != 0:
-                return False, f"Erro ao iniciar wpa_supplicant: {result.stderr}"
+                # Tenta parsear erro
+                error_msg = result.stderr.strip() if result.stderr else "Erro desconhecido"
 
-            # Aguarda conexão
-            time.sleep(3)
-
-            # Solicita IP via DHCP
-            subprocess.run(
-                ['sudo', 'dhclient', '-v', self.DONGLE_INTERFACE],
-                capture_output=True, timeout=30
-            )
+                # Mensagens de erro comuns
+                if "Secrets were required" in error_msg or "password" in error_msg.lower():
+                    return False, "Senha incorreta"
+                elif "not found" in error_msg.lower():
+                    return False, f"Rede '{ssid}' não encontrada"
+                else:
+                    return False, f"Falha ao conectar: {error_msg}"
 
             # Aguarda IP
-            time.sleep(3)
+            time.sleep(2)
 
             # Verifica se conectou
             if self.is_dongle_connected_to_wifi():
@@ -296,32 +268,30 @@ network={{
 
                 return True, f"Conectado! IP: {ip}"
             else:
-                return False, "Falha ao conectar. Verifique SSID e senha."
+                return False, "Falha ao obter IP. Verifique DHCP do roteador."
 
         except subprocess.TimeoutExpired:
-            return False, "Timeout ao conectar"
+            return False, "Timeout ao conectar (30s). Rede muito fraca?"
         except Exception as e:
             return False, f"Erro: {str(e)}"
 
     def disconnect_wifi(self) -> Tuple[bool, str]:
-        """Desconecta o dongle da rede WiFi"""
+        """Desconecta o dongle da rede WiFi usando nmcli"""
         try:
-            # Para wpa_supplicant
-            subprocess.run(
-                ['sudo', 'wpa_cli', '-i', self.DONGLE_INTERFACE, 'disconnect'],
-                capture_output=True, timeout=5
-            )
-
-            # Libera IP
-            subprocess.run(
-                ['sudo', 'dhclient', '-r', self.DONGLE_INTERFACE],
+            # MÉTODO NOVO: Usa nmcli para desconectar
+            result = subprocess.run(
+                ['sudo', 'nmcli', 'device', 'disconnect', self.DONGLE_INTERFACE],
                 capture_output=True, timeout=5
             )
 
             # Desabilita NAT
             self.disable_nat()
 
-            return True, "Desconectado"
+            if result.returncode == 0:
+                return True, "Desconectado com sucesso"
+            else:
+                return False, f"Falha ao desconectar: {result.stderr.decode().strip()}"
+
         except Exception as e:
             return False, f"Erro: {str(e)}"
 
