@@ -165,7 +165,9 @@ class ModbusClientWrapper:
 
     def _init_stub_data(self):
         """Inicializa dados simulados para modo stub"""
-        self.connected = True
+        # Em modo stub, connected = False para indicar que não há CLP real
+        # Isso faz o frontend mostrar status correto (vermelho = sem CLP)
+        self.connected = False
 
         # Simula encoder em 45.7 graus
         self.stub_registers[mm.ENCODER['ANGLE_MSW']] = 0x0000
@@ -761,28 +763,35 @@ class ModbusClientWrapper:
         """
         Grava ângulo de dobra na área de ESCRITA (0x0A00+)
 
-        ✅ CORRIGIDO 28/Nov/2025 - Endereços de escrita corretos
+        ✅ CORRIGIDO 01/Dez/2025 - Conversão para pulsos de encoder
 
         FLUXO:
           1. IHM grava 16-bit em endereço (0x0A00, 0x0A02 ou 0x0A04)
           2. Ladder copia automaticamente para área de leitura (0x0842, 0x0844, 0x0846)
           3. Principal.lad lê da área de leitura e executa dobra
 
+        Encoder: 400 pulsos/volta
+        - 0° = 0 pulsos
+        - 90° = 100 pulsos
+        - 180° = 200 pulsos
+        - 270° = 300 pulsos
+        - 360° = 400 pulsos (0 pulsos, volta completa)
+
         Formato: 16-bit (1 registro apenas)
-        - Conversão: value_clp = graus * 10
-        - Exemplo: 90.0° = 900 (0x0384)
+        - Conversão: pulsos = (graus / 360) × 400
+        - Exemplo: 90.0° = 100 pulsos (0x0064)
 
         Args:
             bend_number (int): 1, 2 ou 3
-            degrees (float): Ângulo em graus (ex: 90.5)
+            degrees (float): Ângulo em graus (ex: 90.0)
 
         Returns:
             bool: True se sucesso
 
         Exemplo:
-            >>> client.write_bend_angle(1, 90.0)  # Dobra 1: 90°
+            >>> client.write_bend_angle(1, 90.0)  # Dobra 1: 90° = 100 pulsos
             True
-            >>> client.write_bend_angle(2, 120.5)  # Dobra 2: 120.5°
+            >>> client.write_bend_angle(2, 180.0)  # Dobra 2: 180° = 200 pulsos
             True
         """
         if bend_number not in [1, 2, 3]:
@@ -799,20 +808,22 @@ class ModbusClientWrapper:
 
         addr = addresses[bend_number]
 
-        # Converter graus para valor CLP 16-bit (graus * 10)
-        value_16bit = int(degrees * 10)
+        # Converter graus para pulsos do encoder (0-399)
+        # Encoder: 400 pulsos/volta
+        # Conversão: pulsos = (graus / 360) × 400
+        encoder_pulses = mm.degrees_to_clp(degrees)
 
-        if value_16bit > 65535:
-            print(f"✗ Valor muito grande: {degrees}° ({value_16bit}) > 65535")
+        if encoder_pulses > 399:
+            print(f"✗ Valor fora do range: {degrees}° ({encoder_pulses} pulsos) > 399")
             return False
 
-        print(f"✎ Gravando Dobra {bend_number}: {degrees}° → 0x{addr:04X} (value={value_16bit})")
+        print(f"✎ Gravando Dobra {bend_number}: {degrees}° → {encoder_pulses} pulsos → 0x{addr:04X}")
 
         # Escrever 16-bit (1 registro) usando write_register
-        success = self.write_register(addr, value_16bit)
+        success = self.write_register(addr, encoder_pulses)
 
         if success:
-            print(f"  ✓ Dobra {bend_number} gravada com sucesso!")
+            print(f"  ✓ Dobra {bend_number} gravada: {degrees}° = {encoder_pulses} pulsos")
         else:
             print(f"  ✗ Erro ao gravar dobra {bend_number}")
 
@@ -822,16 +833,22 @@ class ModbusClientWrapper:
         """
         Lê ângulo de dobra da área de LEITURA (0x0842, 0x0844, 0x0846)
 
-        ✅ CORRIGIDO 28/Nov/2025 - Endereços de leitura corretos
+        ✅ CORRIGIDO 01/Dez/2025 - Conversão de pulsos para graus
 
         FLUXO:
           1. Ladder copia de 0x0A00+ para 0x0842+ automaticamente
           2. IHM lê de 0x0842+ (área de leitura)
-          3. Converte valor CLP para graus (divide por 10)
+          3. Converte pulsos do encoder para graus
+
+        Encoder: 400 pulsos/volta
+        - 0 pulsos = 0°
+        - 100 pulsos = 90°
+        - 200 pulsos = 180°
+        - 300 pulsos = 270°
 
         Formato: 16-bit (1 registro apenas)
-        - Conversão: graus = value_clp / 10.0
-        - Exemplo: 900 (0x0384) = 90.0°
+        - Conversão: graus = (pulsos / 400) × 360
+        - Exemplo: 100 pulsos = 90.0°
 
         Args:
             bend_number (int): 1, 2 ou 3
@@ -858,14 +875,14 @@ class ModbusClientWrapper:
 
         addr = addresses[bend_number]
 
-        # Ler 16-bit (1 registro)
-        value_16bit = self.read_register(addr)
+        # Ler 16-bit (1 registro) - pulsos do encoder
+        encoder_pulses = self.read_register(addr)
 
-        if value_16bit is None:
+        if encoder_pulses is None:
             return None
 
-        # Converter para graus (divide por 10)
-        return value_16bit / 10.0
+        # Converter pulsos para graus usando função do modbus_map
+        return mm.clp_to_degrees(encoder_pulses)
 
     def read_all_bend_angles(self) -> dict:
         """
