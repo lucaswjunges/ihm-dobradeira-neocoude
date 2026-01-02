@@ -57,7 +57,7 @@ class MachineStateManager:
             'machine_state_color': 'gray',
             'machine_state_icon': '⏸️',
 
-            # Estados individuais (M000-M007)
+            # Estados individuais (M000-M008)
             'states': {
                 'ST_IDLE': False,
                 'ST_AGUARDA_DIRECAO': False,
@@ -67,6 +67,7 @@ class MachineStateManager:
                 'ST_COMPLETO': False,
                 'ST_EMERGENCIA': False,
                 'ST_MANUAL': False,
+                'ST_CALIBRACAO': False,
             },
 
             # Bits de controle (B000-B007)
@@ -114,6 +115,18 @@ class MachineStateManager:
                 'LED4': False,
                 'LED5': False,
             },
+
+            # Calibracao (Estado 8) - DESATIVADO 02/Jan/2026
+            # 'calibration': {
+            #     'active': False,
+            #     'step_code': 0,
+            #     'step_name': 'Inativo',
+            #     'step_description': '',
+            #     'progress': 0,
+            #     'resultado_zero': 0,
+            #     'resultado_inercia': 0,
+            #     'resultado_offset': 0,
+            # },
 
             # Metadados
             'connected': False,
@@ -257,6 +270,59 @@ class MachineStateManager:
             print(f"✗ Erro lendo registros de trabalho: {e}")
             return False
 
+    # DESATIVADO 02/Jan/2026: Auto-calibração removida (ajuste manual via ângulos)
+    # async def read_calibration(self) -> bool:
+    #     """
+    #     Le os dados de calibracao (Estado 8).
+    #     """
+    #     try:
+    #         # Verifica se esta em modo calibracao
+    #         calib_active = await asyncio.to_thread(
+    #             self.client.read_coil,
+    #             mm.CALIBRATION['ST_CALIBRACAO']
+    #         )
+    #         self.machine_state['calibration']['active'] = calib_active if calib_active is not None else False
+    #
+    #         # Le etapa atual do sequenciador
+    #         etapa = await asyncio.to_thread(
+    #             self.client.read_register,
+    #             mm.CALIBRATION['ETAPA_CALIB']
+    #         )
+    #         if etapa is not None:
+    #             self.machine_state['calibration']['step_code'] = etapa
+    #             step_info = mm.get_calibration_step_info(etapa)
+    #             self.machine_state['calibration']['step_name'] = step_info['name']
+    #             self.machine_state['calibration']['step_description'] = step_info['description']
+    #             self.machine_state['calibration']['progress'] = step_info['progress']
+    #
+    #         # Le resultados (quando calibracao finalizada)
+    #         if self.machine_state['calibration']['step_code'] >= 70:
+    #             resultado_zero = await asyncio.to_thread(
+    #                 self.client.read_register,
+    #                 mm.CALIBRATION['RESULTADO_ZERO']
+    #             )
+    #             if resultado_zero is not None:
+    #                 self.machine_state['calibration']['resultado_zero'] = resultado_zero
+    #
+    #             resultado_inercia = await asyncio.to_thread(
+    #                 self.client.read_register,
+    #                 mm.CALIBRATION['RESULTADO_INERCIA']
+    #             )
+    #             if resultado_inercia is not None:
+    #                 self.machine_state['calibration']['resultado_inercia'] = resultado_inercia
+    #
+    #             resultado_offset = await asyncio.to_thread(
+    #                 self.client.read_register,
+    #                 mm.CALIBRATION['RESULTADO_OFFSET']
+    #             )
+    #             if resultado_offset is not None:
+    #                 self.machine_state['calibration']['resultado_offset'] = resultado_offset
+    #
+    #         return True
+    #     except Exception as e:
+    #         print(f"✗ Erro lendo calibracao: {e}")
+    #         return False
+
     async def read_angles(self) -> bool:
         """
         Le todos os angulos programados.
@@ -315,6 +381,10 @@ class MachineStateManager:
             await self.read_encoder()
             await self.read_machine_states()
             await self.read_control_bits()
+
+            # DESATIVADO 02/Jan/2026: Auto-calibração removida
+            # if self.machine_state['calibration']['active'] or self.machine_state['poll_count'] % 4 == 0:
+            #     await self.read_calibration()
 
             # Leituras de I/O (a cada 2 ciclos)
             if self.machine_state['poll_count'] % 2 == 0:

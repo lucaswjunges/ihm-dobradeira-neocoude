@@ -531,6 +531,574 @@
             50% { opacity: 0.7; }
         }
 
+        /* Navegação por Abas */
+        .tab-nav {
+            display: flex;
+            background: rgba(0,0,0,0.3);
+            border-bottom: 2px solid rgba(255,255,255,0.1);
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        .tab-btn {
+            flex: 1;
+            min-width: 100px;
+            background: transparent;
+            border: none;
+            color: rgba(255,255,255,0.6);
+            font-size: 12px;
+            font-weight: 600;
+            padding: 12px 8px;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .tab-btn:active {
+            background: rgba(255,255,255,0.1);
+        }
+
+        .tab-btn.active {
+            color: #2ecc71;
+            border-bottom: 3px solid #2ecc71;
+            background: rgba(46,204,113,0.1);
+        }
+
+        .tab-icon {
+            font-size: 18px;
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        /* Seção WiFi */
+        .wifi-section {
+            background: rgba(255,255,255,0.08);
+            border-radius: 12px;
+            padding: 15px;
+            margin-bottom: 15px;
+        }
+
+        .wifi-section-title {
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .wifi-status-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        .wifi-status-card {
+            background: rgba(255,255,255,0.1);
+            border-radius: 10px;
+            padding: 12px;
+            text-align: center;
+        }
+
+        .wifi-status-label {
+            font-size: 10px;
+            opacity: 0.7;
+            text-transform: uppercase;
+            margin-bottom: 5px;
+        }
+
+        .wifi-status-value {
+            font-size: 14px;
+            font-weight: 600;
+            word-break: break-all;
+        }
+
+        .wifi-status-value.connected {
+            color: #2ecc71;
+        }
+
+        .wifi-status-value.disconnected {
+            color: #e74c3c;
+        }
+
+        .wifi-input-group {
+            margin-bottom: 12px;
+        }
+
+        .wifi-input-label {
+            font-size: 11px;
+            opacity: 0.7;
+            margin-bottom: 5px;
+            display: block;
+        }
+
+        .wifi-input {
+            width: 100%;
+            background: rgba(255,255,255,0.12);
+            border: 2px solid rgba(255,255,255,0.2);
+            border-radius: 8px;
+            color: #fff;
+            font-size: 14px;
+            padding: 10px 12px;
+            outline: none;
+            transition: border-color 0.3s;
+        }
+
+        .wifi-input:focus {
+            border-color: #2ecc71;
+        }
+
+        .wifi-input::placeholder {
+            color: rgba(255,255,255,0.4);
+        }
+
+        .wifi-btn {
+            width: 100%;
+            background: rgba(255,255,255,0.15);
+            border: 2px solid rgba(255,255,255,0.25);
+            border-radius: 10px;
+            color: #fff;
+            font-size: 14px;
+            font-weight: 600;
+            padding: 12px;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .wifi-btn:active {
+            transform: scale(0.98);
+        }
+
+        .wifi-btn.primary {
+            background: #2ecc71;
+            border-color: #2ecc71;
+        }
+
+        .wifi-btn.danger {
+            background: rgba(231,76,60,0.3);
+            border-color: rgba(231,76,60,0.5);
+        }
+
+        .wifi-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .wifi-networks-list {
+            max-height: 200px;
+            overflow-y: auto;
+            margin-bottom: 15px;
+        }
+
+        .wifi-network-item {
+            background: rgba(255,255,255,0.08);
+            border: 2px solid transparent;
+            border-radius: 8px;
+            padding: 10px 12px;
+            margin-bottom: 8px;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: all 0.2s;
+        }
+
+        .wifi-network-item:active {
+            background: rgba(255,255,255,0.15);
+        }
+
+        .wifi-network-item.selected {
+            border-color: #2ecc71;
+            background: rgba(46,204,113,0.15);
+        }
+
+        .wifi-network-ssid {
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        .wifi-network-signal {
+            font-size: 12px;
+            opacity: 0.7;
+        }
+
+        .wifi-loading {
+            text-align: center;
+            padding: 20px;
+            opacity: 0.7;
+        }
+
+        .wifi-loading-spinner {
+            display: inline-block;
+            width: 24px;
+            height: 24px;
+            border: 3px solid rgba(255,255,255,0.3);
+            border-radius: 50%;
+            border-top-color: #2ecc71;
+            animation: spin 1s ease-in-out infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .wifi-checkbox {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 12px;
+            cursor: pointer;
+        }
+
+        .wifi-checkbox input {
+            width: 20px;
+            height: 20px;
+            accent-color: #2ecc71;
+        }
+
+        .wifi-checkbox-label {
+            font-size: 13px;
+        }
+
+        /* ========================================
+           CALIBRAÇÃO - ESTILOS
+           ======================================== */
+        .calib-section {
+            background: linear-gradient(135deg, rgba(156, 39, 176, 0.15) 0%, rgba(103, 58, 183, 0.1) 100%);
+            border: 2px solid rgba(156, 39, 176, 0.3);
+            border-radius: 16px;
+            padding: 20px;
+            margin-bottom: 15px;
+        }
+
+        .calib-section-title {
+            font-size: 16px;
+            font-weight: 700;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: #ce93d8;
+        }
+
+        .calib-status-badge {
+            font-size: 11px;
+            padding: 4px 10px;
+            border-radius: 12px;
+            background: rgba(255,255,255,0.1);
+            margin-left: auto;
+        }
+
+        .calib-status-badge.active {
+            background: rgba(156, 39, 176, 0.4);
+            animation: pulse 1.5s infinite;
+        }
+
+        .calib-status-badge.idle {
+            background: rgba(100, 100, 100, 0.4);
+        }
+
+        /* Digital Twin - Disco Animado */
+        .calib-twin-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            margin-bottom: 15px;
+        }
+
+        .calib-motor-svg {
+            width: 150px;
+            height: 150px;
+            transition: transform 0.1s ease-out;
+        }
+
+        .calib-motor-svg.spinning {
+            animation: spinFast 0.5s linear infinite;
+        }
+
+        @keyframes spinFast {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        .calib-motor-center {
+            fill: #9c27b0;
+            filter: drop-shadow(0 0 10px rgba(156, 39, 176, 0.5));
+        }
+
+        .calib-motor-teeth {
+            fill: #7b1fa2;
+        }
+
+        .calib-motor-highlight {
+            fill: #ce93d8;
+        }
+
+        /* Barra de Progresso */
+        .calib-progress-container {
+            margin-bottom: 15px;
+        }
+
+        .calib-progress-label {
+            display: flex;
+            justify-content: space-between;
+            font-size: 12px;
+            margin-bottom: 8px;
+        }
+
+        .calib-progress-step {
+            color: #ce93d8;
+            font-weight: 600;
+        }
+
+        .calib-progress-percent {
+            opacity: 0.7;
+        }
+
+        .calib-progress-bar {
+            height: 12px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 6px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .calib-progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #7b1fa2 0%, #9c27b0 50%, #ce93d8 100%);
+            border-radius: 6px;
+            transition: width 0.5s ease-out;
+            position: relative;
+        }
+
+        .calib-progress-fill::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+            animation: shimmer 1.5s infinite;
+        }
+
+        @keyframes shimmer {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(100%); }
+        }
+
+        .calib-progress-description {
+            font-size: 13px;
+            text-align: center;
+            margin-top: 10px;
+            padding: 10px;
+            background: rgba(0,0,0,0.2);
+            border-radius: 8px;
+            min-height: 40px;
+        }
+
+        /* Checkbox Estilizado */
+        .calib-checkbox-container {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 15px;
+            background: rgba(255,255,255,0.08);
+            border-radius: 10px;
+            margin-bottom: 15px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .calib-checkbox-container:hover {
+            background: rgba(255,255,255,0.12);
+        }
+
+        .calib-checkbox {
+            width: 24px;
+            height: 24px;
+            border: 2px solid rgba(156, 39, 176, 0.5);
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+            flex-shrink: 0;
+        }
+
+        .calib-checkbox.checked {
+            background: #9c27b0;
+            border-color: #9c27b0;
+        }
+
+        .calib-checkbox-icon {
+            color: white;
+            font-size: 16px;
+            opacity: 0;
+            transform: scale(0);
+            transition: all 0.2s;
+        }
+
+        .calib-checkbox.checked .calib-checkbox-icon {
+            opacity: 1;
+            transform: scale(1);
+        }
+
+        .calib-checkbox-text {
+            flex: 1;
+        }
+
+        .calib-checkbox-title {
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 2px;
+        }
+
+        .calib-checkbox-desc {
+            font-size: 11px;
+            opacity: 0.7;
+        }
+
+        /* Botões de Calibração */
+        .calib-buttons {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 10px;
+        }
+
+        .calib-btn {
+            padding: 16px 20px;
+            border-radius: 12px;
+            font-size: 15px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            border: 2px solid transparent;
+        }
+
+        .calib-btn:active {
+            transform: scale(0.98);
+        }
+
+        .calib-btn-start {
+            background: linear-gradient(135deg, #7b1fa2 0%, #9c27b0 100%);
+            color: white;
+            border-color: #9c27b0;
+        }
+
+        .calib-btn-start:hover:not(:disabled) {
+            box-shadow: 0 0 20px rgba(156, 39, 176, 0.5);
+        }
+
+        .calib-btn-start:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .calib-btn-abort {
+            background: rgba(231, 76, 60, 0.2);
+            color: #e74c3c;
+            border-color: rgba(231, 76, 60, 0.5);
+            display: none;
+        }
+
+        .calib-btn-abort.visible {
+            display: flex;
+        }
+
+        .calib-btn-abort:hover {
+            background: rgba(231, 76, 60, 0.4);
+        }
+
+        .calib-btn-icon {
+            font-size: 20px;
+        }
+
+        /* Resultados da Calibração */
+        .calib-results {
+            display: none;
+            margin-top: 15px;
+            padding: 15px;
+            background: rgba(46, 204, 113, 0.1);
+            border: 2px solid rgba(46, 204, 113, 0.3);
+            border-radius: 12px;
+        }
+
+        .calib-results.visible {
+            display: block;
+        }
+
+        .calib-results-title {
+            font-size: 14px;
+            font-weight: 600;
+            color: #2ecc71;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .calib-results-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+        }
+
+        .calib-result-item {
+            text-align: center;
+            padding: 10px;
+            background: rgba(0,0,0,0.2);
+            border-radius: 8px;
+        }
+
+        .calib-result-label {
+            font-size: 10px;
+            opacity: 0.7;
+            margin-bottom: 4px;
+        }
+
+        .calib-result-value {
+            font-size: 16px;
+            font-weight: 700;
+            color: #2ecc71;
+        }
+
+        /* Bloqueio durante calibração */
+        .calib-lock-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.7);
+            z-index: 500;
+            pointer-events: all;
+        }
+
+        .calib-lock-overlay.active {
+            display: block;
+        }
+
         /* Responsivo */
         @media (min-width: 768px) {
             .main-container {
@@ -611,6 +1179,8 @@
 
     <!-- Container Principal -->
     <div class="main-container">
+        <!-- ========== ABA OPERAÇÃO ========== -->
+        <div class="tab-content active" id="tab-operacao">
         <!-- Card de Estado da Máquina -->
         <div class="state-card" id="stateCard">
             <div class="state-icon" id="stateIcon">⏸️</div>
@@ -715,6 +1285,133 @@
                 <div class="toggle-switch" id="manualModeToggle" onclick="toggleManualMode()"></div>
             </div>
         </div>
+        </div><!-- Fim tab-operacao -->
+
+        <!-- ========== ABA WIFI ========== -->
+        <div class="tab-content" id="tab-wifi">
+            <!-- Status das Redes -->
+            <div class="wifi-section">
+                <div class="wifi-section-title">📡 Status das Redes</div>
+                <div class="wifi-status-grid">
+                    <div class="wifi-status-card">
+                        <div class="wifi-status-label">Rede AP (Tablet)</div>
+                        <div class="wifi-status-value connected" id="wifiApSsid">IHM_NEOCOUDE</div>
+                        <div class="wifi-status-value" style="font-size:11px; margin-top:5px; opacity:0.8;">Senha: dobradeira123</div>
+                        <div class="wifi-status-value" id="wifiApIp" style="font-size:12px; margin-top:3px;">192.168.50.1</div>
+                    </div>
+                    <div class="wifi-status-card">
+                        <div class="wifi-status-label">Dongle USB (Internet)</div>
+                        <div class="wifi-status-value" id="wifiDongleStatus">Verificando...</div>
+                        <div class="wifi-status-value" id="wifiDongleIp" style="font-size:12px; margin-top:5px;">-</div>
+                    </div>
+                </div>
+
+                <!-- Tailscale (Acesso Remoto) -->
+                <div class="wifi-status-card" style="margin-top:10px;">
+                    <div class="wifi-status-label">🔒 Tailscale (Acesso Remoto)</div>
+                    <div class="wifi-status-value" id="wifiTailscaleIp" style="font-size:14px; margin-top:5px;">Verificando...</div>
+                    <div style="font-size:11px; opacity:0.7; margin-top:5px;">Acesse de qualquer lugar pelo IP acima</div>
+                </div>
+
+                <button class="wifi-btn" onclick="refreshWifiStatus()" style="margin-top:12px;">
+                    🔄 Atualizar Status
+                </button>
+            </div>
+
+            <!-- Dongle WiFi USB -->
+            <div class="wifi-section" id="wifiDongleSection">
+                <div class="wifi-section-title">📶 Configuração Internet (Dongle USB)</div>
+
+                <!-- Aviso se dongle não detectado -->
+                <div id="wifiDongleNotDetected" style="display:none; text-align:center; padding:15px; opacity:0.7;">
+                    ⚠️ Dongle WiFi USB não detectado.<br>
+                    Conecte um adaptador WiFi USB para habilitar internet.
+                </div>
+
+                <!-- Formulário de conexão (visível se dongle detectado) -->
+                <div id="wifiDongleForm">
+                    <div class="wifi-input-group">
+                        <label class="wifi-input-label">SSID (Nome da Rede)</label>
+                        <input type="text" class="wifi-input" id="wifiSsidInput" placeholder="Ex: Optimos Construtora">
+                    </div>
+                    <div class="wifi-input-group">
+                        <label class="wifi-input-label">Senha</label>
+                        <input type="password" class="wifi-input" id="wifiPasswordInput" placeholder="Senha da rede WiFi">
+                    </div>
+                    <label class="wifi-checkbox">
+                        <input type="checkbox" id="wifiAutoConnect" checked>
+                        <span class="wifi-checkbox-label">Conectar automaticamente ao iniciar</span>
+                    </label>
+                    <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:15px;">
+                        <button class="wifi-btn primary" onclick="connectWifi()">
+                            🔗 Conectar
+                        </button>
+                        <button class="wifi-btn danger" onclick="disconnectWifi()" id="btnDisconnectWifi" disabled>
+                            ❌ Desconectar
+                        </button>
+                    </div>
+                    <button class="wifi-btn" onclick="saveWifiConfig()">
+                        💾 Salvar Configuração
+                    </button>
+                </div>
+            </div>
+
+            <!-- Redes Disponíveis -->
+            <div class="wifi-section">
+                <div class="wifi-section-title">🔍 Redes Disponíveis</div>
+                <button class="wifi-btn" onclick="scanWifiNetworks()" id="btnScanWifi">
+                    📡 Escanear Redes
+                </button>
+                <div id="wifiNetworksList" class="wifi-networks-list" style="margin-top:12px;">
+                    <!-- Redes aparecerão aqui -->
+                </div>
+            </div>
+
+            <!-- NAT / Compartilhamento -->
+            <div class="wifi-section">
+                <div class="wifi-section-title">🌐 Compartilhamento de Internet</div>
+                <p style="font-size:12px; opacity:0.7; margin-bottom:12px;">
+                    Quando habilitado, dispositivos conectados na rede IHM_NEOCOUDE terão acesso à internet através do dongle WiFi USB.
+                </p>
+                <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:10px;">
+                    <span style="font-size:14px;">NAT (Internet para AP)</span>
+                    <div class="toggle-switch" id="wifiNatToggle" onclick="toggleNat()"></div>
+                </div>
+                <div id="wifiNatStatus" style="font-size:12px; opacity:0.7; text-align:center;">
+                    Status: Verificando...
+                </div>
+            </div>
+
+            <!-- ========================================
+                 AUTO-CALIBRAÇÃO - DESATIVADO 02/Jan/2026
+                 ======================================== -->
+            <!-- Calibração manual via ajuste de ângulos (compensa inércia manualmente) -->
+            <!-- Para reativar, descomentar este bloco e código backend -->
+
+            <!-- <div class="calib-section" id="calibSection" style="display:none;">
+                <div class="calib-section-title">
+                    🎯 Auto-Calibração Inteligente (DESATIVADO)
+                    <span class="calib-status-badge idle">DESATIVADO</span>
+                </div>
+                <div style="text-align:center; padding:20px; opacity:0.7;">
+                    ⚠️ Auto-calibração desativada.<br><br>
+                    Ajuste os ângulos manualmente para compensar a inércia da máquina.<br>
+                    Exemplo: Se precisa de 90°, configure 89° para compensar o atraso de parada.
+                </div>
+            </div> -->
+        </div><!-- Fim tab-wifi -->
+    </div>
+
+    <!-- Navegação por Abas (no rodapé) -->
+    <div class="tab-nav">
+        <button class="tab-btn active" onclick="switchTab('operacao')">
+            <span class="tab-icon">🏭</span>
+            <span>Operação</span>
+        </button>
+        <button class="tab-btn" onclick="switchTab('wifi')">
+            <span class="tab-icon">⚙️</span>
+            <span>Configurações</span>
+        </button>
     </div>
 
     <!-- Footer -->
@@ -806,6 +1503,12 @@
                 try {
                     const message = JSON.parse(event.data);
                     console.log('Mensagem recebida:', message);
+
+                    // Mensagens WiFi
+                    if (message.type && message.type.startsWith('wifi_')) {
+                        handleWifiMessage(message);
+                        return;
+                    }
 
                     if (message.type === 'full_state' || message.type === 'state_update') {
                         handleStateUpdate(message.data || {});
@@ -1116,6 +1819,285 @@
         document.getElementById('angleInput').addEventListener('keypress', (e) => {
             if (e.key === 'Enter') saveAngle();
         });
+
+        // ========================================
+        // NAVEGAÇÃO POR ABAS
+        // ========================================
+        function switchTab(tabName) {
+            // Remove active de todos os botões e conteúdos
+            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+
+            // Ativa botão e conteúdo selecionado
+            document.querySelector(`[onclick="switchTab('${tabName}')"]`).classList.add('active');
+            document.getElementById(`tab-${tabName}`).classList.add('active');
+
+            // Se for aba WiFi, atualiza status
+            if (tabName === 'wifi') {
+                refreshWifiStatus();
+            }
+        }
+
+        // ========================================
+        // WIFI MANAGER
+        // ========================================
+        let wifiStatus = {
+            dongle_detected: false,
+            wifi_connected: false,
+            nat_enabled: false
+        };
+        let selectedWifiNetwork = null;
+
+        function refreshWifiStatus() {
+            if (!ws || ws.readyState !== WebSocket.OPEN) return;
+            ws.send(JSON.stringify({ action: 'wifi_status' }));
+        }
+
+        function updateWifiUI(data) {
+            wifiStatus = data;
+
+            // Status do AP
+            document.getElementById('wifiApSsid').textContent = data.ap_ssid || 'IHM_NEOCOUDE';
+            document.getElementById('wifiApIp').textContent = data.ap_ip || '-';
+
+            // Status do Tailscale
+            const tailscaleEl = document.getElementById('wifiTailscaleIp');
+            if (data.tailscale_ip) {
+                tailscaleEl.textContent = data.tailscale_ip;
+                tailscaleEl.className = 'wifi-status-value connected';
+            } else {
+                tailscaleEl.textContent = 'Não conectado';
+                tailscaleEl.className = 'wifi-status-value disconnected';
+            }
+
+            // Status do Dongle
+            const dongleStatusEl = document.getElementById('wifiDongleStatus');
+            const dongleIpEl = document.getElementById('wifiDongleIp');
+            const dongleNotDetected = document.getElementById('wifiDongleNotDetected');
+            const dongleForm = document.getElementById('wifiDongleForm');
+            const btnDisconnect = document.getElementById('btnDisconnectWifi');
+
+            if (data.dongle_detected) {
+                dongleNotDetected.style.display = 'none';
+                dongleForm.style.display = 'block';
+
+                if (data.wifi_connected) {
+                    dongleStatusEl.className = 'wifi-status-value connected';
+                    dongleStatusEl.textContent = data.connected_ssid || 'Conectado';
+                    dongleIpEl.textContent = data.dongle_ip || '-';
+                    btnDisconnect.disabled = false;
+                } else {
+                    dongleStatusEl.className = 'wifi-status-value disconnected';
+                    dongleStatusEl.textContent = 'Desconectado';
+                    dongleIpEl.textContent = '-';
+                    btnDisconnect.disabled = true;
+                }
+
+                // Preenche SSID salvo se existir
+                if (data.config && data.config.ssid) {
+                    document.getElementById('wifiSsidInput').value = data.config.ssid;
+                    document.getElementById('wifiAutoConnect').checked = data.config.auto_connect !== false;
+                }
+            } else {
+                dongleNotDetected.style.display = 'block';
+                dongleForm.style.display = 'none';
+                dongleStatusEl.className = 'wifi-status-value disconnected';
+                dongleStatusEl.textContent = 'Não detectado';
+                dongleIpEl.textContent = '-';
+            }
+
+            // Status do NAT
+            const natToggle = document.getElementById('wifiNatToggle');
+            const natStatus = document.getElementById('wifiNatStatus');
+            if (data.nat_enabled) {
+                natToggle.classList.add('active');
+                natStatus.textContent = 'Status: Ativo - Internet compartilhada';
+            } else {
+                natToggle.classList.remove('active');
+                natStatus.textContent = 'Status: Inativo';
+            }
+        }
+
+        function scanWifiNetworks() {
+            if (!ws || ws.readyState !== WebSocket.OPEN) return;
+
+            const btn = document.getElementById('btnScanWifi');
+            btn.disabled = true;
+            btn.innerHTML = '<div class="wifi-loading-spinner"></div> Escaneando...';
+
+            const listEl = document.getElementById('wifiNetworksList');
+            listEl.innerHTML = '<div class="wifi-loading"><div class="wifi-loading-spinner"></div><br>Escaneando redes...</div>';
+
+            ws.send(JSON.stringify({ action: 'wifi_scan' }));
+        }
+
+        function displayWifiNetworks(networks) {
+            const listEl = document.getElementById('wifiNetworksList');
+            const btn = document.getElementById('btnScanWifi');
+
+            btn.disabled = false;
+            btn.innerHTML = '📡 Escanear Redes';
+
+            if (!networks || networks.length === 0) {
+                listEl.innerHTML = '<div style="text-align:center; padding:15px; opacity:0.7;">Nenhuma rede encontrada</div>';
+                return;
+            }
+
+            listEl.innerHTML = networks.map(net => `
+                <div class="wifi-network-item ${selectedWifiNetwork === net.ssid ? 'selected' : ''}"
+                     onclick="selectWifiNetwork('${net.ssid}')">
+                    <span class="wifi-network-ssid">${net.ssid}</span>
+                    <span class="wifi-network-signal">${getSignalIcon(net.signal)} ${net.signal || '?'} dBm</span>
+                </div>
+            `).join('');
+        }
+
+        function getSignalIcon(signal) {
+            if (!signal) return '📶';
+            if (signal >= -50) return '📶';
+            if (signal >= -70) return '📶';
+            return '📶';
+        }
+
+        function selectWifiNetwork(ssid) {
+            selectedWifiNetwork = ssid;
+            document.getElementById('wifiSsidInput').value = ssid;
+            document.getElementById('wifiPasswordInput').focus();
+
+            // Atualiza visual da lista
+            document.querySelectorAll('.wifi-network-item').forEach(item => {
+                item.classList.toggle('selected', item.querySelector('.wifi-network-ssid').textContent === ssid);
+            });
+        }
+
+        function connectWifi() {
+            if (!ws || ws.readyState !== WebSocket.OPEN) return;
+
+            const ssid = document.getElementById('wifiSsidInput').value.trim();
+            const password = document.getElementById('wifiPasswordInput').value;
+
+            if (!ssid) {
+                alert('Digite o nome da rede (SSID)');
+                return;
+            }
+            if (!password) {
+                alert('Digite a senha da rede');
+                return;
+            }
+
+            ws.send(JSON.stringify({
+                action: 'wifi_connect',
+                ssid: ssid,
+                password: password
+            }));
+
+            // Feedback visual
+            const dongleStatusEl = document.getElementById('wifiDongleStatus');
+            dongleStatusEl.textContent = 'Conectando...';
+            dongleStatusEl.className = 'wifi-status-value';
+        }
+
+        function disconnectWifi() {
+            if (!ws || ws.readyState !== WebSocket.OPEN) return;
+            ws.send(JSON.stringify({ action: 'wifi_disconnect' }));
+        }
+
+        function saveWifiConfig() {
+            if (!ws || ws.readyState !== WebSocket.OPEN) return;
+
+            const ssid = document.getElementById('wifiSsidInput').value.trim();
+            const password = document.getElementById('wifiPasswordInput').value;
+            const autoConnect = document.getElementById('wifiAutoConnect').checked;
+
+            if (!ssid || !password) {
+                alert('Preencha SSID e senha para salvar');
+                return;
+            }
+
+            ws.send(JSON.stringify({
+                action: 'wifi_save_config',
+                ssid: ssid,
+                password: password,
+                auto_connect: autoConnect
+            }));
+
+            alert('Configuração salva!');
+        }
+
+        function toggleNat() {
+            if (!ws || ws.readyState !== WebSocket.OPEN) return;
+
+            const natToggle = document.getElementById('wifiNatToggle');
+            const isActive = natToggle.classList.contains('active');
+
+            if (isActive) {
+                ws.send(JSON.stringify({ action: 'wifi_disable_nat' }));
+            } else {
+                ws.send(JSON.stringify({ action: 'wifi_enable_nat' }));
+            }
+        }
+
+        // Handler de mensagens WiFi
+        function handleWifiMessage(message) {
+            switch (message.type) {
+                case 'wifi_status':
+                    updateWifiUI(message.data);
+                    break;
+                case 'wifi_scan_result':
+                    displayWifiNetworks(message.networks);
+                    break;
+                case 'wifi_connecting':
+                    document.getElementById('wifiDongleStatus').textContent = `Conectando em ${message.ssid}...`;
+                    break;
+                case 'wifi_connect_result':
+                    if (message.success) {
+                        alert(`Conectado em ${message.ssid}!`);
+                    } else {
+                        alert(`Falha: ${message.message}`);
+                    }
+                    refreshWifiStatus();
+                    break;
+                case 'wifi_disconnect_result':
+                    refreshWifiStatus();
+                    break;
+                case 'wifi_config_saved':
+                    console.log('Config WiFi salva:', message.ssid);
+                    break;
+                case 'wifi_nat_result':
+                    const natToggle = document.getElementById('wifiNatToggle');
+                    const natStatus = document.getElementById('wifiNatStatus');
+                    if (message.enabled) {
+                        natToggle.classList.add('active');
+                        natStatus.textContent = 'Status: Ativo - Internet compartilhada';
+                    } else {
+                        natToggle.classList.remove('active');
+                        natStatus.textContent = 'Status: Inativo';
+                    }
+                    break;
+            }
+        }
+
+        // ========================================
+        // AUTO-CALIBRAÇÃO - DESATIVADO 02/Jan/2026
+        // ========================================
+        // Calibração manual via ajuste de ângulos
+        // Código comentado para facilitar futura reativação
+
+        // let calibrationState = {
+        //     active: false,
+        //     warmup: true,
+        //     stepCode: 0,
+        //     progress: 0,
+        //     lastEncoderAngle: 0
+        // };
+        //
+        // function toggleCalibWarmup() { /* DESATIVADO */ }
+        // function startCalibration() { /* DESATIVADO */ }
+        // function abortCalibration() { /* DESATIVADO */ }
+        // function updateCalibrationUI(data) { /* DESATIVADO */ }
+        // function updateMotorAnimation(data) { /* DESATIVADO */ }
+        // function updateCalibrationLock(isCalibrating) { /* DESATIVADO */ }
+        // function handleCalibrationMessage(message) { /* DESATIVADO */ }
 
         // ========================================
         // INICIALIZAÇÃO

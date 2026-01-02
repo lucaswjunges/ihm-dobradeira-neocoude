@@ -11,7 +11,7 @@ Referencia: PROJETO_LADDER_NOVO.md
 """
 
 # ==========================================
-# ESTADOS DA MAQUINA (Coils M000-M007)
+# ESTADOS DA MAQUINA (Coils M000-M008)
 # ==========================================
 # Apenas UM estado deve estar ativo por vez
 
@@ -24,7 +24,46 @@ MACHINE_STATES = {
     'ST_COMPLETO':        0x0305,  # 773 - Sequencia de 3 dobras completa
     'ST_EMERGENCIA':      0x0306,  # 774 - Emergencia ativa
     'ST_MANUAL':          0x0307,  # 775 - Modo manual ativo
+    'ST_CALIBRACAO':      0x0308,  # 776 - Modo de calibracao ativo
 }
+
+# ==========================================
+# AUTO-CALIBRACAO (Estado 8) - DESATIVADO
+# ==========================================
+# DESATIVADO 02/Jan/2026: Calibração manual via ajuste de ângulos
+# Usuário compensa inércia da máquina manualmente (ex: -1° para compensar atraso de parada)
+# Para reativar, descomentar este bloco e código relacionado em:
+#   - main_server.py (handlers calib_start, calib_abort, calib_status)
+#   - state_manager.py (read_calibration)
+#   - static/index.html (seção de calibração)
+
+# CALIBRATION = {
+#     # Comandos (Escrita - IHM -> CLP)
+#     'CMD_INICIA_CALIB':   0x0235,  # 565 - Coil: Comando para iniciar calibracao
+#     'FLAG_AQUECER':       0x0236,  # 566 - Coil: Checkbox de aquecimento hidraulico
+#     'CMD_ABORTAR':        0x0300,  # 768 - Coil: Forcar volta para ST_IDLE (abortar)
+#
+#     # Status (Leitura - CLP -> IHM)
+#     'ST_CALIBRACAO':      0x0308,  # 776 - Coil: Indica se esta em modo calibracao
+#     'ETAPA_CALIB':        0x0930,  # 2352 - Registro: Etapa atual do sequenciador
+#
+#     # Resultados da Calibracao (Leitura)
+#     'RESULTADO_ZERO':     0x0932,  # 2354 - Posicao zero absoluto calculada
+#     'RESULTADO_INERCIA':  0x0934,  # 2356 - Fator de inercia calculado
+#     'RESULTADO_OFFSET':   0x0936,  # 2358 - Offset de correcao angular
+# }
+
+# Descricoes das etapas de calibracao (DESATIVADO)
+# CALIBRATION_STEPS = {
+#     0:  {'name': 'Inativo', 'description': 'Calibracao nao iniciada', 'progress': 0},
+#     10: {'name': 'Buscando Saida', 'description': 'Saindo da zona do sensor...', 'progress': 14},
+#     20: {'name': 'Aquecendo Oleo', 'description': 'Aquecimento hidraulico (30s)...', 'progress': 28},
+#     30: {'name': 'Mapeando Sensor', 'description': 'Mapeando sensor em velocidade lenta...', 'progress': 42},
+#     40: {'name': 'Calculando Zero', 'description': 'Calculando zero absoluto...', 'progress': 56},
+#     50: {'name': 'Teste de Inercia', 'description': 'Disparo balistico para medir inercia...', 'progress': 70},
+#     60: {'name': 'Calculando Fisica', 'description': 'Calculando parametros fisicos...', 'progress': 84},
+#     70: {'name': 'Finalizando', 'description': 'Salvando parametros e finalizando...', 'progress': 100},
+# }
 
 # Descricoes amigaveis dos estados (para exibir na IHM)
 STATE_DESCRIPTIONS = {
@@ -75,6 +114,12 @@ STATE_DESCRIPTIONS = {
         'description': 'Modo manual ativo. Motor gira enquanto pedal pressionado.',
         'color': 'orange',
         'icon': '🔧',
+    },
+    0x0308: {
+        'name': 'CALIBRACAO',
+        'description': 'Auto-calibracao em andamento. Aguarde...',
+        'color': 'purple',
+        'icon': '🎯',
     },
 }
 
@@ -355,27 +400,48 @@ def split_32bit(value: int) -> tuple:
 
 def clp_to_degrees(clp_value: int) -> float:
     """
-    Converte valor CLP para graus.
-    Valor CLP esta em decimos de grau (900 = 90.0 graus).
-    Aplica MOD 360 para mostrar angulo atual dentro de uma volta.
+    Converte valor CLP (pulsos do encoder) para graus.
 
-    NOTA: O encoder e acumulativo e pode ter valores muito grandes.
-    Usamos MOD 3600 (360.0 graus * 10) para normalizar.
+    Encoder: 400 pulsos/volta
+    - 0 pulsos = 0°
+    - 399 pulsos = 359.1°
+    - 400 pulsos = 360° (volta completa)
+
+    Conversão: graus = (pulsos / 400) × 360
+
+    NOTA: O encoder é acumulativo e pode ter valores muito grandes.
+    Usamos MOD 400 para normalizar dentro de uma volta.
     """
     if clp_value is None:
         return 0.0
 
-    # Normaliza para dentro de 360 graus antes de converter
-    # O CLP usa decimos de grau, entao 3600 = 360.0 graus
-    normalized = clp_value % 3600
-    degrees = normalized / 10.0
+    # Normaliza para dentro de 360 graus (0-399 pulsos)
+    normalized = clp_value % 400
+
+    # Converte pulsos para graus: graus = (pulsos / 400) * 360
+    degrees = (normalized / 400.0) * 360.0
 
     return degrees
 
 
 def degrees_to_clp(degrees: float) -> int:
-    """Converte graus para valor CLP (decimos de grau)."""
-    return int(degrees * 10)
+    """
+    Converte graus para valor CLP (pulsos do encoder).
+
+    Encoder: 400 pulsos/volta
+    - 0° = 0 pulsos
+    - 90° = 100 pulsos
+    - 180° = 200 pulsos
+    - 270° = 300 pulsos
+    - 360° = 400 pulsos (0 pulsos, volta completa)
+
+    Conversão: pulsos = (graus / 360) × 400
+    """
+    # Converte graus para pulsos: pulsos = (graus / 360) * 400
+    pulsos = int((degrees / 360.0) * 400)
+
+    # Garante que está no range 0-399
+    return pulsos % 400
 
 
 def rpm_to_register(rpm: float) -> int:
@@ -468,6 +534,24 @@ def get_active_state_address(state_values: dict) -> int:
         if state_values.get(addr, False):
             return addr
     return None
+
+
+# DESATIVADO 02/Jan/2026: Auto-calibração removida
+# def get_calibration_step_info(step_code: int) -> dict:
+#     """
+#     Retorna informacoes sobre uma etapa de calibracao.
+#
+#     Args:
+#         step_code: Codigo da etapa (0, 10, 20, 30, 40, 50, 60, 70)
+#
+#     Returns:
+#         Dict com name, description, progress
+#     """
+#     return CALIBRATION_STEPS.get(step_code, {
+#         'name': 'Desconhecido',
+#         'description': f'Etapa {step_code} nao reconhecida',
+#         'progress': 0,
+#     })
 
 
 # ==========================================

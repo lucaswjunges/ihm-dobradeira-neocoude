@@ -22,6 +22,7 @@ from aiohttp import web
 
 from modbus_client import ModbusClientWrapper
 from state_manager import MachineStateManager
+from wifi_manager import get_wifi_manager
 import modbus_map as mm
 
 
@@ -47,7 +48,8 @@ class IHMServer:
         # Componentes principais
         self.modbus_client = None
         self.state_manager = None
-        
+        self.wifi_manager = None
+
         # Tasks asyncio
         self.tasks = []
         
@@ -83,7 +85,18 @@ class IHMServer:
         # 4. Inicia loop de broadcast
         broadcast_task = asyncio.create_task(self.broadcast_loop())
         self.tasks.append(broadcast_task)
-        
+
+        # 5. Inicializa WiFi Manager
+        self.wifi_manager = get_wifi_manager()
+        wifi_status = self.wifi_manager.get_status()
+        if wifi_status['dongle_detected']:
+            print(f"📶 Dongle WiFi USB detectado: {self.wifi_manager.DONGLE_INTERFACE}")
+            # Inicia loop de auto-connect
+            wifi_task = asyncio.create_task(self.wifi_manager.auto_connect_loop())
+            self.tasks.append(wifi_task)
+        else:
+            print("📶 Dongle WiFi USB não detectado (conecte para habilitar internet)")
+
         print("\n✓ Servidor iniciado com sucesso")
         print(f"  WebSocket: ws://localhost:8765")
         print(f"  HTTP: http://localhost:8080")
@@ -394,6 +407,205 @@ class IHMServer:
                         'type': 'error',
                         'message': 'Valor de HABILITADO não especificado'
                     }))
+
+            # ========================================
+            # AUTO-CALIBRACAO - DESATIVADO 02/Jan/2026
+            # ========================================
+            # Calibração manual via ajuste de ângulos (usuário compensa inércia)
+            # Para reativar, descomentar este bloco e código em modbus_map.py/state_manager.py
+
+            # elif action == 'calib_start':
+            #     # Inicia processo de auto-calibração
+            #     warmup = data.get('warmup', False)  # Flag de aquecimento hidráulico
+            #
+            #     # Verifica se está em IDLE
+            #     state_idle = self.modbus_client.read_coil(mm.MACHINE_STATES['ST_IDLE'])
+            #     if not state_idle:
+            #         await websocket.send(json.dumps({
+            #             'type': 'calib_response',
+            #             'success': False,
+            #             'message': 'Máquina deve estar em IDLE para iniciar calibração'
+            #         }))
+            #         print("❌ [Calib] Tentativa de iniciar calibração fora de IDLE")
+            #         return
+            #
+            #     # Define flag de aquecimento
+            #     warmup_success = self.modbus_client.write_coil(mm.CALIBRATION['FLAG_AQUECER'], bool(warmup))
+            #     print(f"🔧 [Calib] Aquecimento: {'SIM' if warmup else 'NÃO'} (success={warmup_success})")
+            #
+            #     # Dispara comando de iniciar calibração
+            #     start_success = self.modbus_client.write_coil(mm.CALIBRATION['CMD_INICIA_CALIB'], True)
+            #
+            #     # Aguarda um pouco e desliga o comando (pulso)
+            #     await asyncio.sleep(0.2)
+            #     self.modbus_client.write_coil(mm.CALIBRATION['CMD_INICIA_CALIB'], False)
+            #
+            #     success = warmup_success and start_success
+            #     print(f"{'✅' if success else '❌'} [Calib] Calibração iniciada")
+            #
+            #     await websocket.send(json.dumps({
+            #         'type': 'calib_response',
+            #         'success': success,
+            #         'message': 'Calibração iniciada!' if success else 'Falha ao iniciar calibração',
+            #         'warmup': warmup
+            #     }))
+            #
+            #     # Broadcast para todos os clientes
+            #     if success:
+            #         for client in self.clients:
+            #             try:
+            #                 await client.send(json.dumps({
+            #                     'type': 'calib_started',
+            #                     'warmup': warmup
+            #                 }))
+            #             except:
+            #                 pass
+            #
+            # elif action == 'calib_abort':
+            #     # Aborta processo de calibração (força ST_IDLE)
+            #     print("⚠️ [Calib] Abortando calibração...")
+            #
+            #     # Força todos os estados de motor para OFF (segurança)
+            #     self.modbus_client.write_coil(mm.DIGITAL_OUTPUTS['S0'], False)
+            #     self.modbus_client.write_coil(mm.DIGITAL_OUTPUTS['S1'], False)
+            #     self.modbus_client.write_coil(mm.DIGITAL_OUTPUTS['S2'], False)
+            #
+            #     # Reseta estado de calibração
+            #     self.modbus_client.write_coil(mm.CALIBRATION['ST_CALIBRACAO'], False)
+            #
+            #     # Força volta para ST_IDLE
+            #     # Primeiro desliga todos os outros estados
+            #     for state_name, state_addr in mm.MACHINE_STATES.items():
+            #         if state_name != 'ST_IDLE':
+            #             self.modbus_client.write_coil(state_addr, False)
+            #
+            #     # Liga ST_IDLE
+            #     success = self.modbus_client.write_coil(mm.MACHINE_STATES['ST_IDLE'], True)
+            #
+            #     # Zera etapa de calibração
+            #     self.modbus_client.write_register(mm.CALIBRATION['ETAPA_CALIB'], 0)
+            #
+            #     print(f"{'✅' if success else '❌'} [Calib] Calibração abortada")
+            #
+            #     await websocket.send(json.dumps({
+            #         'type': 'calib_aborted',
+            #         'success': success
+            #     }))
+            #
+            #     # Broadcast para todos os clientes
+            #     for client in self.clients:
+            #         try:
+            #             await client.send(json.dumps({
+            #                 'type': 'calib_aborted',
+            #                 'success': success
+            #             }))
+            #         except:
+            #             pass
+            #
+            # elif action == 'calib_status':
+            #     # Retorna status atual da calibração
+            #     calib_state = self.state_manager.machine_state.get('calibration', {})
+            #     await websocket.send(json.dumps({
+            #         'type': 'calib_status',
+            #         'data': calib_state
+            #     }))
+
+            # ========================================
+            # WIFI MANAGER ACTIONS (30/Nov/2025)
+            # ========================================
+            elif action == 'wifi_status':
+                # Retorna status completo do WiFi (dongle, AP, IPs)
+                wifi_status = self.wifi_manager.get_status()
+                await websocket.send(json.dumps({
+                    'type': 'wifi_status',
+                    'data': wifi_status
+                }))
+                print(f"📶 [WiFi] Status enviado: dongle={wifi_status['dongle_detected']}, conectado={wifi_status['wifi_connected']}")
+
+            elif action == 'wifi_scan':
+                # Escaneia redes WiFi disponíveis
+                print("📶 [WiFi] Escaneando redes...")
+                networks = self.wifi_manager.scan_networks()
+                await websocket.send(json.dumps({
+                    'type': 'wifi_scan_result',
+                    'networks': networks
+                }))
+                print(f"📶 [WiFi] {len(networks)} redes encontradas")
+
+            elif action == 'wifi_connect':
+                # Conecta na rede WiFi especificada
+                ssid = data.get('ssid')
+                password = data.get('password')
+
+                if ssid and password:
+                    print(f"📶 [WiFi] Conectando em '{ssid}'...")
+                    await websocket.send(json.dumps({
+                        'type': 'wifi_connecting',
+                        'ssid': ssid
+                    }))
+
+                    # Executa conexão (pode demorar)
+                    success, message = self.wifi_manager.connect_to_wifi(ssid, password)
+                    await websocket.send(json.dumps({
+                        'type': 'wifi_connect_result',
+                        'success': success,
+                        'message': message,
+                        'ssid': ssid
+                    }))
+                    print(f"📶 [WiFi] Resultado: {message}")
+                else:
+                    await websocket.send(json.dumps({
+                        'type': 'error',
+                        'message': 'SSID e senha são obrigatórios'
+                    }))
+
+            elif action == 'wifi_disconnect':
+                # Desconecta do WiFi
+                success, message = self.wifi_manager.disconnect_wifi()
+                await websocket.send(json.dumps({
+                    'type': 'wifi_disconnect_result',
+                    'success': success,
+                    'message': message
+                }))
+                print(f"📶 [WiFi] Desconectado: {message}")
+
+            elif action == 'wifi_save_config':
+                # Salva configuração de WiFi (SSID e senha)
+                ssid = data.get('ssid')
+                password = data.get('password')
+                auto_connect = data.get('auto_connect', True)
+
+                if ssid and password:
+                    self.wifi_manager.set_config(ssid, password, auto_connect)
+                    await websocket.send(json.dumps({
+                        'type': 'wifi_config_saved',
+                        'success': True,
+                        'ssid': ssid
+                    }))
+                    print(f"📶 [WiFi] Config salva: SSID='{ssid}', auto_connect={auto_connect}")
+                else:
+                    await websocket.send(json.dumps({
+                        'type': 'error',
+                        'message': 'SSID e senha são obrigatórios para salvar'
+                    }))
+
+            elif action == 'wifi_enable_nat':
+                # Habilita NAT (compartilhamento de internet)
+                success = self.wifi_manager.enable_nat()
+                await websocket.send(json.dumps({
+                    'type': 'wifi_nat_result',
+                    'enabled': success
+                }))
+                print(f"📶 [WiFi] NAT {'habilitado' if success else 'falhou'}")
+
+            elif action == 'wifi_disable_nat':
+                # Desabilita NAT
+                success = self.wifi_manager.disable_nat()
+                await websocket.send(json.dumps({
+                    'type': 'wifi_nat_result',
+                    'enabled': not success
+                }))
+                print(f"📶 [WiFi] NAT {'desabilitado' if success else 'falhou ao desabilitar'}")
 
         except json.JSONDecodeError:
             print(f"✗ JSON inválido recebido: {message}")
