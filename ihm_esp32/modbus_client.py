@@ -310,8 +310,8 @@ class ModbusClientWrapper:
 
         try:
             # OTIMIZADO: Ler 2 registros consecutivos de uma vez (mais eficiente e funciona melhor)
-            # CORREÇÃO 20/Nov/2025: CLP usa INPUT REGISTERS (FC 0x04), não HOLDING (FC 0x03)
-            result = self.client.read_input_registers(address=msw_address, count=2, slave=self.slave_id)
+            # CORRIGIDO 02/Jan/2026: ENCODER usa HOLDING REGISTERS (FC 0x03)!
+            result = self.client.read_holding_registers(address=msw_address, count=2, slave=self.slave_id)
             if result.isError():
                 self._handle_communication_error(f"Erro ao ler 32-bit 0x{msw_address:04X}")
                 return None
