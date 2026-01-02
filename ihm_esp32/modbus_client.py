@@ -68,7 +68,7 @@ class ModbusClientWrapper:
                 parity='N',
                 stopbits=2,  # CORRIGIDO 27/Nov/2025: 2 stop bits necessário
                 bytesize=8,
-                timeout=1  # Timeout adequado para RPi
+                timeout=0.2  # OTIMIZADO 02/Jan/2026: 200ms para leitura rápida @ 57600bps
             )
             # Configura slave_id no objeto client
             self.client.slave_id = self.slave_id
@@ -140,7 +140,7 @@ class ModbusClientWrapper:
                 parity='N',
                 stopbits=2,  # CORRIGIDO 27/Nov/2025: 2 stop bits necessário
                 bytesize=8,
-                timeout=1
+                timeout=0.2  # OTIMIZADO 02/Jan/2026: 200ms
             )
             self.client.slave_id = self.slave_id
 

@@ -34,6 +34,8 @@ class MachineStateManager:
         self.poll_interval = poll_interval
         self.running = False
 
+        # REMOVIDO: Filtro digital (CLP já fornece valor preciso 0-399)
+
         # Estado completo da maquina
         self.machine_state: Dict[str, Any] = {
             # Encoder / Posicao
@@ -137,15 +139,17 @@ class MachineStateManager:
 
     async def read_encoder(self) -> bool:
         """
-        Le encoder (32-bit) e atualiza estado.
+        Le encoder (32-bit) DIRETO do CLP - SEM FILTRO.
 
-        CORRIGIDO 02/Jan/2026: Leitura profissional do encoder
-        - Encoder: 400 pulsos/volta (0-399)
-        - Zerado quando sensor E0 (posição zero) fica ON
-        - Sentido inferido por DIR_AVANCO (0x0380) e DIR_RECUO (0x0381)
+        OTIMIZADO 02/Jan/2026: Leitura direta e rápida
+        - CLP já fornece valor preciso 0-399 pulsos
+        - Conversão direta: (pulsos / 400) × 360 = graus
+        - Taxa: 50ms (20 Hz) - aproveitando Modbus RTU 57600bps
+        - Timeout otimizado para leitura rápida
         """
         try:
-            # Ler contador de pulsos (0-65535, mas normalizado para 0-399 por hardware)
+            # Ler contador de pulsos DIRETO (32-bit)
+            # 04D6 (MSW) + 04D7 (LSW) = valor acumulativo
             raw = await asyncio.to_thread(
                 self.client.read_32bit,
                 mm.ENCODER['ANGLE_MSW'],
@@ -153,21 +157,22 @@ class MachineStateManager:
             )
 
             if raw is not None:
-                # Armazena valor bruto
+                # Valor bruto acumulativo (pode ser > 400)
                 self.machine_state['encoder_raw'] = raw
 
                 # Normaliza para 0-399 pulsos (MOD 400)
-                pulsos_normalizados = raw % 400
+                # CLP conta continuamente, precisamos pegar posição dentro da volta
+                pulsos = raw % 400
 
-                # Converte pulsos para graus (0-360°)
-                # 400 pulsos = 360° → 1 pulso = 0.9°
-                graus = (pulsos_normalizados / 400.0) * 360.0
+                # Conversão DIRETA para graus (sem filtro!)
+                # 400 pulsos = 360° → pulsos × 0.9 = graus
+                graus = (pulsos / 400.0) * 360.0
 
-                # Armazena posição em graus
+                # Atualiza estado (valores limpos, direto do CLP)
                 self.machine_state['encoder_degrees'] = graus
-                self.machine_state['encoder_pulses'] = pulsos_normalizados
+                self.machine_state['encoder_pulses'] = pulsos
 
-                # Detecta movimento comparando com valor anterior
+                # Detecta movimento (delta > 0)
                 if hasattr(self, '_last_encoder_raw'):
                     delta = abs(raw - self._last_encoder_raw)
                     self.machine_state['encoder_moving'] = delta > 0
@@ -451,30 +456,37 @@ class MachineStateManager:
 
     async def start_polling(self):
         """
-        Inicia loop de polling continuo com taxa adaptativa.
+        Inicia loop de polling com taxa OTIMIZADA para Modbus RTU.
 
-        CORRIGIDO 02/Jan/2026: Polling adaptativo baseado no estado
-        - DOBRANDO/RETORNANDO: 100ms (10 Hz) - tracking preciso do encoder
-        - IDLE/AGUARDANDO: 250ms (4 Hz) - economia de recursos
-        - Otimizado para resposta em tempo real na IHM
+        OTIMIZADO 02/Jan/2026: Máximo desempenho respeitando limites do Modbus
+        - MOVIMENTO: 50ms (20 Hz) - máximo sustentável em Modbus RTU 57600bps
+        - PARADO: 150ms (6.7 Hz) - economia de CPU
+        - SEM FILTRO: CLP já fornece dados precisos
+        - Leitura direta com timeout otimizado
         """
         self.running = True
-        base_interval = self.poll_interval  # 250ms padrão
-        fast_interval = 0.1  # 100ms durante movimento
+        idle_interval = 0.15    # 150ms quando parado (6.7 Hz)
+        fast_interval = 0.05    # 50ms durante movimento (20 Hz) - ideal para Modbus!
 
-        print(f"✓ State Manager iniciado (polling adaptativo: {base_interval*1000:.0f}ms padrão, {fast_interval*1000:.0f}ms em movimento)")
+        print(f"🚀 State Manager OTIMIZADO para Modbus RTU iniciado!")
+        print(f"   📊 Parado: {idle_interval*1000:.0f}ms ({1/idle_interval:.1f} Hz)")
+        print(f"   ⚡ Movimento: {fast_interval*1000:.0f}ms ({1/fast_interval:.0f} Hz)")
+        print(f"   🎯 Leitura DIRETA sem filtro (CLP fornece dados precisos)")
 
         while self.running:
             start_time = time.time()
             await self.poll_once()
             elapsed = time.time() - start_time
 
-            # Polling adaptativo: mais rápido durante movimento
+            # Polling adaptativo: rápido durante movimento
             current_state = self.machine_state.get('machine_state_address', 0x0300)
             is_moving = current_state in [0x0302, 0x0303]  # ST_DOBRANDO ou ST_RETORNANDO
 
-            # Usa intervalo rápido se em movimento, senão usa padrão
-            target_interval = fast_interval if is_moving else base_interval
+            # Também considera encoder_moving (detecta movimento fino)
+            encoder_moving = self.machine_state.get('encoder_moving', False)
+
+            # Usa intervalo rápido se em movimento
+            target_interval = fast_interval if (is_moving or encoder_moving) else idle_interval
 
             sleep_time = max(0, target_interval - elapsed)
             await asyncio.sleep(sleep_time)
