@@ -155,20 +155,22 @@ class MachineStateManager:
             )
 
             if pulsos is not None:
-                # Valor já vem 0-399 do CLP (16-bit)
+                # Valor RAW do registro (pode ser > 399 sem sensor zero)
                 self.machine_state['encoder_raw'] = pulsos
 
-                # NÃO precisa MOD 400, CLP já normaliza!
-                # Pulsos já estão 0-399
-                self.machine_state['encoder_pulsos'] = pulsos
+                # NORMALIZA para 0-399 com MOD 400
+                # Necessário quando sensor zero está ausente (bancada de teste)
+                # Com sensor: CLP zera automaticamente
+                # Sem sensor: Acumula indefinidamente, precisamos MOD
+                pulsos_normalizados = pulsos % 400
 
-                # Conversão DIRETA para graus
+                # Conversão para graus (0-360°)
                 # 400 pulsos = 360° → pulsos × 0.9 = graus
-                graus = (pulsos / 400.0) * 360.0
+                graus = (pulsos_normalizados / 400.0) * 360.0
 
                 # Atualiza estado
                 self.machine_state['encoder_degrees'] = graus
-                self.machine_state['encoder_pulses'] = pulsos
+                self.machine_state['encoder_pulses'] = pulsos_normalizados
 
                 # Detecta movimento
                 if hasattr(self, '_last_encoder_pulsos'):
