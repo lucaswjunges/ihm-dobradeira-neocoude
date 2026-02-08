@@ -203,25 +203,51 @@ ENCODER = {
 # ==========================================
 # ANGULOS PROGRAMADOS (16-bit)
 # ==========================================
-# Unidade: 0.1 grau (900 = 90.0 graus)
-# CORRIGIDO 27/Nov/2025: Mapeamento conforme novo ladder
+# ⚠️ DESCOBERTA CRÍTICA 02/Jan/2026 - ÂNGULOS SÃO GRAVADOS DOBRADOS! ⚠️
+#
+# Para dobrar vergalhão em 90°, a MÁQUINA GIRA 180°!
+#
+# LEITURA:
+#   - CLP retorna pulsos do encoder (0-400 decimal)
+#   - Converter para graus: (pulsos / 400) × 360 = graus_maquina
+#   - Ângulo real = graus_maquina ÷ 2
+#   - Exemplo: 200 pulsos → 180° máquina → 90° real
+#
+# ESCRITA:
+#   - Usuário digita ângulo real (ex: 90°)
+#   - Ângulo máquina = real × 2 (90° → 180°)
+#   - Pulsos = (180 / 360) × 400 = 200 pulsos
+#   - Gravar 200 pulsos no CLP
+#
+# ENDEREÇOS (todos em DECIMAL):
+#   Leitura:  2114, 2116, 2118 (0x0842, 0x0844, 0x0846)
+#   Escrita:  2560, 2562, 2564 (0x0A00, 0x0A02, 0x0A04)
 #
 # Fluxo: IHM escreve em 0x0A00+ → Ladder copia para 0x0842+
-#   0x0A00 → 0x0842 (Angulo 1)
-#   0x0A02 → 0x0844 (Angulo 2)
-#   0x0A04 → 0x0846 (Angulo 3)
-#   0x0A06 → 0x06E0 (Velocidade RPM)
+#   2560 (0x0A00) → 2114 (0x0842) - Angulo 1
+#   2562 (0x0A02) → 2116 (0x0844) - Angulo 2
+#   2564 (0x0A04) → 2118 (0x0846) - Angulo 3
+#   2566 (0x0A06) → 1760 (0x06E0) - Velocidade RPM
 
 BEND_ANGLES = {
-    # Enderecos de LEITURA (onde o CLP armazena os valores)
-    'ANGULO_1_READ': 0x0842,  # 2114 - Angulo dobra 1 (leitura)
-    'ANGULO_2_READ': 0x0844,  # 2116 - Angulo dobra 2 (leitura)
-    'ANGULO_3_READ': 0x0846,  # 2118 - Angulo dobra 3 (leitura)
+    # CORRIGIDO 08/Fev/2026: Leitura usa mesmos endereços de escrita!
+    # Os endereços 0x0842+ dependem do ladder copiar, mas nem sempre funciona.
+    # Holding registers são leitura+escrita, então lemos de onde escrevemos.
+    #
+    # Endereços antigos (dependiam de cópia no ladder - NÃO CONFIÁVEIS):
+    #   'ANGULO_1_READ': 2114,  # 0x0842
+    #   'ANGULO_2_READ': 2116,  # 0x0844
+    #   'ANGULO_3_READ': 2118,  # 0x0846
 
-    # Enderecos de ESCRITA (onde a IHM escreve)
-    'ANGULO_1_WRITE': 0x0A00,  # 2560 - Angulo dobra 1 (escrita)
-    'ANGULO_2_WRITE': 0x0A02,  # 2562 - Angulo dobra 2 (escrita)
-    'ANGULO_3_WRITE': 0x0A04,  # 2564 - Angulo dobra 3 (escrita)
+    # Enderecos de LEITURA = ESCRITA (holding registers são R/W)
+    'ANGULO_1_READ': 2560,  # 0x0A00 - Angulo dobra 1 (leitura direta)
+    'ANGULO_2_READ': 2562,  # 0x0A02 - Angulo dobra 2 (leitura direta)
+    'ANGULO_3_READ': 2564,  # 0x0A04 - Angulo dobra 3 (leitura direta)
+
+    # Enderecos de ESCRITA (mesmos que leitura agora)
+    'ANGULO_1_WRITE': 2560,  # 0x0A00 - Angulo dobra 1 (escrita)
+    'ANGULO_2_WRITE': 2562,  # 0x0A02 - Angulo dobra 2 (escrita)
+    'ANGULO_3_WRITE': 2564,  # 0x0A04 - Angulo dobra 3 (escrita)
 }
 
 # ==========================================
@@ -260,14 +286,17 @@ WORK_REGISTERS = {
 # Formula: valor = rpm * 105.533 (1583/15)
 
 INVERTER = {
-    'VELOCIDADE_INVERSOR': 0x06E0,  # 1760 - Saida analogica para inversor (LEITURA)
-    'VELOCIDADE_WRITE': 0x0A06,     # 2566 - Endereco de escrita (IHM -> Ladder -> 0x06E0)
+    # CORRIGIDO 08/Fev/2026: Leitura usa endereço de escrita!
+    # 0x06E0 dependia do ladder copiar de 0x0A06, retornava 0.
+    # Holding registers são R/W, então lemos de onde escrevemos.
+    'VELOCIDADE_INVERSOR': 0x0A06,  # 2566 - Leitura direta do endereço de escrita
+    'VELOCIDADE_WRITE': 0x0A06,     # 2566 - Endereco de escrita (IHM -> CLP)
 }
 
 # Alias para compatibilidade com modbus_client.py
 RPM_REGISTERS = {
-    'RPM_READ': 0x06E0,   # 1760 - Leitura do inversor
-    'RPM_WRITE': 0x0A06,  # 2566 - Escrita (IHM -> Ladder)
+    'RPM_READ': 0x0A06,   # 2566 - Leitura direta (mesmo endereço de escrita)
+    'RPM_WRITE': 0x0A06,  # 2566 - Escrita (IHM -> CLP)
 }
 
 # ==========================================
@@ -400,10 +429,16 @@ def split_32bit(value: int) -> tuple:
 
 def clp_to_degrees(clp_value: int) -> float:
     """
-    Converte valor CLP (pulsos do encoder) para graus.
+    Converte valor CLP (pulsos do encoder) para graus DA MÁQUINA.
 
-    Encoder: 400 pulsos/volta
+    ⚠️ IMPORTANTE: Esta função NÃO aplica divisão por 2!
+    Retorna o ângulo que a MÁQUINA girou, não o ângulo real da dobra.
+    Para ângulo real da dobra, use machine_angle_to_real()
+
+    Encoder: 400 pulsos/volta (DECIMAL: 0-400, nunca A/B/F)
     - 0 pulsos = 0°
+    - 100 pulsos = 90°
+    - 200 pulsos = 180°
     - 399 pulsos = 359.1°
     - 400 pulsos = 360° (volta completa)
 
@@ -411,6 +446,12 @@ def clp_to_degrees(clp_value: int) -> float:
 
     NOTA: O encoder é acumulativo e pode ter valores muito grandes.
     Usamos MOD 400 para normalizar dentro de uma volta.
+
+    Args:
+        clp_value: Pulsos do encoder (0-400 decimal)
+
+    Returns:
+        Graus que a máquina girou (0-360°)
     """
     if clp_value is None:
         return 0.0
@@ -426,9 +467,13 @@ def clp_to_degrees(clp_value: int) -> float:
 
 def degrees_to_clp(degrees: float) -> int:
     """
-    Converte graus para valor CLP (pulsos do encoder).
+    Converte graus DA MÁQUINA para pulsos do encoder.
 
-    Encoder: 400 pulsos/volta
+    ⚠️ IMPORTANTE: Esta função NÃO aplica multiplicação por 2!
+    Espera o ângulo que a MÁQUINA vai girar, não o ângulo real da dobra.
+    Para converter ângulo real, use real_angle_to_machine() primeiro.
+
+    Encoder: 400 pulsos/volta (DECIMAL: 0-400, nunca A/B/F)
     - 0° = 0 pulsos
     - 90° = 100 pulsos
     - 180° = 200 pulsos
@@ -436,12 +481,92 @@ def degrees_to_clp(degrees: float) -> int:
     - 360° = 400 pulsos (0 pulsos, volta completa)
 
     Conversão: pulsos = (graus / 360) × 400
+
+    Args:
+        degrees: Graus que a máquina vai girar (0-360°)
+
+    Returns:
+        Pulsos do encoder (0-399)
     """
     # Converte graus para pulsos: pulsos = (graus / 360) * 400
     pulsos = int((degrees / 360.0) * 400)
 
     # Garante que está no range 0-399
     return pulsos % 400
+
+
+def real_angle_to_clp(real_degrees: float) -> int:
+    """
+    Converte ângulo REAL de dobra (IHM) para valor do CLP.
+
+    CORRIGIDO 08/Fev/2026:
+    1. Relação 2:1 - disco gira 2x o ângulo da dobra
+    2. SEM compensação de inércia automática - operador ajusta manualmente
+       O operador deve ajustar o ângulo digitado para compensar a inércia da máquina.
+       Ex: Se quer 90° e máquina faz 92°, digitar 88° para compensar.
+
+    MOTIVO: Compensação automática causava ângulos inconsistentes.
+            Máquinas diferentes têm inércias diferentes.
+            Melhor deixar o operador ajustar manualmente.
+
+    Fórmula: valor = angulo × 2
+
+    Exemplos:
+      - IHM 90° → 180 (disco gira 180°)
+      - IHM 45° → 90 (disco gira 90°)
+      - IHM 120° → 240 (disco gira 240°)
+
+    Args:
+        real_degrees: Ângulo de dobra desejado (0-180°)
+
+    Returns:
+        Valor em graus do disco para gravar no CLP
+    """
+    # CASO ESPECIAL: Zero
+    if real_degrees is None or real_degrees <= 0:
+        return 0
+
+    # 08/Fev/2026: Removida compensação automática de inércia
+    # O operador ajusta manualmente o ângulo para compensar a inércia
+    # Isso é mais confiável e previsível
+
+    FATOR_2_PARA_1 = 2.0  # Disco gira 2x o ângulo da dobra
+
+    # Aplica relação 2:1 (sem compensação de inércia)
+    valor_disco = int(real_degrees * FATOR_2_PARA_1)
+
+    return valor_disco
+
+
+def clp_to_real_angle(clp_value: int) -> float:
+    """
+    Converte valor do CLP para ângulo REAL de dobra (IHM).
+
+    CORRIGIDO 08/Fev/2026:
+    - CLP armazena valor do disco (2x o ângulo da dobra)
+    - Sem compensação de inércia (operador ajusta manualmente)
+
+    Fórmula: angulo = valor / 2
+    Exemplo: 180 → 180 / 2 = 90°
+
+    Args:
+        clp_value: Valor lido do CLP (graus do disco)
+
+    Returns:
+        Ângulo de dobra em graus (0-180°)
+    """
+    if clp_value is None or clp_value == 0:
+        return 0.0
+
+    FATOR_2_PARA_1 = 2.0
+
+    # Valor do disco
+    valor_disco = float(clp_value)
+
+    # Divide por 2 para obter ângulo de dobra
+    angulo_usuario = valor_disco / FATOR_2_PARA_1
+
+    return angulo_usuario
 
 
 def rpm_to_register(rpm: float) -> int:

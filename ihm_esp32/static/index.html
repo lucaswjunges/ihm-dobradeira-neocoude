@@ -199,6 +199,7 @@
             text-align: center;
             cursor: pointer;
             transition: all 0.2s;
+            position: relative;
         }
 
         .angle-card:active {
@@ -211,20 +212,166 @@
             box-shadow: 0 0 15px rgba(46,204,113,0.3);
         }
 
-        .angle-card-label {
+        /* Estados de sincronização do ângulo - MELHORADO 08/Fev/2026 */
+        .angle-card.pending {
+            border-color: #f39c12 !important;
+            border-width: 3px !important;
+            background: rgba(243,156,18,0.15) !important;
+            animation: pendingPulse 0.6s ease-in-out infinite;
+        }
+
+        .angle-card.confirmed {
+            border-color: #2ecc71 !important;
+            border-width: 3px !important;
+            background: rgba(46,204,113,0.2) !important;
+            box-shadow: 0 0 25px rgba(46,204,113,0.7);
+            animation: confirmFlash 0.3s ease-out;
+        }
+
+        .angle-card.error {
+            border-color: #e74c3c !important;
+            border-width: 3px !important;
+            background: rgba(231,76,60,0.2) !important;
+            box-shadow: 0 0 20px rgba(231,76,60,0.6);
+            animation: errorShake 0.4s ease-out;
+        }
+
+        .angle-card.synced {
+            border-color: rgba(46,204,113,0.5) !important;
+        }
+
+        @keyframes pendingPulse {
+            0%, 100% {
+                box-shadow: 0 0 5px rgba(243,156,18,0.3);
+                transform: scale(1);
+            }
+            50% {
+                box-shadow: 0 0 25px rgba(243,156,18,0.8);
+                transform: scale(1.02);
+            }
+        }
+
+        @keyframes confirmFlash {
+            0% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+
+        @keyframes errorShake {
+            0%, 100% { transform: translateX(0); }
+            20%, 60% { transform: translateX(-5px); }
+            40%, 80% { transform: translateX(5px); }
+        }
+
+        /* Indicador de status grande no card */
+        .angle-card::after {
+            content: '';
+            position: absolute;
+            top: 6px;
+            right: 6px;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: transparent;
+            opacity: 0;
+            transition: all 0.3s;
+        }
+
+        .angle-card.synced::after {
+            content: '✓';
+            opacity: 1;
+            background: rgba(46,204,113,0.9);
+            width: auto;
+            height: auto;
+            padding: 2px 5px;
+            border-radius: 4px;
             font-size: 10px;
-            opacity: 0.7;
+            color: white;
+            font-weight: bold;
+        }
+
+        .angle-card.pending::after {
+            content: '⏳';
+            opacity: 1;
+            background: rgba(243,156,18,0.9);
+            width: auto;
+            height: auto;
+            padding: 2px 5px;
+            border-radius: 4px;
+            font-size: 10px;
+            animation: blink 0.4s infinite;
+        }
+
+        .angle-card.error::after {
+            content: '✗';
+            opacity: 1;
+            background: rgba(231,76,60,0.9);
+            width: auto;
+            height: auto;
+            padding: 2px 5px;
+            border-radius: 4px;
+            font-size: 10px;
+            color: white;
+            font-weight: bold;
+        }
+
+        @keyframes blink {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.4; }
+        }
+
+        .angle-card-label {
+            font-size: 11px;
+            opacity: 0.8;
             margin-bottom: 5px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 5px;
+            font-weight: 600;
         }
 
         .angle-card-value {
-            font-size: 20px;
+            font-size: 22px;
             font-weight: 700;
         }
 
         .angle-card-unit {
             font-size: 14px;
             opacity: 0.6;
+        }
+
+        /* Status text no label - mais visível */
+        .angle-card.pending .angle-card-label::before {
+            content: 'ENVIANDO';
+            font-size: 9px;
+            background: #f39c12;
+            color: #000;
+            padding: 1px 4px;
+            border-radius: 3px;
+            margin-right: 3px;
+            font-weight: 700;
+        }
+
+        .angle-card.confirmed .angle-card-label::before {
+            content: 'OK!';
+            font-size: 9px;
+            background: #2ecc71;
+            color: #fff;
+            padding: 1px 4px;
+            border-radius: 3px;
+            margin-right: 3px;
+            font-weight: 700;
+        }
+
+        .angle-card.error .angle-card-label::before {
+            content: 'ERRO';
+            font-size: 9px;
+            background: #e74c3c;
+            color: #fff;
+            padding: 1px 4px;
+            border-radius: 3px;
+            margin-right: 3px;
+            font-weight: 700;
         }
 
         /* Dimmer de Velocidade */
@@ -513,7 +660,7 @@
             border-color: #2ecc71;
         }
 
-        /* Overlay de erro */
+        /* Overlay de erro - AGORA MAIS SUAVE */
         .overlay {
             position: fixed;
             top: 0;
@@ -526,10 +673,16 @@
             align-items: center;
             justify-content: center;
             z-index: 999;
+            transition: opacity 0.3s ease;
         }
 
         .overlay.active {
             display: flex;
+        }
+
+        /* Modo reconectando - overlay suave */
+        .overlay.reconnecting {
+            background: rgba(44,62,80,0.9);
         }
 
         .overlay-icon {
@@ -542,6 +695,23 @@
             font-weight: 900;
             text-shadow: 0 4px 20px rgba(0,0,0,0.5);
             animation: pulse 1s infinite;
+        }
+
+        .overlay-submessage {
+            font-size: 14px;
+            opacity: 0.8;
+            margin-top: 15px;
+        }
+
+        /* Spinner de reconexão */
+        .reconnect-spinner {
+            width: 40px;
+            height: 40px;
+            border: 4px solid rgba(255,255,255,0.3);
+            border-radius: 50%;
+            border-top-color: #fff;
+            animation: spin 1s ease-in-out infinite;
+            margin-bottom: 20px;
         }
 
         @keyframes pulse {
@@ -1162,17 +1332,22 @@
     </style>
 </head>
 <body>
-    <!-- Overlay de erro -->
+    <!-- Overlay de erro / reconexão -->
     <div class="overlay" id="errorOverlay">
-        <div class="overlay-icon">⚠️</div>
-        <div class="overlay-message" id="errorMessage">DESLIGADO</div>
+        <div class="reconnect-spinner" id="reconnectSpinner" style="display:none;"></div>
+        <div class="overlay-icon" id="overlayIcon">⚠️</div>
+        <div class="overlay-message" id="errorMessage">DESCONECTADO</div>
+        <div class="overlay-submessage" id="overlaySubmessage"></div>
     </div>
 
-    <!-- Modal para editar ângulo -->
+    <!-- Modal para editar ângulo - ATUALIZAÇÃO IMEDIATA -->
     <div class="modal" id="angleModal">
         <div class="modal-content">
             <div class="modal-title" id="modalTitle">Editar Ângulo - Dobra 1</div>
-            <input type="number" class="modal-input" id="angleInput" placeholder="0.0" step="0.1" min="0" max="360">
+            <input type="number" class="modal-input" id="angleInput" placeholder="0.0" step="0.1" min="0" max="360" inputmode="decimal">
+            <div style="font-size:11px; opacity:0.7; text-align:center; margin-bottom:15px;">
+                ⚡ Valor é enviado ao CLP imediatamente
+            </div>
             <div class="modal-buttons">
                 <button class="modal-btn" onclick="closeModal()">Cancelar</button>
                 <button class="modal-btn confirm" onclick="saveAngle()">Salvar</button>
@@ -1217,40 +1392,49 @@
                     <span id="encoderPulses">0</span> pulsos
                 </div>
             </div>
-            <div class="info-card">
-                <div class="info-label">Dobra Atual</div>
-                <div class="info-value" id="currentBend">1</div>
+            <!-- NOVO 08/Fev/2026: Máximo atingido para verificar repetibilidade -->
+            <div class="info-card" id="maxEncoderCard" style="background: rgba(46,204,113,0.15); border: 2px solid rgba(46,204,113,0.3);">
+                <div class="info-label">Máximo Atingido <button onclick="resetMaxEncoder()" style="font-size:10px; padding:2px 6px; margin-left:5px; background:#e74c3c; border:none; color:white; border-radius:4px; cursor:pointer;">ZERAR</button></div>
+                <div class="info-value" id="maxEncoderValue" style="color:#2ecc71; font-size:26px;">0.0°</div>
+                <div style="font-size: 11px; opacity: 0.6; margin-top: 4px;">
+                    Último: <span id="lastMaxValue">—</span>
+                </div>
             </div>
             <div class="info-card">
                 <div class="info-label">Ângulo Alvo</div>
                 <div class="info-value" id="targetAngle">0.0°</div>
             </div>
             <div class="info-card">
-                <div class="info-label">Peças Produzidas</div>
-                <div class="info-value counter" id="pieceCounter">0</div>
-                <button class="reset-btn" onclick="resetCounter()">ZERAR</button>
+                <div class="info-label">Dobra Atual</div>
+                <div class="info-value" id="currentBend">1</div>
             </div>
         </div>
 
-        <!-- Ângulos Programados -->
-        <div class="section-title">Ângulos Programados</div>
+        <!-- Indicador de erro/discrepância de dobra -->
+        <div id="bendAlertBanner" style="display:none; background: rgba(231,76,60,0.2); border: 2px solid #e74c3c; border-radius: 8px; padding: 10px; margin-bottom: 15px; text-align: center;">
+            <div style="font-weight: bold; color: #e74c3c;" id="bendAlertText">Alerta de Dobra</div>
+            <div style="font-size: 12px; opacity: 0.8; margin-top: 4px;" id="bendAlertSuggestion">Sugestão de compensação</div>
+        </div>
+
+        <!-- Ângulos Programados - TOQUE PARA EDITAR A QUALQUER MOMENTO -->
+        <div class="section-title">Ângulos Programados <span style="opacity:0.6; font-size:10px;">(toque para editar)</span></div>
         <div class="angles-grid">
-            <div class="angle-card" id="angleCard1" onclick="editAngle(1)">
+            <div class="angle-card synced" id="angleCard1" onclick="editAngle(1)">
                 <div class="angle-card-label">DOBRA 1</div>
                 <div class="angle-card-value">
-                    <span id="angle1">90.0</span><span class="angle-card-unit">°</span>
+                    <span id="angle1">---</span><span class="angle-card-unit">°</span>
                 </div>
             </div>
-            <div class="angle-card" id="angleCard2" onclick="editAngle(2)">
+            <div class="angle-card synced" id="angleCard2" onclick="editAngle(2)">
                 <div class="angle-card-label">DOBRA 2</div>
                 <div class="angle-card-value">
-                    <span id="angle2">90.0</span><span class="angle-card-unit">°</span>
+                    <span id="angle2">---</span><span class="angle-card-unit">°</span>
                 </div>
             </div>
-            <div class="angle-card" id="angleCard3" onclick="editAngle(3)">
+            <div class="angle-card synced" id="angleCard3" onclick="editAngle(3)">
                 <div class="angle-card-label">DOBRA 3</div>
                 <div class="angle-card-value">
-                    <span id="angle3">90.0</span><span class="angle-card-unit">°</span>
+                    <span id="angle3">---</span><span class="angle-card-unit">°</span>
                 </div>
             </div>
         </div>
@@ -1437,7 +1621,7 @@
 
     <!-- Footer -->
     <div class="footer">
-        Desenvolvido por Eng. <a href="https://www.linkedin.com/in/lucas-william-junges-a95b00143" target="_blank">Lucas William Junges</a> | IHM Web v2.0
+        <a href="https://www.blumenauautomacao.com.br" target="_blank" style="color: #3498db;">Blumenau Automação</a> | IHM Web v2.1
     </div>
 
     <script>
@@ -1449,6 +1633,31 @@
         let currentSpeed = 5.0;
         let pedalSeguraEnabled = false;
         let manualModeEnabled = false;
+        let lastMessageTime = 0;
+        let watchdogTimer = null;
+
+        // MELHORADO 08/Fev/2026: Reconexão silenciosa e instantânea
+        let reconnectAttempts = 0;
+        let reconnectTimer = null;
+        let isReconnecting = false;
+        let overlayDelayTimer = null;
+        let wasHidden = false;  // Detecta se tela estava apagada
+        const OVERLAY_DELAY_MS = 4000;  // Só mostra overlay após 4s desconectado (tolerante)
+        const MAX_RECONNECT_DELAY = 5000;  // Max 5s entre tentativas (mais agressivo)
+        const BASE_RECONNECT_DELAY = 100;   // Começa com 100ms (instantâneo)
+
+        // NOVO 08/Fev/2026: Rastreamento de máximo do encoder para verificar repetibilidade
+        let maxEncoderValue = 0.0;          // Máximo atingido na dobra atual
+        let lastMaxEncoderValue = null;     // Máximo da dobra anterior (para comparação)
+        let encoderWasMoving = false;       // Flag para detectar fim de movimento
+
+        // Estado de sincronização dos ângulos
+        // Guarda qual valor foi enviado e se foi confirmado pelo CLP
+        let angleSync = {
+            1: { pending: false, confirmed: false, localValue: 0.0, clpValue: 0.0 },
+            2: { pending: false, confirmed: false, localValue: 0.0, clpValue: 0.0 },
+            3: { pending: false, confirmed: false, localValue: 0.0, clpValue: 0.0 }
+        };
 
         // Mapeamento de estados para descrições amigáveis
         const STATE_INFO = {
@@ -1509,21 +1718,174 @@
         };
 
         // ========================================
-        // WEBSOCKET
+        // WEBSOCKET - RECONEXÃO AUTOMÁTICA AGRESSIVA
         // ========================================
+        function startWatchdog() {
+            // Watchdog tolerante (10s) - reconecta se não receber mensagem
+            if (watchdogTimer) clearInterval(watchdogTimer);
+
+            watchdogTimer = setInterval(() => {
+                const now = Date.now();
+                const timeSinceLastMessage = now - lastMessageTime;
+
+                // Se passou mais de 10s sem mensagem, reconecta
+                if (timeSinceLastMessage > 10000 && ws && ws.readyState === WebSocket.OPEN) {
+                    console.warn(`⚠️ Watchdog: Sem mensagens por ${(timeSinceLastMessage/1000).toFixed(1)}s, reconectando...`);
+                    ws.close();
+                }
+            }, 1000);
+        }
+
+        function showReconnectingOverlay() {
+            // MELHORADO 08/Fev/2026: NÃO mostra overlay se tela estava apagada
+            // Isso evita o "DESCONECTADO" ao acordar o celular
+            if (wasHidden) {
+                console.log('📱 Reconexão silenciosa (tela estava apagada)');
+                return;  // Silencioso - não mostra overlay
+            }
+
+            // Só mostra overlay após OVERLAY_DELAY_MS (para falhas reais)
+            if (overlayDelayTimer) return;  // Já tem timer rodando
+
+            overlayDelayTimer = setTimeout(() => {
+                // Verifica novamente se não reconectou durante o delay
+                if (!ws || ws.readyState !== WebSocket.OPEN) {
+                    // Não mostra se a tela foi apagada durante o delay
+                    if (wasHidden) return;
+
+                    const overlay = document.getElementById('errorOverlay');
+                    const spinner = document.getElementById('reconnectSpinner');
+                    const icon = document.getElementById('overlayIcon');
+                    const msg = document.getElementById('errorMessage');
+                    const submsg = document.getElementById('overlaySubmessage');
+
+                    overlay.classList.add('active', 'reconnecting');
+                    overlay.classList.remove('error');
+                    spinner.style.display = 'block';
+                    icon.style.display = 'none';
+                    msg.textContent = 'RECONECTANDO...';
+                    submsg.textContent = `Tentativa ${reconnectAttempts}`;
+                }
+            }, OVERLAY_DELAY_MS);
+        }
+
+        function hideOverlay() {
+            // Cancela timer de delay
+            if (overlayDelayTimer) {
+                clearTimeout(overlayDelayTimer);
+                overlayDelayTimer = null;
+            }
+
+            const overlay = document.getElementById('errorOverlay');
+            const spinner = document.getElementById('reconnectSpinner');
+            const icon = document.getElementById('overlayIcon');
+
+            overlay.classList.remove('active', 'reconnecting');
+            spinner.style.display = 'none';
+            icon.style.display = 'block';
+        }
+
+        function showErrorOverlay(message) {
+            // Erro real (CLP falhou) - mostra imediatamente
+            if (overlayDelayTimer) {
+                clearTimeout(overlayDelayTimer);
+                overlayDelayTimer = null;
+            }
+
+            const overlay = document.getElementById('errorOverlay');
+            const spinner = document.getElementById('reconnectSpinner');
+            const icon = document.getElementById('overlayIcon');
+            const msg = document.getElementById('errorMessage');
+            const submsg = document.getElementById('overlaySubmessage');
+
+            overlay.classList.add('active');
+            overlay.classList.remove('reconnecting');
+            spinner.style.display = 'none';
+            icon.style.display = 'block';
+            icon.textContent = '⚠️';
+            msg.textContent = message;
+            submsg.textContent = '';
+        }
+
+        function scheduleReconnect() {
+            if (reconnectTimer) clearTimeout(reconnectTimer);
+
+            // Backoff exponencial: 500ms, 1s, 2s, 4s... max 10s
+            const delay = Math.min(BASE_RECONNECT_DELAY * Math.pow(2, reconnectAttempts), MAX_RECONNECT_DELAY);
+            reconnectAttempts++;
+
+            console.log(`🔄 Reconectando em ${delay}ms (tentativa ${reconnectAttempts})`);
+
+            reconnectTimer = setTimeout(() => {
+                if (!ws || ws.readyState === WebSocket.CLOSED) {
+                    connectWebSocket();
+                }
+            }, delay);
+        }
+
         function connectWebSocket() {
+            // Limpa conexão anterior
+            if (ws) {
+                ws.onopen = null;
+                ws.onclose = null;
+                ws.onerror = null;
+                ws.onmessage = null;
+                if (ws.readyState === WebSocket.OPEN || ws.readyState === WebSocket.CONNECTING) {
+                    ws.close();
+                }
+            }
+
             const wsHost = window.location.hostname || 'localhost';
-            ws = new WebSocket(`ws://${wsHost}:8765`);
+            isReconnecting = true;
+
+            try {
+                ws = new WebSocket(`ws://${wsHost}:8765`);
+            } catch (e) {
+                console.error('❌ Erro criando WebSocket:', e);
+                showReconnectingOverlay();
+                scheduleReconnect();
+                return;
+            }
 
             ws.onopen = () => {
-                console.log('WebSocket conectado');
+                console.log('✅ WebSocket conectado' + (wasHidden ? ' (silencioso após tela apagada)' : ''));
+                reconnectAttempts = 0;  // Reset contador
+                isReconnecting = false;
+                wasHidden = false;  // Reset flag de tela apagada
+                hideOverlay();
                 updateConnectionStatus('ws', true);
+                lastMessageTime = Date.now();
+                startWatchdog();
+
+                // Marca todos ângulos como precisando re-sync
+                for (let i = 1; i <= 3; i++) {
+                    angleSync[i].confirmed = false;
+                }
             };
 
             ws.onmessage = (event) => {
                 try {
+                    lastMessageTime = Date.now();
+
                     const message = JSON.parse(event.data);
-                    console.log('Mensagem recebida:', message);
+
+                    // Resposta de ângulo - atualiza estado de sync
+                    if (message.type === 'angle_response') {
+                        handleAngleResponse(message);
+                        return;
+                    }
+
+                    // Erro de ângulo - mostra alerta
+                    if (message.type === 'angle_error') {
+                        handleAngleError(message);
+                        return;
+                    }
+
+                    // Confirmação de ângulo (broadcast)
+                    if (message.data?.angle_confirmed) {
+                        const conf = message.data.angle_confirmed;
+                        handleAngleConfirmed(conf.bend, conf.angle);
+                    }
 
                     // Mensagens WiFi
                     if (message.type && message.type.startsWith('wifi_')) {
@@ -1537,20 +1899,139 @@
                         handleStateUpdate(message);
                     }
                 } catch (e) {
-                    console.error('Erro ao processar mensagem:', e, event.data);
+                    console.error('❌ Erro ao processar mensagem:', e, event.data);
                 }
             };
 
-            ws.onclose = () => {
-                console.log('WebSocket desconectado');
+            ws.onclose = (event) => {
+                console.log(`🔌 WebSocket desconectado (code: ${event.code})`);
                 updateConnectionStatus('ws', false);
-                setTimeout(connectWebSocket, 3000);
+
+                if (watchdogTimer) {
+                    clearInterval(watchdogTimer);
+                    watchdogTimer = null;
+                }
+
+                // Inicia reconexão automática
+                showReconnectingOverlay();
+                scheduleReconnect();
             };
 
             ws.onerror = (error) => {
-                console.error('Erro WebSocket:', error);
-                updateConnectionStatus('ws', false);
+                console.error('❌ Erro WebSocket:', error);
+                // onclose será chamado automaticamente
             };
+        }
+
+        // Handler específico para resposta de ângulo
+        function handleAngleResponse(message) {
+            const bend = message.bend;
+            const success = message.success;
+            const angle = message.angle;
+            const verified = message.verified || false;
+
+            const card = document.getElementById(`angleCard${bend}`);
+            if (!card) return;
+
+            // Remove classes anteriores
+            card.classList.remove('pending', 'confirmed', 'error');
+
+            if (success) {
+                // Sucesso - mostra verde por 2s
+                angleSync[bend].confirmed = true;
+                angleSync[bend].clpValue = angle;
+                angleSync[bend].pending = false;
+
+                card.classList.add('confirmed', 'synced');
+                setTimeout(() => {
+                    card.classList.remove('confirmed');
+                }, 2000);
+
+                const verifyText = verified ? ' (verificado)' : '';
+                console.log(`✅ Ângulo ${bend} confirmado: ${angle}°${verifyText}`);
+            } else {
+                // Erro - mostra vermelho e alerta
+                angleSync[bend].pending = false;
+                card.classList.add('error');
+
+                // Mostra alerta ao usuário
+                showAngleErrorAlert(bend, angle, message.message || 'Falha ao gravar');
+
+                setTimeout(() => {
+                    card.classList.remove('error');
+                }, 5000);
+
+                console.error(`❌ Falha ao gravar ângulo ${bend}: ${message.message}`);
+            }
+        }
+
+        // Handler para erro de ângulo (broadcast)
+        function handleAngleError(message) {
+            const bend = message.bend;
+            const angle = message.angle;
+            const errorMsg = message.message || 'Erro desconhecido';
+
+            const card = document.getElementById(`angleCard${bend}`);
+            if (card) {
+                card.classList.remove('pending', 'confirmed');
+                card.classList.add('error');
+
+                setTimeout(() => {
+                    card.classList.remove('error');
+                }, 5000);
+            }
+
+            showAngleErrorAlert(bend, angle, errorMsg);
+        }
+
+        // Handler para confirmação de ângulo (broadcast)
+        function handleAngleConfirmed(bend, angle) {
+            const card = document.getElementById(`angleCard${bend}`);
+            if (!card) return;
+
+            angleSync[bend].confirmed = true;
+            angleSync[bend].clpValue = angle;
+            angleSync[bend].pending = false;
+
+            card.classList.remove('pending', 'error');
+            card.classList.add('synced', 'confirmed');
+
+            setTimeout(() => {
+                card.classList.remove('confirmed');
+            }, 2000);
+
+            console.log(`📢 Ângulo ${bend} confirmado por broadcast: ${angle}°`);
+        }
+
+        // Mostra alerta de erro de ângulo
+        function showAngleErrorAlert(bend, angle, errorMsg) {
+            // Cria toast de erro temporário
+            const toast = document.createElement('div');
+            toast.style.cssText = `
+                position: fixed;
+                bottom: 80px;
+                left: 50%;
+                transform: translateX(-50%);
+                background: rgba(231,76,60,0.95);
+                color: white;
+                padding: 15px 25px;
+                border-radius: 12px;
+                font-weight: 600;
+                font-size: 14px;
+                z-index: 1100;
+                box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+                max-width: 90%;
+                text-align: center;
+            `;
+            toast.innerHTML = `
+                ⚠️ Erro ao gravar Dobra ${bend}<br>
+                <span style="font-size:12px; opacity:0.9;">${errorMsg}</span>
+            `;
+            document.body.appendChild(toast);
+
+            setTimeout(() => {
+                toast.remove();
+            }, 5000);
         }
 
         // ========================================
@@ -1568,9 +2049,11 @@
             }
 
             // Encoder (CORRIGIDO 02/Jan/2026: visualização profissional)
+            // MELHORADO 08/Fev/2026: Rastreia máximo atingido para verificar repetibilidade
             if (data.encoder_degrees !== undefined && data.encoder_degrees !== null) {
                 const encoderEl = document.getElementById('encoderValue');
-                encoderEl.textContent = data.encoder_degrees.toFixed(1) + '°';
+                const currentAngle = data.encoder_degrees;
+                encoderEl.textContent = currentAngle.toFixed(1) + '°';
 
                 // Animação de pulsação durante movimento
                 if (data.encoder_moving) {
@@ -1578,6 +2061,9 @@
                 } else {
                     encoderEl.classList.remove('moving');
                 }
+
+                // NOVO: Rastreia máximo atingido
+                updateMaxEncoder(currentAngle, data.encoder_moving);
             }
 
             // Pulsos do encoder (debug)
@@ -1603,7 +2089,8 @@
 
             // Contador de peças
             if (data.contador_pecas !== undefined) {
-                document.getElementById('pieceCounter').textContent = data.contador_pecas;
+                const pieceEl = document.getElementById('pieceCounter');
+                if (pieceEl) pieceEl.textContent = data.contador_pecas;
             }
 
             // Velocidade
@@ -1613,28 +2100,22 @@
                 document.getElementById('speedSlider').value = data.velocidade_rpm;
             }
 
-            // Ângulos programados
+            // Ângulos programados - com verificação de sincronização
             if (data.angles) {
-                if (data.angles.bend_1 !== undefined) {
-                    document.getElementById('angle1').textContent = data.angles.bend_1.toFixed(1);
-                }
-                if (data.angles.bend_2 !== undefined) {
-                    document.getElementById('angle2').textContent = data.angles.bend_2.toFixed(1);
-                }
-                if (data.angles.bend_3 !== undefined) {
-                    document.getElementById('angle3').textContent = data.angles.bend_3.toFixed(1);
-                }
+                updateAngleFromServer(1, data.angles.bend_1);
+                updateAngleFromServer(2, data.angles.bend_2);
+                updateAngleFromServer(3, data.angles.bend_3);
             }
 
             // Compatibilidade com formato antigo
             if (data.bend_1_left !== undefined) {
-                document.getElementById('angle1').textContent = data.bend_1_left.toFixed(1);
+                updateAngleFromServer(1, data.bend_1_left);
             }
             if (data.bend_2_left !== undefined) {
-                document.getElementById('angle2').textContent = data.bend_2_left.toFixed(1);
+                updateAngleFromServer(2, data.bend_2_left);
             }
             if (data.bend_3_left !== undefined) {
-                document.getElementById('angle3').textContent = data.bend_3_left.toFixed(1);
+                updateAngleFromServer(3, data.bend_3_left);
             }
 
             // Control bits (PEDAL_SEGURA, MODO_MANUAL)
@@ -1686,6 +2167,40 @@
             }
         }
 
+        // NOVO: Atualiza ângulo recebido do servidor e verifica sincronização
+        function updateAngleFromServer(bend, value) {
+            if (value === undefined || value === null) return;
+
+            const displayEl = document.getElementById(`angle${bend}`);
+            const card = document.getElementById(`angleCard${bend}`);
+            if (!displayEl || !card) return;
+
+            // Atualiza display
+            displayEl.textContent = value.toFixed(1);
+
+            // Atualiza estado de sincronização
+            angleSync[bend].clpValue = value;
+
+            // Se não estava pendente, marca como synced
+            if (!angleSync[bend].pending) {
+                angleSync[bend].confirmed = true;
+                card.classList.add('synced');
+                card.classList.remove('pending', 'error');
+            } else {
+                // Estava pendente - verifica se valor bateu
+                if (Math.abs(angleSync[bend].localValue - value) < 0.1) {
+                    // Valor bateu - confirma
+                    angleSync[bend].pending = false;
+                    angleSync[bend].confirmed = true;
+                    card.classList.remove('pending');
+                    card.classList.add('synced', 'confirmed');
+                    setTimeout(() => {
+                        card.classList.remove('confirmed');
+                    }, 2000);
+                }
+            }
+        }
+
         function updateToggle(toggleId, isActive) {
             const toggle = document.getElementById(toggleId);
             if (toggle) {
@@ -1700,18 +2215,17 @@
             dot.classList.toggle('connected', connected);
             text.textContent = connected ? (type === 'ws' ? 'WS' : 'CLP') : 'OFF';
 
-            // Overlay de erro
-            const overlay = document.getElementById('errorOverlay');
-            const errorMsg = document.getElementById('errorMessage');
-
+            // Overlay de erro - NOVA LÓGICA
             if (type === 'ws' && !connected) {
-                overlay.classList.add('active');
-                errorMsg.textContent = 'DESCONECTADO';
+                // WebSocket desconectou - inicia reconexão silenciosa
+                // Overlay só aparece após OVERLAY_DELAY_MS (3s)
+                showReconnectingOverlay();
             } else if (type === 'clp' && !connected && ws && ws.readyState === WebSocket.OPEN) {
-                overlay.classList.add('active');
-                errorMsg.textContent = 'FALHA CLP';
+                // CLP desconectou - mostra erro imediato (problema real)
+                showErrorOverlay('FALHA CLP');
             } else if (connected && ws && ws.readyState === WebSocket.OPEN) {
-                overlay.classList.remove('active');
+                // Tudo OK - esconde overlay
+                hideOverlay();
             }
         }
 
@@ -1844,13 +2358,42 @@
                 return;
             }
 
+            const bend = currentBendEdit;
+            const card = document.getElementById(`angleCard${bend}`);
+
+            // Marca como pendente ANTES de enviar
+            angleSync[bend].pending = true;
+            angleSync[bend].confirmed = false;
+            angleSync[bend].localValue = value;
+            card.classList.remove('synced', 'confirmed', 'error');
+            card.classList.add('pending');
+
+            // Envia para o servidor
             ws.send(JSON.stringify({
                 action: 'write_angle',
-                bend: currentBendEdit,
+                bend: bend,
                 angle: value
             }));
 
-            document.getElementById(`angle${currentBendEdit}`).textContent = value.toFixed(1);
+            // Atualiza display imediatamente (feedback instantâneo)
+            document.getElementById(`angle${bend}`).textContent = value.toFixed(1);
+
+            console.log(`📤 Enviando ângulo ${bend} = ${value}° (aguardando confirmação)`);
+
+            // Timeout de segurança - se não receber resposta em 5s, marca erro
+            setTimeout(() => {
+                if (angleSync[bend].pending) {
+                    angleSync[bend].pending = false;
+                    card.classList.remove('pending');
+                    card.classList.add('error');
+                    console.warn(`⚠️ Timeout: Ângulo ${bend} não confirmado`);
+
+                    setTimeout(() => {
+                        card.classList.remove('error');
+                    }, 3000);
+                }
+            }, 5000);
+
             closeModal();
         }
 
@@ -2137,6 +2680,102 @@
         // function updateMotorAnimation(data) { /* DESATIVADO */ }
         // function updateCalibrationLock(isCalibrating) { /* DESATIVADO */ }
         // function handleCalibrationMessage(message) { /* DESATIVADO */ }
+
+        // ========================================
+        // VISIBILIDADE DA PÁGINA - MELHORADO 08/Fev/2026
+        // Reconexão silenciosa quando celular volta do bolso
+        // ========================================
+        document.addEventListener('visibilitychange', () => {
+            if (document.visibilityState === 'visible') {
+                console.log('📱 Tela ativada - verificando conexão...');
+
+                // IMPORTANTE: Cancela qualquer overlay pendente imediatamente
+                if (overlayDelayTimer) {
+                    clearTimeout(overlayDelayTimer);
+                    overlayDelayTimer = null;
+                }
+
+                // Se WebSocket não está conectado, reconecta SILENCIOSAMENTE
+                if (!ws || ws.readyState !== WebSocket.OPEN) {
+                    console.log('🔄 Reconectando silenciosamente após tela ativada...');
+                    wasHidden = true;  // Marca que estava com tela apagada
+                    reconnectAttempts = 0;  // Reset para reconexão instantânea
+
+                    if (reconnectTimer) {
+                        clearTimeout(reconnectTimer);
+                        reconnectTimer = null;
+                    }
+
+                    // Esconde overlay se estiver visível (reconexão silenciosa)
+                    hideOverlay();
+
+                    // Reconecta imediatamente (sem delay)
+                    connectWebSocket();
+                } else {
+                    // WebSocket parece OK, mas verifica se está responsivo
+                    wasHidden = false;
+                    lastMessageTime = Date.now() - 8000;  // Força verificação em 2s
+                    console.log('✅ WebSocket OK, aguardando próximo heartbeat');
+
+                    // Garante que overlay está escondido
+                    hideOverlay();
+                }
+            } else {
+                console.log('📱 Tela desativada - reconexão silenciosa habilitada');
+                wasHidden = true;  // Marca que vai entrar em modo suspenso
+            }
+        });
+
+        // Também detecta quando o navegador volta do modo offline
+        window.addEventListener('online', () => {
+            console.log('🌐 Conexão de rede restaurada');
+            if (!ws || ws.readyState !== WebSocket.OPEN) {
+                wasHidden = true;  // Trata como se tela estivesse apagada (silencioso)
+                reconnectAttempts = 0;
+                hideOverlay();
+                connectWebSocket();
+            }
+        });
+
+        // ========================================
+        // MÁXIMO ENCODER - Repetibilidade
+        // ========================================
+
+        /**
+         * Rastreia o valor máximo atingido pelo encoder durante uma dobra.
+         * Quando o encoder para de se mover (encoder_moving: true→false),
+         * salva o máximo anterior em "Último" e zera para a próxima dobra.
+         */
+        function updateMaxEncoder(currentAngle, isMoving) {
+            // Atualiza máximo se o ângulo atual é maior
+            if (currentAngle > maxEncoderValue) {
+                maxEncoderValue = currentAngle;
+                document.getElementById('maxEncoderValue').textContent = maxEncoderValue.toFixed(1) + '°';
+            }
+
+            // Detecta fim de movimento (estava movendo → parou)
+            if (encoderWasMoving && !isMoving && maxEncoderValue > 0.5) {
+                // Salva o máximo desta dobra como "Último"
+                lastMaxEncoderValue = maxEncoderValue;
+                document.getElementById('lastMaxValue').textContent = lastMaxEncoderValue.toFixed(1) + '°';
+                // NÃO zera automaticamente - operador quer ver o máximo até clicar ZERAR
+            }
+
+            encoderWasMoving = isMoving;
+        }
+
+        /**
+         * Zera o máximo manualmente (botão ZERAR).
+         * Move o valor atual para "Último" antes de zerar.
+         */
+        function resetMaxEncoder() {
+            if (maxEncoderValue > 0.5) {
+                lastMaxEncoderValue = maxEncoderValue;
+                document.getElementById('lastMaxValue').textContent = lastMaxEncoderValue.toFixed(1) + '°';
+            }
+            maxEncoderValue = 0.0;
+            document.getElementById('maxEncoderValue').textContent = '0.0°';
+        }
 
         // ========================================
         // INICIALIZAÇÃO

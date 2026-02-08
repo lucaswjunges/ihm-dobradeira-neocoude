@@ -39,3 +39,5 @@ Thumbs.db
 # Project specific
 wifi_config.json
 *.log
+*.pid
+logs/

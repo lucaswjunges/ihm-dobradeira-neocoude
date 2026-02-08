@@ -77,7 +77,11 @@ class IHMServer:
 
         # 2. Inicializa State Manager (funciona mesmo sem CLP)
         self.state_manager = MachineStateManager(self.modbus_client)
-        
+
+        # NOVO 08/Fev/2026: Callback para auditoria de dobras
+        # Quando uma dobra é completada, envia resultado para todos os clientes
+        self.state_manager.on_bend_logged = self._on_bend_logged
+
         # 3. Inicia loop de polling
         poll_task = asyncio.create_task(self.state_manager.start_polling())
         self.tasks.append(poll_task)
@@ -125,6 +129,9 @@ class IHMServer:
             print(f"🔍 [DEBUG] connected no estado: {initial_state.get('connected')}")
             print(f"🔍 [DEBUG] encoder_raw no estado: {initial_state.get('encoder_raw')}")
             print(f"🔍 [DEBUG] encoder_degrees no estado: {initial_state.get('encoder_degrees')}")
+            print(f"🔍 [DEBUG] angles no estado: {initial_state.get('angles')}")
+            print(f"🔍 [DEBUG] velocidade_rpm no estado: {initial_state.get('velocidade_rpm')}")
+            print(f"🔍 [DEBUG] target_angle no estado: {initial_state.get('target_angle')}")
 
             await websocket.send(json.dumps({
                 'type': 'full_state',
@@ -188,22 +195,75 @@ class IHMServer:
 
             elif action == 'write_angle':
                 # Escrever ângulo de dobra
-                # ATUALIZADO 20/Nov/2025: Formato 16-bit validado
+                # MELHORADO 08/Fev/2026: Verificação de escrita + leitura forçada + broadcast
                 bend_num = data.get('bend')  # 1, 2 ou 3
                 angle_degrees = float(data.get('angle'))  # Graus (ex: 90.0, 120.5)
 
                 print(f"📝 [WEB] Recebido: Gravar Dobra {bend_num} = {angle_degrees}°")
 
                 if bend_num in [1, 2, 3]:
-                    # Usa método validado que escreve em área 0x0A00 (16-bit)
-                    success = self.modbus_client.write_bend_angle(bend_num, angle_degrees)
-                    print(f"{'✅' if success else '❌'} [WEB] Resultado: {success}")
-                    await websocket.send(json.dumps({
+                    # Usa método com verificação (read-after-write)
+                    success = self.modbus_client.write_bend_angle(bend_num, angle_degrees, verify=True)
+
+                    # NOVO: Força leitura imediata dos ângulos no próximo ciclo de polling
+                    if success:
+                        self.state_manager.force_angle_read = True
+
+                    status_icon = '✅' if success else '❌'
+                    print(f"{status_icon} [WEB] Dobra {bend_num} = {angle_degrees}° → {'CONFIRMADO' if success else 'FALHOU'}")
+
+                    # Resposta detalhada ao cliente
+                    response = {
                         'type': 'angle_response',
                         'bend': bend_num,
                         'angle': angle_degrees,
-                        'success': success
-                    }))
+                        'success': success,
+                        'verified': success,  # Indica que foi verificado
+                        'message': f'Ângulo {bend_num} {"confirmado" if success else "FALHOU - verifique conexão"}',
+                    }
+
+                    await websocket.send(json.dumps(response))
+
+                    # BROADCAST para TODOS os clientes
+                    if success:
+                        # Atualiza estado local imediatamente (sem esperar polling)
+                        bend_key = f'bend_{bend_num}'
+                        self.state_manager.machine_state['angles'][bend_key] = angle_degrees
+
+                        # Broadcast imediato com status de confirmação
+                        update_msg = json.dumps({
+                            'type': 'state_update',
+                            'data': {
+                                'angles': {bend_key: angle_degrees},
+                                f'bend_{bend_num}_left': angle_degrees,
+                                'target_angle': angle_degrees if self.state_manager.machine_state.get('dobra_atual', 1) == bend_num else self.state_manager.machine_state.get('target_angle', 0),
+                                'angle_confirmed': {
+                                    'bend': bend_num,
+                                    'angle': angle_degrees,
+                                    'timestamp': time.time()
+                                }
+                            }
+                        })
+                        for client in self.clients:
+                            try:
+                                await client.send(update_msg)
+                            except:
+                                pass
+                        print(f"📢 [BROADCAST] Ângulo {bend_num} = {angle_degrees}° CONFIRMADO para {len(self.clients)} clientes")
+                    else:
+                        # Erro: notifica todos os clientes
+                        error_msg = json.dumps({
+                            'type': 'angle_error',
+                            'bend': bend_num,
+                            'angle': angle_degrees,
+                            'message': 'Falha ao gravar ângulo - verifique conexão CLP'
+                        })
+                        for client in self.clients:
+                            try:
+                                await client.send(error_msg)
+                            except:
+                                pass
+                        print(f"🚨 [BROADCAST] ERRO ao gravar ângulo {bend_num}")
                 else:
                     print(f"❌ [WEB] Número de dobra inválido: {bend_num}")
 
@@ -607,29 +667,121 @@ class IHMServer:
                 }))
                 print(f"📶 [WiFi] NAT {'desabilitado' if success else 'falhou ao desabilitar'}")
 
+            elif action == 'get_bend_stats':
+                # NOVO 08/Fev/2026: Retorna estatísticas de auditoria de dobras
+                from bend_logger import get_bend_logger
+                logger = get_bend_logger()
+
+                stats = logger.get_session_stats()
+                recommendations = logger.get_compensation_recommendation()
+                trend = logger.get_error_trend()
+
+                await websocket.send(json.dumps({
+                    'type': 'bend_stats',
+                    'stats': stats,
+                    'recommendations': recommendations,
+                    'trend': trend
+                }))
+                print(f"📊 [Stats] Enviadas estatísticas de dobras")
+
         except json.JSONDecodeError:
             print(f"✗ JSON inválido recebido: {message}")
         except Exception as e:
             print(f"✗ Erro processando mensagem: {e}")
-            
+
+    def _on_bend_logged(self, result: dict):
+        """
+        Callback chamado quando uma dobra é registrada pelo BendLogger.
+
+        NOVO 08/Fev/2026: Sistema de auditoria de dobras.
+        Faz broadcast do resultado para todos os clientes conectados.
+
+        Args:
+            result: Dicionário com resultado da dobra:
+                - success: bool
+                - error: float (graus de erro)
+                - alert: str ou None
+                - compensation_suggested: float
+                - record: dict com todos os dados
+        """
+        # Prepara mensagem para broadcast
+        message = {
+            'type': 'bend_completed',
+            'success': result.get('success', False),
+            'error_degrees': result.get('error', 0.0),
+            'alert': result.get('alert'),
+            'compensation_suggested': result.get('compensation_suggested', 0.0),
+            'record': result.get('record', {})
+        }
+
+        # Log
+        if result.get('alert'):
+            print(f"🚨 [AUDITORIA] {result['alert']}")
+        else:
+            print(f"✅ [AUDITORIA] Dobra OK (erro: {result.get('error', 0):.1f}°)")
+
+        # Broadcast assíncrono para todos os clientes
+        # Precisa agendar porque estamos em contexto síncrono
+        asyncio.create_task(self._broadcast_bend_result(message))
+
+    async def _broadcast_bend_result(self, message: dict):
+        """Faz broadcast do resultado de uma dobra para todos os clientes."""
+        if not self.clients:
+            return
+
+        msg_json = json.dumps(message)
+        for client in self.clients:
+            try:
+                await client.send(msg_json)
+            except Exception as e:
+                print(f"⚠️ Erro enviando resultado de dobra: {e}")
+
+        print(f"📢 [BROADCAST] Resultado de dobra enviado para {len(self.clients)} clientes")
+
     async def broadcast_loop(self):
         """
         Loop que envia atualizações para todos os clientes conectados
+
+        OTIMIZADO 06/Jan/2026:
+        - Broadcast a cada 150ms (balanceado)
+        - Heartbeat a cada 3s (margem segura para watchdog 10s)
+        - Logging de erros melhorado
+        - Timestamp em cada mensagem
         """
         previous_state = {}
+        heartbeat_counter = 0
+        HEARTBEAT_INTERVAL = 20  # A cada 20 broadcasts (3s @ 150ms) - bem antes do watchdog!
 
         while True:
-            await asyncio.sleep(0.5)  # Broadcast a cada 500ms
+            await asyncio.sleep(0.15)  # OTIMIZADO 06/Jan/2026: Broadcast a cada 150ms
 
             if not self.clients:
                 # Atualiza previous_state mesmo sem clientes
                 previous_state = self.state_manager.get_state()
+                heartbeat_counter = 0
                 continue
+
+            # Heartbeat periódico (a cada 3s)
+            heartbeat_counter += 1
+            send_heartbeat = (heartbeat_counter >= HEARTBEAT_INTERVAL)
+            if send_heartbeat:
+                heartbeat_counter = 0
 
             # Pega apenas mudanças (deltas)
             changes = self.state_manager.get_changes(previous_state)
 
+            # CRÍTICO: Envia heartbeat SEMPRE a cada 3s (keep-alive)
+            if send_heartbeat:
+                if not changes:
+                    changes = {'heartbeat': True}
+                else:
+                    # Adiciona heartbeat junto com as mudanças
+                    changes['heartbeat'] = True
+
             if changes:
+                # Adiciona timestamp para debug
+                changes['timestamp'] = time.time()
+
                 message = json.dumps({
                     'type': 'state_update',
                     'data': changes
@@ -640,11 +792,17 @@ class IHMServer:
                 for client in self.clients:
                     try:
                         await client.send(message)
-                    except:
+                    except websockets.exceptions.ConnectionClosed as e:
+                        print(f"⚠️ Cliente desconectou durante broadcast: {client.remote_address} - {e}")
+                        disconnected.add(client)
+                    except Exception as e:
+                        print(f"✗ Erro enviando para cliente {client.remote_address}: {e}")
                         disconnected.add(client)
 
                 # Remove clientes desconectados
-                self.clients -= disconnected
+                if disconnected:
+                    print(f"🔌 Removendo {len(disconnected)} cliente(s) desconectado(s)")
+                    self.clients -= disconnected
 
             # Atualiza estado anterior
             previous_state = self.state_manager.get_state()
@@ -719,12 +877,48 @@ class IHMServer:
             Response com HTML
         """
         html_path = Path(__file__).parent / 'static' / 'index.html'
-        
+
         if html_path.exists():
             return web.FileResponse(html_path)
         else:
             return web.Response(text="index.html não encontrado", status=404)
-            
+
+    async def captive_portal_android(self, request):
+        """
+        Responde para detecção de captive portal do Android
+        URL: /generate_204
+        Android espera HTTP 204 (No Content) quando NÃO há captive portal
+        Retornamos HTTP 302 (redirect) para indicar que HÁ captive portal
+        """
+        return web.Response(
+            status=302,
+            headers={'Location': 'http://192.168.50.1:8080/'}
+        )
+
+    async def captive_portal_ios(self, request):
+        """
+        Responde para detecção de captive portal do iOS/macOS
+        URL: /hotspot-detect.html
+        Apple espera HTML com <title>Success</title> quando NÃO há captive portal
+        Retornamos redirect para indicar que HÁ captive portal
+        """
+        return web.Response(
+            status=302,
+            headers={'Location': 'http://192.168.50.1:8080/'}
+        )
+
+    async def captive_portal_windows(self, request):
+        """
+        Responde para detecção de captive portal do Windows
+        URL: /connecttest.txt
+        Windows espera texto "Microsoft Connect Test" quando NÃO há captive portal
+        Retornamos redirect para indicar que HÁ captive portal
+        """
+        return web.Response(
+            status=302,
+            headers={'Location': 'http://192.168.50.1:8080/'}
+        )
+
     async def run(self):
         """Executa servidor (WebSocket + HTTP)"""
         # Inicializa componentes
@@ -736,6 +930,22 @@ class IHMServer:
         app.router.add_get('/', self.http_handler)
         app.router.add_get('/index.html', self.http_handler)
         app.router.add_static('/static', Path(__file__).parent / 'static')
+
+        # ==========================================
+        # CAPTIVE PORTAL - Detecção automática
+        # ==========================================
+        # Android
+        app.router.add_get('/generate_204', self.captive_portal_android)
+        app.router.add_get('/gen_204', self.captive_portal_android)
+
+        # iOS/macOS
+        app.router.add_get('/hotspot-detect.html', self.captive_portal_ios)
+        app.router.add_get('/library/test/success.html', self.captive_portal_ios)
+
+        # Windows
+        app.router.add_get('/connecttest.txt', self.captive_portal_windows)
+        app.router.add_get('/redirect', self.captive_portal_windows)
+        app.router.add_get('/ncsi.txt', self.captive_portal_windows)
         runner = web.AppRunner(app)
         await runner.setup()
         site = web.TCPSite(runner, '0.0.0.0', 8080)

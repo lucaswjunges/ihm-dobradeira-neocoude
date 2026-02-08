@@ -41,7 +41,7 @@ class ModbusClientWrapper:
 
         # Contador de erros consecutivos para detecção de desconexão
         self.consecutive_errors = 0
-        self.max_errors_before_disconnect = 5  # Só desconecta após 5 erros seguidos
+        self.max_errors_before_disconnect = 10  # OTIMIZADO: 10 erros seguidos (mais tolerante)
 
         # Reconexão automática
         self.reconnect_attempts = 0
@@ -68,7 +68,7 @@ class ModbusClientWrapper:
                 parity='N',
                 stopbits=2,  # CORRIGIDO 27/Nov/2025: 2 stop bits necessário
                 bytesize=8,
-                timeout=0.2  # OTIMIZADO 02/Jan/2026: 200ms para leitura rápida @ 57600bps
+                timeout=0.5  # OTIMIZADO 06/Jan/2026: 500ms para estabilidade @ 57600bps
             )
             # Configura slave_id no objeto client
             self.client.slave_id = self.slave_id
@@ -140,7 +140,7 @@ class ModbusClientWrapper:
                 parity='N',
                 stopbits=2,  # CORRIGIDO 27/Nov/2025: 2 stop bits necessário
                 bytesize=8,
-                timeout=0.2  # OTIMIZADO 02/Jan/2026: 200ms
+                timeout=0.5  # OTIMIZADO 06/Jan/2026: 500ms para estabilidade
             )
             self.client.slave_id = self.slave_id
 
@@ -759,114 +759,144 @@ class ModbusClientWrapper:
         address = all_keys[key_name]
         return self.press_key(address, hold_ms=100)
 
-    def write_bend_angle(self, bend_number: int, degrees: float) -> bool:
+    def write_bend_angle(self, bend_number: int, degrees: float, verify: bool = True) -> bool:
         """
-        Grava ângulo de dobra na área de ESCRITA (0x0A00+)
+        Grava ângulo REAL de dobra com verificação read-after-write.
 
-        ✅ CORRIGIDO 01/Dez/2025 - Conversão para pulsos de encoder
+        CORRIGIDO 08/Fev/2026: READ = WRITE (mesmos endereços 0x0A00+)
+        Verificação agora lê do mesmo endereço que escreveu (não depende do ladder copiar).
 
-        FLUXO:
-          1. IHM grava 16-bit em endereço (0x0A00, 0x0A02 ou 0x0A04)
-          2. Ladder copia automaticamente para área de leitura (0x0842, 0x0844, 0x0846)
-          3. Principal.lad lê da área de leitura e executa dobra
-
-        Encoder: 400 pulsos/volta
-        - 0° = 0 pulsos
-        - 90° = 100 pulsos
-        - 180° = 200 pulsos
-        - 270° = 300 pulsos
-        - 360° = 400 pulsos (0 pulsos, volta completa)
-
-        Formato: 16-bit (1 registro apenas)
-        - Conversão: pulsos = (graus / 360) × 400
-        - Exemplo: 90.0° = 100 pulsos (0x0064)
+        Endereços (DECIMAL):
+          - Dobra 1: 2560 (0x0A00)
+          - Dobra 2: 2562 (0x0A02)
+          - Dobra 3: 2564 (0x0A04)
 
         Args:
             bend_number (int): 1, 2 ou 3
-            degrees (float): Ângulo em graus (ex: 90.0)
+            degrees (float): Ângulo REAL da dobra (ex: 90.0°)
+            verify (bool): Se True, lê de volta para confirmar (recomendado)
 
         Returns:
-            bool: True se sucesso
+            bool: True se sucesso E verificado
 
         Exemplo:
-            >>> client.write_bend_angle(1, 90.0)  # Dobra 1: 90° = 100 pulsos
-            True
-            >>> client.write_bend_angle(2, 180.0)  # Dobra 2: 180° = 200 pulsos
+            >>> client.write_bend_angle(1, 90.0)
+            ✎ Gravando Dobra 1: 90.0° → valor 180 → endereço 2560
+            ✓ Verificação OK: lido 180 = esperado 180
             True
         """
         if bend_number not in [1, 2, 3]:
             print(f"✗ Número de dobra inválido: {bend_number} (deve ser 1, 2 ou 3)")
             return False
 
-        # Mapeamento: Endereços de ESCRITA (0x0A00, 0x0A02, 0x0A04)
-        # CORRIGIDO 28/Nov/2025: Usar mm.BEND_ANGLES que tem os endereços corretos
-        addresses = {
-            1: mm.BEND_ANGLES['ANGULO_1_WRITE'],    # 0x0A00 (2560)
-            2: mm.BEND_ANGLES['ANGULO_2_WRITE'],    # 0x0A02 (2562)
-            3: mm.BEND_ANGLES['ANGULO_3_WRITE'],    # 0x0A04 (2564)
+        # Mapeamento: Endereços de ESCRITA (DECIMAL)
+        write_addresses = {
+            1: mm.BEND_ANGLES['ANGULO_1_WRITE'],    # 2560 (0x0A00)
+            2: mm.BEND_ANGLES['ANGULO_2_WRITE'],    # 2562 (0x0A02)
+            3: mm.BEND_ANGLES['ANGULO_3_WRITE'],    # 2564 (0x0A04)
         }
 
-        addr = addresses[bend_number]
+        # Mapeamento: Endereços de LEITURA para verificação
+        read_addresses = {
+            1: mm.BEND_ANGLES['ANGULO_1_READ'],     # 2114 (0x0842)
+            2: mm.BEND_ANGLES['ANGULO_2_READ'],     # 2116 (0x0844)
+            3: mm.BEND_ANGLES['ANGULO_3_READ'],     # 2118 (0x0846)
+        }
 
-        # Converter graus para pulsos do encoder (0-399)
-        # Encoder: 400 pulsos/volta
-        # Conversão: pulsos = (graus / 360) × 400
-        encoder_pulses = mm.degrees_to_clp(degrees)
+        write_addr = write_addresses[bend_number]
+        read_addr = read_addresses[bend_number]
 
-        if encoder_pulses > 399:
-            print(f"✗ Valor fora do range: {degrees}° ({encoder_pulses} pulsos) > 399")
+        # Converter ângulo REAL para valor CLP
+        clp_value = mm.real_angle_to_clp(degrees)
+
+        if clp_value > 2048:
+            print(f"✗ Valor fora do range: {degrees}° → {clp_value} > 2048")
             return False
 
-        print(f"✎ Gravando Dobra {bend_number}: {degrees}° → {encoder_pulses} pulsos → 0x{addr:04X}")
+        print(f"✎ [WRITE] Dobra {bend_number}: {degrees}° → valor {clp_value} (0x{clp_value:04X}) → addr {write_addr}")
 
-        # Escrever 16-bit (1 registro) usando write_register
-        success = self.write_register(addr, encoder_pulses)
+        # CONFIABILIDADE: 5 tentativas com delay crescente
+        MAX_RETRIES = 5
+        RETRY_DELAYS = [0.05, 0.1, 0.2, 0.3, 0.5]  # 50ms, 100ms, 200ms, 300ms, 500ms
 
-        if success:
-            print(f"  ✓ Dobra {bend_number} gravada: {degrees}° = {encoder_pulses} pulsos")
-        else:
-            print(f"  ✗ Erro ao gravar dobra {bend_number}")
+        for attempt in range(MAX_RETRIES):
+            # Tenta escrever
+            success = self.write_register(write_addr, clp_value)
 
-        return success
+            if not success:
+                if attempt < MAX_RETRIES - 1:
+                    delay = RETRY_DELAYS[attempt]
+                    print(f"  ⚠️ Escrita falhou (tentativa {attempt + 1}/{MAX_RETRIES}), retry em {delay*1000:.0f}ms...")
+                    time.sleep(delay)
+                continue
+
+            # Escrita OK - agora verifica se o CLP recebeu corretamente
+            if verify:
+                # Aguarda ladder copiar de 0x0A00+ para 0x0842+
+                time.sleep(0.15)  # 150ms para sincronização do ladder
+
+                # Lê de volta para verificar
+                value_read = self.read_register(read_addr)
+
+                if value_read is None:
+                    print(f"  ⚠️ Verificação falhou (não conseguiu ler addr {read_addr})")
+                    if attempt < MAX_RETRIES - 1:
+                        time.sleep(RETRY_DELAYS[attempt])
+                    continue
+
+                # Tolerância de ±2 unidades (erros de arredondamento)
+                if abs(value_read - clp_value) <= 2:
+                    print(f"  ✓ Dobra {bend_number} CONFIRMADA: gravado {clp_value}, lido {value_read} (OK)")
+                    if attempt > 0:
+                        print(f"    (sucesso na tentativa {attempt + 1}/{MAX_RETRIES})")
+                    return True
+                else:
+                    print(f"  ❌ DISCREPÂNCIA! Gravado {clp_value}, lido {value_read} (diff={abs(value_read - clp_value)})")
+                    # Tenta novamente
+                    if attempt < MAX_RETRIES - 1:
+                        time.sleep(RETRY_DELAYS[attempt])
+                    continue
+            else:
+                # Sem verificação - assume sucesso
+                print(f"  ✓ Dobra {bend_number} gravada: {degrees}° = {clp_value} (sem verificação)")
+                return True
+
+        print(f"  ✗ FALHA CRÍTICA: Dobra {bend_number} não confirmada após {MAX_RETRIES} tentativas!")
+        print(f"    Ação recomendada: Verificar conexão Modbus e cabo RS485")
+        return False
 
     def read_bend_angle(self, bend_number: int) -> Optional[float]:
         """
-        Lê ângulo de dobra da área de LEITURA (0x0842, 0x0844, 0x0846)
+        Lê ângulo REAL de dobra diretamente dos registros de escrita.
 
-        ✅ CORRIGIDO 01/Dez/2025 - Conversão de pulsos para graus
+        CORRIGIDO 08/Fev/2026: Lê dos endereços de ESCRITA (0x0A00+)
+        Os endereços antigos (0x0842+) dependiam do ladder copiar e retornavam 0.
+        Holding registers são R/W, lemos de onde escrevemos.
 
-        FLUXO:
-          1. Ladder copia de 0x0A00+ para 0x0842+ automaticamente
-          2. IHM lê de 0x0842+ (área de leitura)
-          3. Converte pulsos do encoder para graus
+        Conversão: valor_disco / 2 = ângulo real
 
-        Encoder: 400 pulsos/volta
-        - 0 pulsos = 0°
-        - 100 pulsos = 90°
-        - 200 pulsos = 180°
-        - 300 pulsos = 270°
-
-        Formato: 16-bit (1 registro apenas)
-        - Conversão: graus = (pulsos / 400) × 360
-        - Exemplo: 100 pulsos = 90.0°
+        Endereços (DECIMAL):
+          - Dobra 1: 2560 (0x0A00)
+          - Dobra 2: 2562 (0x0A02)
+          - Dobra 3: 2564 (0x0A04)
 
         Args:
             bend_number (int): 1, 2 ou 3
 
         Returns:
-            float: Ângulo em graus, ou None se erro
+            float: Ângulo REAL da dobra, ou None se erro
 
         Exemplo:
             >>> angle = client.read_bend_angle(1)
-            >>> print(f"Dobra 1: {angle}°")
+            >>> print(f"Dobra 1: {angle}° real")
+            📖 Lendo Dobra 1 de endereço 2114: 512 (0x0200) → 90.0°
             Dobra 1: 90.0°
         """
-        # Mapeamento: Endereços de LEITURA (0x0842, 0x0844, 0x0846)
-        # CORRIGIDO 28/Nov/2025: Usar mm.BEND_ANGLES que tem os endereços corretos
+        # Mapeamento: Endereços de LEITURA (DECIMAL)
         addresses = {
-            1: mm.BEND_ANGLES['ANGULO_1_READ'],  # 0x0842 (2114)
-            2: mm.BEND_ANGLES['ANGULO_2_READ'],  # 0x0844 (2116)
-            3: mm.BEND_ANGLES['ANGULO_3_READ'],  # 0x0846 (2118)
+            1: mm.BEND_ANGLES['ANGULO_1_READ'],  # 2114 (0x0842)
+            2: mm.BEND_ANGLES['ANGULO_2_READ'],  # 2116 (0x0844)
+            3: mm.BEND_ANGLES['ANGULO_3_READ'],  # 2118 (0x0846)
         }
 
         if bend_number not in addresses:
@@ -875,14 +905,18 @@ class ModbusClientWrapper:
 
         addr = addresses[bend_number]
 
-        # Ler 16-bit (1 registro) - pulsos do encoder
-        encoder_pulses = self.read_register(addr)
+        # Ler 16-bit (1 registro) - valor em escala 0-2048
+        clp_value = self.read_register(addr)
 
-        if encoder_pulses is None:
+        if clp_value is None:
             return None
 
-        # Converter pulsos para graus usando função do modbus_map
-        return mm.clp_to_degrees(encoder_pulses)
+        # Converter valor CLP para ângulo REAL
+        real_angle = mm.clp_to_real_angle(clp_value)
+
+        print(f"📖 Lendo Dobra {bend_number} de endereço {addr}: {clp_value} (0x{clp_value:04X}) → {real_angle:.1f}°")
+
+        return real_angle
 
     def read_all_bend_angles(self) -> dict:
         """

@@ -10,11 +10,13 @@ Referencia: PROJETO_LADDER_NOVO.md
 """
 
 import asyncio
+import copy
 import time
 from typing import Optional, Dict, Any
 from datetime import datetime
 from modbus_client import ModbusClientWrapper
 import modbus_map as mm
+from bend_logger import get_bend_logger
 
 
 class MachineStateManager:
@@ -34,6 +36,21 @@ class MachineStateManager:
         self.poll_interval = poll_interval
         self.running = False
 
+        # MELHORADO 08/Fev/2026: Flag para forçar leitura imediata de ângulos
+        # Usado após escrita de ângulo para confirmação rápida
+        self.force_angle_read = False
+
+        # NOVO 08/Fev/2026: Sistema de auditoria de dobras
+        # Detecta quando uma dobra é completada e registra automaticamente
+        self._previous_state = None
+        self._bend_start_time = None
+        self._bend_start_angle = None
+        self._bend_target_angle = None
+        self._bend_logger = get_bend_logger(tolerance=2.0)
+
+        # Callback para notificar quando uma dobra é registrada
+        self.on_bend_logged = None  # Será setado pelo main_server
+
         # REMOVIDO: Filtro digital (CLP já fornece valor preciso 0-399)
 
         # Estado completo da maquina
@@ -42,11 +59,11 @@ class MachineStateManager:
             'encoder_raw': 0,
             'encoder_degrees': 0.0,
 
-            # Angulos programados
+            # Angulos programados (0 até leitura do CLP)
             'angles': {
-                'bend_1': 90.0,
-                'bend_2': 90.0,
-                'bend_3': 90.0,
+                'bend_1': 0.0,
+                'bend_2': 0.0,
+                'bend_3': 0.0,
             },
 
             # Angulo alvo atual
@@ -141,11 +158,17 @@ class MachineStateManager:
         """
         Le encoder (16-bit) DIRETO do CLP em 04D6.
 
-        CORRIGIDO 02/Jan/2026: Leitura correta!
+        CORRIGIDO 06/Jan/2026: Conversão encoder → IHM!
         - Encoder está em 0x04D6 (1238) - APENAS 1 REGISTRO de 16-bit
         - NÃO é 32-bit! NÃO precisa ler 04D7!
-        - Valor já vem 0-399 pulsos do CLP
-        - Conversão direta: (pulsos / 400) × 360 = graus
+        - Valor 0-399 pulsos (ou mais se sem sensor zero)
+        - Encoder mede DISCO que gira 2x mais que IHM
+        - Conversão: pulsos → graus DISCO → graus IHM
+
+        Exemplo:
+        - Encoder: 376 pulsos
+        - Disco: (376/400) × 360° = 338.4°
+        - IHM: 338.4° / 2 = 169.2° ✅
         """
         try:
             # Ler contador de pulsos DIRETO (16-bit, apenas 04D6!)
@@ -164,12 +187,17 @@ class MachineStateManager:
                 # Sem sensor: Acumula indefinidamente, precisamos MOD
                 pulsos_normalizados = pulsos % 400
 
-                # Conversão para graus (0-360°)
-                # 400 pulsos = 360° → pulsos × 0.9 = graus
-                graus = (pulsos_normalizados / 400.0) * 360.0
+                # PASSO 1: Conversão pulsos → graus DISCO (0-360°)
+                # 400 pulsos = 360° disco
+                graus_disco = (pulsos_normalizados / 400.0) * 360.0
 
-                # Atualiza estado
-                self.machine_state['encoder_degrees'] = graus
+                # PASSO 2: Conversão disco → IHM (relação 2:1)
+                # Disco gira o dobro do ângulo IHM devido à transmissão
+                graus_ihm = graus_disco / 2.0
+
+                # Atualiza estado (encoder_degrees agora é IHM!)
+                self.machine_state['encoder_degrees'] = graus_ihm
+                self.machine_state['encoder_degrees_disco'] = graus_disco  # Debug
                 self.machine_state['encoder_pulses'] = pulsos_normalizados
 
                 # Detecta movimento
@@ -359,37 +387,40 @@ class MachineStateManager:
 
     async def read_angles(self) -> bool:
         """
-        Le todos os angulos programados.
+        Le todos os angulos programados e converte para ângulos REAIS.
 
-        CORRIGIDO 27/Nov/2025: Le de 0x0842+ (onde o ladder copia os valores)
-        CORRIGIDO 02/Jan/2026: Usa mm.clp_to_degrees() para converter pulsos -> graus
+        CORRIGIDO 08/Fev/2026: Lê dos endereços de ESCRITA (0x0A00+)
+        Os endereços antigos (0x0842+) dependiam do ladder copiar e retornavam 0.
+
+        Endereços de leitura (DECIMAL): 2560, 2562, 2564
+        Conversão: ângulo_real = valor_clp / 2
         """
         try:
-            # Angulo 1 (0x0842)
+            # Angulo 1 (endereço 2114 decimal)
             ang1 = await asyncio.to_thread(
                 self.client.read_register,
-                mm.BEND_ANGLES['ANGULO_1_READ']
+                mm.BEND_ANGLES['ANGULO_1_READ']  # 2114
             )
             if ang1 is not None:
-                self.machine_state['angles']['bend_1'] = mm.clp_to_degrees(ang1)
+                self.machine_state['angles']['bend_1'] = mm.clp_to_real_angle(ang1)
 
-            # Angulo 2 (0x0844)
+            # Angulo 2 (endereço 2116 decimal)
             ang2 = await asyncio.to_thread(
                 self.client.read_register,
-                mm.BEND_ANGLES['ANGULO_2_READ']
+                mm.BEND_ANGLES['ANGULO_2_READ']  # 2116
             )
             if ang2 is not None:
-                self.machine_state['angles']['bend_2'] = mm.clp_to_degrees(ang2)
+                self.machine_state['angles']['bend_2'] = mm.clp_to_real_angle(ang2)
 
-            # Angulo 3 (0x0846)
+            # Angulo 3 (endereço 2118 decimal)
             ang3 = await asyncio.to_thread(
                 self.client.read_register,
-                mm.BEND_ANGLES['ANGULO_3_READ']
+                mm.BEND_ANGLES['ANGULO_3_READ']  # 2118
             )
             if ang3 is not None:
-                self.machine_state['angles']['bend_3'] = mm.clp_to_degrees(ang3)
+                self.machine_state['angles']['bend_3'] = mm.clp_to_real_angle(ang3)
 
-            # Angulo alvo = angulo da dobra atual
+            # Angulo alvo = angulo REAL da dobra atual
             dobra = self.machine_state.get('dobra_atual', 1)
             if dobra == 1:
                 self.machine_state['target_angle'] = self.machine_state['angles']['bend_1']
@@ -403,6 +434,70 @@ class MachineStateManager:
             print(f"✗ Erro lendo angulos: {e}")
             return False
 
+    def _detect_bend_completion(self):
+        """
+        Detecta quando uma dobra é completada e registra automaticamente.
+
+        NOVO 08/Fev/2026: Sistema de auditoria de dobras.
+
+        Detecta transição:
+        - ST_DOBRANDO (0x0302) → qualquer outro estado = dobra completada
+        - Registra ângulo programado vs ângulo executado
+        - Emite alerta se erro exceder tolerância
+        """
+        current_state = self.machine_state.get('machine_state_address', 0x0300)
+
+        # Detecta início de dobra (entrada em ST_DOBRANDO)
+        if current_state == 0x0302 and self._previous_state != 0x0302:
+            # Iniciou uma dobra
+            self._bend_start_time = time.time()
+            self._bend_start_angle = self.machine_state.get('encoder_degrees', 0.0)
+            dobra_atual = self.machine_state.get('dobra_atual', 1)
+            self._bend_target_angle = self.machine_state['angles'].get(f'bend_{dobra_atual}', 90.0)
+            print(f"🔄 Dobra {dobra_atual} INICIADA (alvo: {self._bend_target_angle}°)")
+
+        # Detecta fim de dobra (saída de ST_DOBRANDO)
+        elif self._previous_state == 0x0302 and current_state != 0x0302:
+            # Dobra completada - registrar
+            if self._bend_start_time is not None:
+                duration_ms = int((time.time() - self._bend_start_time) * 1000)
+                angle_executed = self.machine_state.get('encoder_degrees', 0.0)
+                angle_programmed = self._bend_target_angle or 90.0
+                dobra_atual = self.machine_state.get('dobra_atual', 1)
+                speed_rpm = self.machine_state.get('velocidade_rpm', 5.0)
+
+                # Determina direção
+                dir_avanco = self.machine_state.get('control_bits', {}).get('DIR_AVANCO', False)
+                direction = 'CCW' if dir_avanco else 'CW'
+
+                # Registra a dobra
+                result = self._bend_logger.log_bend(
+                    bend_number=dobra_atual,
+                    angle_programmed=angle_programmed,
+                    angle_executed=angle_executed,
+                    speed_rpm=speed_rpm,
+                    direction=direction,
+                    duration_ms=duration_ms
+                )
+
+                # Armazena resultado para broadcast
+                self.machine_state['last_bend_result'] = result
+
+                # Notifica via callback se configurado
+                if self.on_bend_logged and callable(self.on_bend_logged):
+                    try:
+                        self.on_bend_logged(result)
+                    except Exception as e:
+                        print(f"⚠️ Erro no callback on_bend_logged: {e}")
+
+                # Limpa estado temporário
+                self._bend_start_time = None
+                self._bend_start_angle = None
+                self._bend_target_angle = None
+
+        # Atualiza estado anterior
+        self._previous_state = current_state
+
     async def poll_once(self) -> bool:
         """
         Executa um ciclo completo de polling.
@@ -411,6 +506,8 @@ class MachineStateManager:
         - Encoder SEMPRE lido (crítico para visualização em tempo real)
         - I/O e estados a cada ciclo durante movimento
         - Registros estáticos lidos menos frequentemente
+
+        MELHORADO 08/Fev/2026: Detecção de conclusão de dobra para auditoria
         """
         try:
             self.machine_state['poll_count'] += 1
@@ -427,6 +524,9 @@ class MachineStateManager:
             # Estados da máquina: necessário para detectar movimento
             await self.read_machine_states()
 
+            # NOVO 08/Fev/2026: Detecta conclusão de dobra para auditoria
+            self._detect_bend_completion()
+
             # Bits de controle: direção, pedal, etc
             await self.read_control_bits()
 
@@ -440,11 +540,19 @@ class MachineStateManager:
                 await self.read_work_registers()  # Movido para cá (dobra atual, contador)
 
             # ==========================================
-            # LEITURAS ESPORÁDICAS (A CADA 20 CICLOS)
+            # LEITURAS DE ÂNGULOS - MELHORADO 08/Fev/2026
             # ==========================================
-            # Ângulos são estáticos, não precisam ser lidos sempre
-            if self.machine_state['poll_count'] % 20 == 0:
+            # Ângulos lidos a cada 5 ciclos (~1.5s) ou IMEDIATAMENTE se force_angle_read
+            should_read_angles = (
+                self.force_angle_read or  # Leitura forçada após escrita
+                self.machine_state['poll_count'] % 5 == 0  # A cada 5 ciclos (era 20)
+            )
+
+            if should_read_angles:
                 await self.read_angles()
+                if self.force_angle_read:
+                    print("✅ [StateManager] Leitura forçada de ângulos concluída")
+                    self.force_angle_read = False  # Reset flag
 
             return True
         except Exception as e:
@@ -465,13 +573,13 @@ class MachineStateManager:
         - Leitura direta com timeout otimizado
         """
         self.running = True
-        idle_interval = 0.15    # 150ms quando parado (6.7 Hz)
-        fast_interval = 0.05    # 50ms durante movimento (20 Hz) - ideal para Modbus!
+        idle_interval = 0.3     # OTIMIZADO 06/Jan/2026: 300ms quando parado (3.3 Hz)
+        fast_interval = 0.1     # OTIMIZADO 06/Jan/2026: 100ms durante movimento (10 Hz)
 
         print(f"🚀 State Manager OTIMIZADO para Modbus RTU iniciado!")
         print(f"   📊 Parado: {idle_interval*1000:.0f}ms ({1/idle_interval:.1f} Hz)")
         print(f"   ⚡ Movimento: {fast_interval*1000:.0f}ms ({1/fast_interval:.0f} Hz)")
-        print(f"   🎯 Leitura DIRETA sem filtro (CLP fornece dados precisos)")
+        print(f"   🎯 Polling balanceado para estabilidade máxima")
 
         while self.running:
             start_time = time.time()
@@ -501,9 +609,10 @@ class MachineStateManager:
         """
         Retorna estado completo com campos achatados para compatibilidade.
 
-        CORRIGIDO 02/Jan/2026: Adiciona informações do encoder
+        CORRIGIDO 08/Fev/2026: Deep copy para evitar referências compartilhadas
+        que impediam get_changes() de detectar mudanças em dicts aninhados.
         """
-        state = self.machine_state.copy()
+        state = copy.deepcopy(self.machine_state)
 
         # Achatar angulos para compatibilidade
         if 'angles' in state:
@@ -515,8 +624,9 @@ class MachineStateManager:
         state['encoder_angle'] = state.get('encoder_degrees', 0.0)
         state['speed_class'] = int(state.get('velocidade_rpm', 5))
 
-        # Flag PEDAL_SEGURA para interface
-        state['pedal_segura'] = state['control_bits'].get('PEDAL_SEGURA', False)
+        # DESABILITADO 08/Fev/2026: PEDAL_SEGURA sempre False por solicitação do operador
+        # O operador achou incômodo ter que segurar o pedal durante toda a dobra
+        state['pedal_segura'] = False  # SEMPRE False - ignorar valor do CLP
 
         # Modo (para compatibilidade)
         state['mode_manual'] = state['states'].get('ST_MANUAL', False)

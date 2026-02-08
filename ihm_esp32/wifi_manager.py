@@ -339,8 +339,24 @@ class WiFiManager:
                 capture_output=True, timeout=5
             )
 
+            # ==========================================
+            # CAPTIVE PORTAL - Redirecionamento HTTP
+            # ==========================================
+            # Redireciona porta 80 → 8080 (servidor HTTP da IHM)
+            # Dispositivos tentam acessar URLs de detecção na porta 80
+            subprocess.run(
+                ['sudo', 'iptables', '-t', 'nat', '-A', 'PREROUTING',
+                 '-i', self.AP_INTERFACE, '-p', 'tcp', '--dport', '80',
+                 '-j', 'REDIRECT', '--to-port', '8080'],
+                capture_output=True, timeout=5
+            )
+
+            # NOTA: NÃO bloqueamos HTTPS (443) para permitir acesso à internet!
+            # Captive portal funcionará via DNS (URLs específicas de detecção)
+
             self._nat_enabled = True
             print("[WiFi] NAT habilitado - Internet disponível na rede AP")
+            print("[WiFi] Captive Portal configurado (porta 80 → 8080, HTTPS liberado)")
             return True
 
         except Exception as e:
